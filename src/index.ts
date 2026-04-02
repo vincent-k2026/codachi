@@ -14,7 +14,7 @@ async function main(): Promise<void> {
       return;
     }
 
-    initSession();
+    initSession(stdin.transcript_path);
 
     render({
       contextPercent: getContextPercent(stdin),

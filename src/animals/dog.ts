@@ -1,76 +1,51 @@
 import type { AnimalDef } from './types.js';
 import { f } from './types.js';
 
-const tiny = (e: string, m: string, t: string) => f([
-  `U\\_/U${t}`,
-  `(${e}w${e})`,
-  ` (${m}) `,
+// Dog: floppy U ears hang DOWN beside face, big nose, tongue when happy
+
+const tiny = (e: string, t: string) => f([
+  `U    U${t}`,
+  `(${e}ω${e}) `,
+  ` \\__/  `,
 ]);
 
-const small = (e: string, m: string, t: string) => f([
-  ` U\\___/U${t} `,
-  ` ( ${e}w${e} ) `,
-  `  (${m})   `,
+const small = (e: string, t: string) => f([
+  ` U      U${t}`,
+  ` ( ${e} ω ${e} )`,
+  `  \\____/ `,
 ]);
 
-const medium = (e: string, m: string, t: string) => f([
-  `  U\\_____/U${t}  `,
-  ` (  ${e} w ${e}  ) `,
-  `   (${m})     `,
+const medium = (e: string, t: string) => f([
+  `  U        U${t}`,
+  ` (  ${e}  ω  ${e}  )`,
+  `  \\______/  `,
 ]);
 
-const chubby = (e: string, m: string, t: string) => f([
-  `   U\\_________/U${t}  `,
-  `  (  ${e}  w  ${e}  )  `,
-  `    ( ${m} )     `,
+const chubby = (e: string, t: string) => f([
+  `   U            U${t}`,
+  `  (  ${e}    ω    ${e}  )`,
+  `   \\__________/  `,
 ]);
 
-const thicc = (e: string, m: string, t: string) => f([
-  `    U\\_____________/U${t}  `,
-  `   (  ${e}    w    ${e}  )  `,
-  `     (  ${m}  )     `,
+const thicc = (e: string, t: string) => f([
+  `    U                U${t}`,
+  `   (  ${e}      ω      ${e}  )`,
+  `    \\______________/  `,
 ]);
 
-function make(
-  build: (e: string, m: string, t: string) => ReturnType<typeof f>,
-  normalMouth: string,
-  dangerMouth: string,
-) {
+function make(build: (e: string, t: string) => ReturnType<typeof f>) {
   return {
-    idle: [
-      build('o', normalMouth, '~'),
-      build('-', normalMouth, ' '),
-      build('^', normalMouth, '~'),
-      build('-', normalMouth, ' '),
-    ],
-    busy: [
-      build('o', normalMouth, '~'),
-      build('^', normalMouth, '~'),
-      build('o', normalMouth, '~'),
-      build('^', normalMouth, '~'),
-    ],
-    danger: [
-      build('O', dangerMouth, '!'),
-      build('-', dangerMouth, '!'),
-      build('O', dangerMouth, '!'),
-      build('O', dangerMouth, ' '),
-    ],
-    sleep: [
-      build('-', normalMouth, 'z'),
-      build('-', normalMouth, 'Z'),
-      build('-', normalMouth, 'z'),
-      build('-', normalMouth, ' '),
-    ],
+    idle:   [build('o', '~'), build('-', ' '), build('o', ' '), build('^', '~')],
+    busy:   [build('o', '~'), build('^', '~'), build('-', '~'), build('^', '~')],
+    danger: [build('O', '!'), build('-', '!'), build('O', '!'), build('O', ' ')],
+    sleep:  [build('-', 'z'), build('-', 'Z'), build('-', 'z'), build('-', ' ')],
   };
 }
 
 export const dog: AnimalDef = {
   name: 'Dog',
   frames: {
-    tiny:   make(tiny,   '^ ^', '~~~'),
-    small:  make(small,  '^ ^', '~~~'),
-    medium: make(medium, '> ^ <', '> ~ <'),
-    chubby: make(chubby, '> ^^ <', '> ~~ <'),
-    thicc:  make(thicc,  '> ^^^ <', '> ~~~ <'),
+    tiny: make(tiny), small: make(small), medium: make(medium),
+    chubby: make(chubby), thicc: make(thicc),
   },
 };

@@ -6,16 +6,15 @@ const STATE_DIR = path.join(os.homedir(), '.claude', 'plugins', 'claude-pet');
 const STATE_FILE = path.join(STATE_DIR, 'state.json');
 
 interface DiskState {
+  transcriptPath?: string;
   sessionStart?: number;
-  lastSeen?: number;
   animalIndex?: number;
   paletteIndex?: number;
 }
 
 function loadDiskState(): DiskState {
   try {
-    const raw = fs.readFileSync(STATE_FILE, 'utf8');
-    return JSON.parse(raw) as DiskState;
+    return JSON.parse(fs.readFileSync(STATE_FILE, 'utf8')) as DiskState;
   } catch {
     return {};
   }
@@ -25,30 +24,28 @@ function saveDiskState(state: DiskState): void {
   try {
     fs.mkdirSync(STATE_DIR, { recursive: true });
     fs.writeFileSync(STATE_FILE, JSON.stringify(state));
-  } catch {
-    // silently fail
-  }
+  } catch {}
 }
 
 let diskState: DiskState = {};
 
-const SESSION_TIMEOUT_MS = 5 * 60 * 1000; // 5 min gap = new session
-
-/** Initialize session. New animal + palette if session expired or first run. */
-export function initSession(): void {
+/**
+ * Initialize session. A new transcript_path from Claude Code = new session.
+ * Same transcript_path = same pet.
+ */
+export function initSession(transcriptPath?: string): void {
   diskState = loadDiskState();
-  const now = Date.now();
-  const isNewSession = diskState.sessionStart == null
-    || diskState.lastSeen == null
-    || (now - diskState.lastSeen) > SESSION_TIMEOUT_MS;
+  const isSameSession = transcriptPath && diskState.transcriptPath === transcriptPath;
 
-  if (isNewSession) {
-    diskState.sessionStart = now;
-    diskState.animalIndex = Math.floor(Math.random() * 6);
-    diskState.paletteIndex = Math.floor(Math.random() * 10);
+  if (!isSameSession) {
+    diskState = {
+      transcriptPath: transcriptPath ?? '',
+      sessionStart: Date.now(),
+      animalIndex: Math.floor(Math.random() * 6),
+      paletteIndex: Math.floor(Math.random() * 10),
+    };
+    saveDiskState(diskState);
   }
-  diskState.lastSeen = now;
-  saveDiskState(diskState);
 }
 
 export function getSessionAnimalIndex(): number {
