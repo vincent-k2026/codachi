@@ -17,10 +17,25 @@ Your pet grows fatter as your context window fills up, reacts to your git activi
 Body size scales with context window usage — from tiny to thicc.
 
 ```
- /\_/\~      /\_/\~        /\_/\~            /\_____/\~          /\_________/\~
-( owo )    ( owo )     =( o w o )=      ==( o  w  o )==     ===( o    w    o )===
- (^ ^)      (^ ^)       (> ^ <)          ( > ^^ < )          (  > ^^^ <  )
-  ~20%       ~35%          ~55%              ~75%                   ~95%
+ /\_/\~       tiny (~20%)
+( owo )
+ (^ ^)
+
+  /\_/\~      small (~35%)
+ ( owo )
+  (^ ^)
+
+   /\_/\~       medium (~55%)
+ =( o w o )=
+   (> ^ <)
+
+    /\_____/\~       chubby (~75%)
+ ==( o  w  o )==
+    ( > ^^ < )
+
+     /\_________/\~       thicc (~95%)
+ ===( o    w    o )===
+     (  > ^^^ <  )
 ```
 
 ### 6 Animals, 10 Color Palettes
