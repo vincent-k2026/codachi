@@ -1,99 +1,89 @@
 import type { AnimalDef } from './types.js';
-import { f } from './types.js';
+import type { SpriteGrid } from '../render/sprite.js';
+
+// Rabbit: tall ears (2), round eyes (3), small nose (4)
+const tinyBase: SpriteGrid = [
+  [0, 2, 0, 0, 0, 2, 0],
+  [0, 2, 0, 0, 0, 2, 0],
+  [1, 1, 1, 1, 1, 1, 1],
+  [1, 3, 0, 4, 0, 3, 1],
+  [0, 1, 1, 1, 1, 1, 0],
+  [0, 4, 0, 0, 0, 4, 0],
+];
+const tinyBlink: SpriteGrid = [
+  [0, 2, 0, 0, 0, 2, 0],
+  [0, 2, 0, 0, 0, 2, 0],
+  [1, 1, 1, 1, 1, 1, 1],
+  [1, 0, 0, 4, 0, 0, 1],
+  [0, 1, 1, 1, 1, 1, 0],
+  [0, 4, 0, 0, 0, 4, 0],
+];
+const tinyHappy: SpriteGrid = [
+  [0, 2, 0, 0, 0, 2, 0],
+  [0, 2, 0, 0, 0, 2, 0],
+  [1, 1, 1, 1, 1, 1, 1],
+  [1, 3, 0, 3, 0, 3, 1],
+  [0, 1, 1, 1, 1, 1, 0],
+  [0, 4, 0, 0, 0, 4, 0],
+];
+
+const medBase: SpriteGrid = [
+  [0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0],
+  [0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0],
+  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 1, 0, 3, 0, 4, 0, 3, 0, 1, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0],
+];
+const medBlink: SpriteGrid = [
+  [0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0],
+  [0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0],
+  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 1, 0, 0, 0, 4, 0, 0, 0, 1, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0],
+];
+const medHappy: SpriteGrid = [
+  [0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0],
+  [0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0],
+  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 1, 0, 3, 0, 3, 0, 3, 0, 1, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0],
+];
+
+const chubbyBase: SpriteGrid = [
+  [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 1, 0, 0, 3, 0, 0, 4, 0, 0, 3, 0, 0, 1, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0],
+];
+const chubbyBlink: SpriteGrid = [
+  [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 1, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0],
+];
+const chubbyHappy: SpriteGrid = [
+  [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+  [0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0],
+  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
+  [0, 1, 0, 0, 3, 0, 0, 3, 0, 0, 3, 0, 0, 1, 0],
+  [0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0],
+  [0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0],
+];
 
 export const rabbit: AnimalDef = {
   name: 'Rabbit',
-  frames: {
-    tiny: {
-      idle: [
-        f(['(\\(\\   ', '( -.- ) ', 'o(")(") ']),
-        f(['(\\(\\   ', '( o.o ) ', 'o(")(") ']),
-      ],
-      busy: [
-        f(['(\\(\\   ', '( >.< )/', 'o(")(")\\']),
-        f(['(\\(\\   ', '\\( >.< )', 'o(")(") ']),
-      ],
-      danger: [
-        f(['(\\(\\ ! ', '( O.O ) ', 'o(")(") ']),
-        f(['!(\\(\\  ', '( O.O ) ', 'o(")(") ']),
-      ],
-      sleep: [
-        f(['(\\.\\    ', '( -.- ) z', 'o(")(")  ']),
-        f(['(\\.\\     ', '( -.- ) zZ', 'o(")(")   ']),
-      ],
-    },
-    small: {
-      idle: [
-        f([' (\\  (\\   ', ' ( o . o ) ', ' o_(")_(") ']),
-        f([' (\\  (\\   ', ' ( - . - ) ', ' o_(")_(") ']),
-      ],
-      busy: [
-        f([' (\\  (\\   ', ' ( > . < )/', ' o_(")_(")\\']),
-        f([' (\\  (\\   ', ' \\( > . < )', ' o_(")_(") ']),
-      ],
-      danger: [
-        f([' (\\  (\\ !!', ' ( O . O ) ', ' o_(")_(") ']),
-        f(['!!(\\  (\\  ', ' ( O . O ) ', ' o_(")_(") ']),
-      ],
-      sleep: [
-        f([' (\\.  .\\    ', ' ( - . - ) zZ', ' o_(")_("  ) ']),
-        f([' (\\.  .\\      ', ' ( - . - ) zZzZ', ' o_(")_("    ) ']),
-      ],
-    },
-    medium: {
-      idle: [
-        f(['  (\\   (\\    ', ' (  o . o  )  ', ' o__(")__(")  ']),
-        f(['  (\\   (\\    ', ' (  - . -  )  ', ' o__(")__(")  ']),
-        f(['  (\\   (\\    ', ' (  o . o  )  ', ' o__(")__(")\\ ']),
-      ],
-      busy: [
-        f(['  (\\   (\\    ', ' (  > . <  )/ ', ' o__(")__(")  ']),
-        f(['  (\\   (\\    ', ' \\(  > . <  ) ', ' o__(")__(")  ']),
-      ],
-      danger: [
-        f(['  (\\   (\\ !! ', ' (  O . O  )  ', ' o__(")__(")  ']),
-        f(['!!(\\   (\\    ', ' (  O . O  )  ', ' o__(")__(")  ']),
-      ],
-      sleep: [
-        f(['  (\\.   .\\       ', ' (  -  .  -  ) zZz', ' o__(")__("  )    ']),
-        f(['  (\\.   .\\      ', ' (  -  .  -  ) zZ', ' o__(")__("  )   ']),
-      ],
-    },
-    chubby: {
-      idle: [
-        f(['   (\\     (\\      ', '  (   o  .  o   )  ', '  o___(")___(")    ']),
-        f(['   (\\     (\\      ', '  (   -  .  -   )  ', '  o___(")___(")    ']),
-      ],
-      busy: [
-        f(['   (\\     (\\      ', '  (   >  .  <   )/ ', '  o___(")___(")    ']),
-        f(['   (\\     (\\      ', '  \\(   >  .  <   ) ', '  o___(")___(")    ']),
-      ],
-      danger: [
-        f(['   (\\     (\\ !!!! ', '  (   O  .  O   )  ', '  o___(")___(")    ']),
-        f(['!!!!(\\     (\\     ', '  (   O  .  O   )  ', '  o___(")___(")    ']),
-      ],
-      sleep: [
-        f(['   (\\.     .\\          ', '  (   -   .   -   ) zZzZ', '  o___(")___("     )    ']),
-        f(['   (\\.     .\\         ', '  (   -   .   -   ) zZz', '  o___(")___("     )   ']),
-      ],
-    },
-    thicc: {
-      idle: [
-        f(['    (\\        (\\        ', '   (    o    .    o    ) ', '   o_____(")_____(")    ']),
-        f(['    (\\        (\\        ', '   (    -    .    -    ) ', '   o_____(")_____(")    ']),
-      ],
-      busy: [
-        f(['    (\\        (\\        ', '   (    >    .    <    )/', '   o_____(")_____(")    ']),
-        f(['    (\\        (\\        ', '   \\(    >    .    <    )', '   o_____(")_____(")    ']),
-      ],
-      danger: [
-        f(['    (\\        (\\ !!!!! ', '   (    O    .    O    ) ', '   o_____(")_____(")    ']),
-        f(['!!!!!(\\        (\\      ', '   (    O    .    O    ) ', '   o_____(")_____(")    ']),
-      ],
-      sleep: [
-        f(['    (\\.        .\\            ', '   (    -    .    -    ) zZzZz', '   o_____(")_____("      )   ']),
-        f(['    (\\.        .\\           ', '   (    -    .    -    ) zZzZ', '   o_____(")_____("      )  ']),
-      ],
-    },
+  sprites: {
+    tiny:   { idle: [tinyBase, tinyBlink, tinyBase, tinyHappy], busy: [tinyBase, tinyHappy, tinyBlink, tinyHappy], danger: [tinyBase, tinyBlink, tinyBase, tinyBlink], sleep: [tinyBlink, tinyBlink, tinyBlink, tinyBlink] },
+    small:  { idle: [tinyBase, tinyBlink, tinyBase, tinyHappy], busy: [tinyBase, tinyHappy, tinyBlink, tinyHappy], danger: [tinyBase, tinyBlink, tinyBase, tinyBlink], sleep: [tinyBlink, tinyBlink, tinyBlink, tinyBlink] },
+    medium: { idle: [medBase, medBlink, medBase, medHappy], busy: [medBase, medHappy, medBlink, medHappy], danger: [medBase, medBlink, medBase, medBlink], sleep: [medBlink, medBlink, medBlink, medBlink] },
+    chubby: { idle: [chubbyBase, chubbyBlink, chubbyBase, chubbyHappy], busy: [chubbyBase, chubbyHappy, chubbyBlink, chubbyHappy], danger: [chubbyBase, chubbyBlink, chubbyBase, chubbyBlink], sleep: [chubbyBlink, chubbyBlink, chubbyBlink, chubbyBlink] },
+    thicc:  { idle: [chubbyBase, chubbyBlink, chubbyBase, chubbyHappy], busy: [chubbyBase, chubbyHappy, chubbyBlink, chubbyHappy], danger: [chubbyBase, chubbyBlink, chubbyBase, chubbyBlink], sleep: [chubbyBlink, chubbyBlink, chubbyBlink, chubbyBlink] },
   },
 };

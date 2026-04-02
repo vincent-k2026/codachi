@@ -1,6 +1,7 @@
-import type { AnimalType, BodySize, Animation, AnimalFrame } from '../types.js';
+import type { AnimalType, BodySize, Animation } from '../types.js';
 import type { AnimalDef } from './types.js';
-import { pickFrame } from './types.js';
+import type { SpriteGrid } from '../render/sprite.js';
+import { pickSprite } from './types.js';
 import { cat } from './cat.js';
 import { dog } from './dog.js';
 import { rabbit } from './rabbit.js';
@@ -16,13 +17,13 @@ export function getAnimalName(type: AnimalType): string {
   return REGISTRY[type].name;
 }
 
-export function getAnimalFrame(
+export function getAnimalSprite(
   type: AnimalType,
   size: BodySize,
   animation: Animation,
-  frameIndex: number,
-): AnimalFrame {
-  return pickFrame(REGISTRY[type], size, animation, frameIndex);
+  tick: number,
+): SpriteGrid {
+  return pickSprite(REGISTRY[type], size, animation, tick);
 }
 
 export function getBodySize(contextPercent: number): BodySize {
