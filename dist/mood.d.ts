@@ -1,5 +1,4 @@
-import type { BodySize, Animation, AnimalType } from './types.js';
-import type { GitStatus } from './types.js';
+import type { BodySize, Animation, AnimalType, GitStatus } from './types.js';
 interface MoodContext {
     contextPercent: number;
     size: BodySize;
@@ -7,7 +6,7 @@ interface MoodContext {
     animalType: AnimalType;
     git: GitStatus | null;
     fiveHourUsage: number | null;
-    frameIndex: number;
+    moodTick: number;
 }
 export declare function getMoodMessage(ctx: MoodContext): string;
 export {};

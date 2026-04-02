@@ -6,6 +6,9 @@ export function charWidth(ch: string): number {
   const cp = ch.codePointAt(0);
   if (cp === undefined) return 0;
 
+  // Fast path: ASCII is always 1 wide
+  if (cp < 0x7F) return cp < 0x20 ? 0 : 1;
+
   // East Asian Wide / Fullwidth ranges that are 2 cells wide in terminals
   if (
     (cp >= 0x1100 && cp <= 0x115F) ||   // Hangul Jamo

@@ -10,18 +10,3 @@ export declare function getSevenDayUsage(stdin: StdinData): {
     percent: number;
     resetsIn: string | null;
 } | null;
-export interface TokenBreakdown {
-    input: number;
-    output: number;
-    cacheWrite: number;
-    cacheRead: number;
-    total: number;
-    windowSize: number;
-    inputStr: string;
-    outputStr: string;
-    cacheWriteStr: string;
-    cacheReadStr: string;
-    totalStr: string;
-    windowStr: string;
-}
-export declare function getTokenBreakdown(stdin: StdinData): TokenBreakdown | null;

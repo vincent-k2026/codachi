@@ -1,10 +1,7 @@
-import type { BodySize, Animation } from '../types.js';
+import type { BodySize, Animation, AnimalFrame } from '../types.js';
 import { stringWidth } from '../width.js';
 
-export interface AnimalFrame {
-  lines: string[];
-  width: number;
-}
+export type { AnimalFrame };
 
 export interface AnimalDef {
   name: string;

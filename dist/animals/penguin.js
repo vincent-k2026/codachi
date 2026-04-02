@@ -1,259 +1,42 @@
-function f(lines) {
-    const width = Math.max(...lines.map(l => l.length));
-    return { lines: lines.map(l => l.padEnd(width)), width };
+import { f } from './types.js';
+// Penguin: round head (no ears), bowtie/beak v, flippers <  >
+const tiny = (e, t) => f([
+    ` (${e}v${e})${t}`,
+    `<(   )>`,
+    `  " "  `,
+]);
+const small = (e, t) => f([
+    `  (${e} v ${e})${t} `,
+    ` <(     )> `,
+    `   "   "   `,
+]);
+const medium = (e, t) => f([
+    `   (${e}  v  ${e})${t}  `,
+    `  <(         )> `,
+    `    "       "   `,
+]);
+const chubby = (e, t) => f([
+    `    (${e}    v    ${e})${t}  `,
+    `   <(             )> `,
+    `     "           "   `,
+]);
+const thicc = (e, t) => f([
+    `     (${e}       v       ${e})${t}  `,
+    `    <(                     )> `,
+    `      "                 "    `,
+]);
+function make(build) {
+    return {
+        idle: [build('o', ' '), build('-', ' '), build('o', '~'), build('^', ' ')],
+        busy: [build('o', '~'), build('^', '~'), build('-', '~'), build('^', '~')],
+        danger: [build('O', '!'), build('-', '!'), build('O', '!'), build('O', ' ')],
+        sleep: [build('-', 'z'), build('-', 'Z'), build('-', 'z'), build('-', ' ')],
+    };
 }
 export const penguin = {
     name: 'Penguin',
     frames: {
-        tiny: {
-            idle: [
-                f([
-                    '  (^v^)  ',
-                    ' /|  |\\ ',
-                    '  d  b  ',
-                ]),
-                f([
-                    '  (^v^)  ',
-                    ' \\|  |/ ',
-                    '  d  b  ',
-                ]),
-            ],
-            busy: [
-                f([
-                    '  (>v<)  ',
-                    ' /|  |\\~',
-                    '  d  b  ',
-                ]),
-                f([
-                    '  (>v<)  ',
-                    '~\\|  |/ ',
-                    '  d  b  ',
-                ]),
-            ],
-            danger: [
-                f([
-                    '  (OvO)! ',
-                    ' /|  |\\ ',
-                    '  d  b  ',
-                ]),
-                f([
-                    ' !(OvO)  ',
-                    ' /|  |\\ ',
-                    '  d  b  ',
-                ]),
-            ],
-            sleep: [
-                f([
-                    '  (-v-) z',
-                    ' /|  |\\ ',
-                    '  d  b  ',
-                ]),
-                f([
-                    '  (-v-)zZ',
-                    ' /|  |\\ ',
-                    '  d  b  ',
-                ]),
-            ],
-        },
-        small: {
-            idle: [
-                f([
-                    '   (^ v ^)   ',
-                    '  /|    |\\  ',
-                    '   d    b   ',
-                ]),
-                f([
-                    '   (^ v ^)   ',
-                    '  \\|    |/  ',
-                    '   d    b   ',
-                ]),
-            ],
-            busy: [
-                f([
-                    '   (> v <)   ',
-                    '  /|    |\\ ~',
-                    '   d    b   ',
-                ]),
-                f([
-                    '   (> v <)   ',
-                    '~ \\|    |/  ',
-                    '   d    b   ',
-                ]),
-            ],
-            danger: [
-                f([
-                    '   (O v O) !!',
-                    '  /|    |\\  ',
-                    '   d    b    ',
-                ]),
-                f([
-                    '!! (O v O)   ',
-                    '  /|    |\\  ',
-                    '   d    b    ',
-                ]),
-            ],
-            sleep: [
-                f([
-                    '   (- v -) zZ ',
-                    '  /|    |\\   ',
-                    '   d    b    ',
-                ]),
-                f([
-                    '   (- v -)zZzZ',
-                    '  /|    |\\   ',
-                    '   d    b    ',
-                ]),
-            ],
-        },
-        medium: {
-            idle: [
-                f([
-                    '    (^  v  ^)    ',
-                    '   /|      |\\   ',
-                    '    d      b    ',
-                ]),
-                f([
-                    '    (^  v  ^)    ',
-                    '   \\|      |/   ',
-                    '    d      b    ',
-                ]),
-            ],
-            busy: [
-                f([
-                    '    (>  v  <)    ',
-                    '   /|      |\\ ~ ',
-                    '    d      b    ',
-                ]),
-                f([
-                    '    (>  v  <)    ',
-                    ' ~ \\|      |/   ',
-                    '    d      b    ',
-                ]),
-            ],
-            danger: [
-                f([
-                    '    (O  v  O) !!!',
-                    '   /|      |\\   ',
-                    '    d      b    ',
-                ]),
-                f([
-                    '!!!(O  v  O)     ',
-                    '   /|      |\\   ',
-                    '    d      b    ',
-                ]),
-            ],
-            sleep: [
-                f([
-                    '    (-  v  -) zZz ',
-                    '   /|      |\\    ',
-                    '    d      b     ',
-                ]),
-                f([
-                    '    (-  v  -) zZzZz',
-                    '   /|      |\\     ',
-                    '    d      b      ',
-                ]),
-            ],
-        },
-        chubby: {
-            idle: [
-                f([
-                    '     (^    v    ^)     ',
-                    '    /|          |\\    ',
-                    '     d          b     ',
-                ]),
-                f([
-                    '     (^    v    ^)     ',
-                    '    \\|          |/    ',
-                    '     d          b     ',
-                ]),
-            ],
-            busy: [
-                f([
-                    '     (>    v    <)     ',
-                    '    /|          |\\ ~  ',
-                    '     d          b     ',
-                ]),
-                f([
-                    '     (>    v    <)     ',
-                    '  ~ \\|          |/    ',
-                    '     d          b     ',
-                ]),
-            ],
-            danger: [
-                f([
-                    '     (O    v    O) !!!!',
-                    '    /|          |\\    ',
-                    '     d          b     ',
-                ]),
-                f([
-                    '!!!!(O    v    O)      ',
-                    '    /|          |\\    ',
-                    '     d          b     ',
-                ]),
-            ],
-            sleep: [
-                f([
-                    '     (-    v    -) zZzZz ',
-                    '    /|          |\\      ',
-                    '     d          b       ',
-                ]),
-                f([
-                    '     (-    v    -)  zZzZ ',
-                    '    /|          |\\      ',
-                    '     d          b       ',
-                ]),
-            ],
-        },
-        thicc: {
-            idle: [
-                f([
-                    '      (^      v      ^)       ',
-                    '     /|                |\\     ',
-                    '      d                b      ',
-                ]),
-                f([
-                    '      (^      v      ^)       ',
-                    '     \\|                |/     ',
-                    '      d                b      ',
-                ]),
-            ],
-            busy: [
-                f([
-                    '      (>      v      <)       ',
-                    '     /|                |\\ ~   ',
-                    '      d                b      ',
-                ]),
-                f([
-                    '      (>      v      <)       ',
-                    '  ~  \\|                |/     ',
-                    '      d                b      ',
-                ]),
-            ],
-            danger: [
-                f([
-                    '      (O      v      O) !!!!! ',
-                    '     /|                |\\     ',
-                    '      d                b      ',
-                ]),
-                f([
-                    '!!!!!(O      v      O)        ',
-                    '     /|                |\\     ',
-                    '      d                b      ',
-                ]),
-            ],
-            sleep: [
-                f([
-                    '      (-      v      -) zZzZzZz',
-                    '     /|                |\\      ',
-                    '      d                b       ',
-                ]),
-                f([
-                    '      (-      v      -)  zZzZzZ',
-                    '     /|                |\\      ',
-                    '      d                b       ',
-                ]),
-            ],
-        },
+        tiny: make(tiny), small: make(small), medium: make(medium),
+        chubby: make(chubby), thicc: make(thicc),
     },
 };

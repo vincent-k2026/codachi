@@ -1,16 +1,34 @@
 import { execSync } from 'node:child_process';
 import type { GitStatus } from './types.js';
+import { stringWidth } from './width.js';
+
+const GIT_TIMEOUT = 2000;
+const CACHE_TTL_MS = 2000; // cache git results for 2s
+
+let cached: { status: GitStatus | null; cwd: string; time: number } | null = null;
 
 function run(cmd: string, cwd?: string): string {
   try {
-    return execSync(cmd, { cwd, encoding: 'utf8', timeout: 2000, stdio: ['pipe', 'pipe', 'pipe'] }).trim();
+    return execSync(cmd, { cwd, encoding: 'utf8', timeout: GIT_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }).trim();
   } catch {
     return '';
   }
 }
 
-export function getGitStatus(cwd?: string): GitStatus | null {
-  // Single call: branch + tracking + file status
+function truncateByWidth(str: string, maxWidth: number): string {
+  let w = 0;
+  let i = 0;
+  for (const ch of str) {
+    const cw = stringWidth(ch);
+    if (w + cw > maxWidth - 3) return str.slice(0, i) + '...';
+    w += cw;
+    i += ch.length;
+  }
+  return str;
+}
+
+function compute(cwd?: string): GitStatus | null {
+  // 1. Branch + files + ahead/behind in one call
   const statusRaw = run('git status --porcelain -b', cwd);
   if (!statusRaw) return null;
 
@@ -18,7 +36,6 @@ export function getGitStatus(cwd?: string): GitStatus | null {
   const branchLine = lines[0] || '';
   const fileLines = lines.slice(1).filter(Boolean);
 
-  // Parse branch line: "## main...origin/main [ahead 2, behind 1]"
   const branchMatch = branchLine.match(/^## ([^\s.]+)/);
   const branch = branchMatch ? branchMatch[1] : 'HEAD';
 
@@ -29,7 +46,6 @@ export function getGitStatus(cwd?: string): GitStatus | null {
     behind = parseInt(abMatch[2]) || 0;
   }
 
-  // Parse file status
   let modified = 0, added = 0, deleted = 0, untracked = 0;
   for (const line of fileLines) {
     const code = line.slice(0, 2);
@@ -39,29 +55,41 @@ export function getGitStatus(cwd?: string): GitStatus | null {
     else modified++;
   }
 
-  // Single call: combined diff stats (staged + unstaged)
-  let insertions = 0, deletions = 0;
-  const diffStat = run('git diff HEAD --shortstat', cwd);
-  const insMatch = diffStat.match(/(\d+) insertion/);
-  const delMatch = diffStat.match(/(\d+) deletion/);
-  if (insMatch) insertions = parseInt(insMatch[1]);
-  if (delMatch) deletions = parseInt(delMatch[1]);
+  // 2. Line stats + last commit + stash in one combined call
+  let insertions = 0, deletions = 0, lastCommit = '', stashCount = 0;
 
-  // Last commit + stash in one shot
-  const lastCommitRaw = run('git log -1 --format=%s', cwd);
-  const lastCommit = lastCommitRaw.length > 40 ? lastCommitRaw.slice(0, 37) + '...' : lastCommitRaw;
-
-  const stashList = run('git stash list', cwd);
-  const stashCount = stashList ? stashList.split('\n').filter(Boolean).length : 0;
+  const combined = run(
+    'git diff HEAD --shortstat 2>/dev/null; echo "---SEP---"; git log -1 --format=%s 2>/dev/null; echo "---SEP---"; git stash list 2>/dev/null',
+    cwd,
+  );
+  if (combined) {
+    const parts = combined.split('---SEP---').map(s => s.trim());
+    // diff stats
+    const insMatch = parts[0]?.match(/(\d+) insertion/);
+    const delMatch = parts[0]?.match(/(\d+) deletion/);
+    if (insMatch) insertions = parseInt(insMatch[1]);
+    if (delMatch) deletions = parseInt(delMatch[1]);
+    // last commit (unicode-safe truncation)
+    lastCommit = truncateByWidth(parts[1] || '', 40);
+    // stash count
+    stashCount = parts[2] ? parts[2].split('\n').filter(Boolean).length : 0;
+  }
 
   return {
-    branch,
-    isDirty: fileLines.length > 0,
-    ahead, behind,
-    modified, added, deleted, untracked,
-    insertions, deletions,
-    fileCount: fileLines.length,
-    lastCommit,
-    stashCount,
+    branch, isDirty: fileLines.length > 0,
+    ahead, behind, modified, added, deleted, untracked,
+    insertions, deletions, fileCount: fileLines.length,
+    lastCommit, stashCount,
   };
+}
+
+export function getGitStatus(cwd?: string): GitStatus | null {
+  const now = Date.now();
+  const dir = cwd || '';
+  if (cached && cached.cwd === dir && (now - cached.time) < CACHE_TTL_MS) {
+    return cached.status;
+  }
+  const status = compute(cwd);
+  cached = { status, cwd: dir, time: now };
+  return status;
 }

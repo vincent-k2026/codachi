@@ -11,8 +11,8 @@ const REGISTRY = {
 export function getAnimalName(type) {
     return REGISTRY[type].name;
 }
-export function getAnimalFrame(type, size, animation, frameIndex) {
-    return pickFrame(REGISTRY[type], size, animation, frameIndex);
+export function getAnimalFrame(type, size, animation, tick) {
+    return pickFrame(REGISTRY[type], size, animation, tick);
 }
 export function getBodySize(contextPercent) {
     if (contextPercent < 20)

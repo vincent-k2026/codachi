@@ -1,4 +1,10 @@
-import type { PetState } from './types.js';
-export declare function loadState(): PetState;
-export declare function saveState(state: PetState): void;
-export declare function nextFrame(state: PetState): PetState;
+/**
+ * Initialize session. A new transcript_path from Claude Code = new session.
+ * Same transcript_path = same pet.
+ */
+export declare function initSession(transcriptPath?: string): void;
+export declare function getSessionAnimalIndex(): number;
+export declare function getSessionPaletteIndex(): number;
+export declare function animTick(): number;
+export declare function moodTick(): number;
+export declare function sessionUptime(): string;

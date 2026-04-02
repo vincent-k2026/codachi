@@ -1,11 +1,12 @@
 import type { PetColors, AnimalType, GitStatus } from '../types.js';
-import type { TokenBreakdown } from '../stdin.js';
+import type { ProjectInfo } from '../project.js';
 interface RenderInput {
     contextPercent: number;
     modelName: string;
     animalType: AnimalType;
     colors: PetColors;
     git: GitStatus | null;
+    project: ProjectInfo;
     fiveHourUsage: {
         percent: number;
         resetsIn: string | null;
@@ -14,8 +15,9 @@ interface RenderInput {
         percent: number;
         resetsIn: string | null;
     } | null;
-    tokens: TokenBreakdown | null;
-    frameIndex: number;
+    animTick: number;
+    moodTick: number;
+    uptime: string;
 }
 export declare function render(input: RenderInput): void;
 export {};

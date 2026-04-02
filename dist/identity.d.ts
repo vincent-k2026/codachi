@@ -1,3 +1,3 @@
 import type { AnimalType, PetColors } from './types.js';
-export declare function getAnimalType(username?: string): AnimalType;
-export declare function getPetColors(username?: string): PetColors;
+export declare function getAnimalType(): AnimalType;
+export declare function getPetColors(): PetColors;

@@ -130,7 +130,9 @@ export function render(input: RenderInput): void {
 
   // Line 2: Git
   let line2 = '';
-  if (git) {
+  if (!git) {
+    line2 = `${DIM}(no git repo)${RESET}`;
+  } else if (git) {
     const dm = git.isDirty ? '*' : '';
     line2 = `${C}git:(${A}${git.branch}${dm}${C})${RESET}`;
     const fs: string[] = [];

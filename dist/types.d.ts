@@ -34,11 +34,6 @@ export interface AnimalFrame {
     lines: string[];
     width: number;
 }
-export interface Animal {
-    name: string;
-    type: AnimalType;
-    getFrame(size: BodySize, animation: Animation, frameIndex: number): AnimalFrame;
-}
 export interface PetColors {
     body: string;
     accent: string;
@@ -57,8 +52,6 @@ export interface GitStatus {
     insertions: number;
     deletions: number;
     fileCount: number;
-}
-export interface PetState {
-    frameIndex: number;
-    lastUpdate: number;
+    lastCommit: string;
+    stashCount: number;
 }
