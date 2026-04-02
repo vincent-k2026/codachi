@@ -1,89 +1,74 @@
 import type { AnimalDef } from './types.js';
-import type { SpriteGrid } from '../render/sprite.js';
+import { f } from './types.js';
 
-// Fox: pointy ears (2), white cheeks inside body, bushy tail area
-const tinyBase: SpriteGrid = [
-  [2, 0, 0, 0, 0, 0, 2],
-  [1, 1, 1, 1, 1, 1, 1],
-  [1, 3, 0, 0, 0, 3, 1],
-  [1, 0, 0, 4, 0, 0, 1],
-  [0, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 0, 4, 0, 0],
-];
-const tinyBlink: SpriteGrid = [
-  [2, 0, 0, 0, 0, 0, 2],
-  [1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 0, 0, 0, 1],
-  [1, 0, 0, 4, 0, 0, 1],
-  [0, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 0, 4, 0, 0],
-];
-const tinyHappy: SpriteGrid = [
-  [2, 0, 0, 0, 0, 0, 2],
-  [1, 1, 1, 1, 1, 1, 1],
-  [1, 3, 0, 0, 0, 3, 1],
-  [1, 0, 3, 3, 3, 0, 1],
-  [0, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 0, 4, 0, 0],
-];
+const tiny = (e: string, m: string, t: string) => f([
+  `/V\\_/V\\${t}`,
+  `(${e}w${e}) `,
+  ` \\_Y_/ `,
+]);
 
-const medBase: SpriteGrid = [
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 3, 0, 0, 0, 3, 0, 1, 1],
-  [1, 1, 0, 0, 0, 4, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 4, 0, 0, 0, 4, 4, 0, 0],
-];
-const medBlink: SpriteGrid = [
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 4, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 4, 0, 0, 0, 4, 4, 0, 0],
-];
-const medHappy: SpriteGrid = [
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 3, 0, 0, 0, 3, 0, 1, 1],
-  [1, 1, 0, 0, 3, 3, 3, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 4, 0, 0, 0, 4, 4, 0, 0],
-];
+const small = (e: string, m: string, t: string) => f([
+  ` /V\\___/V\\${t} `,
+  ` ( ${e}w${e} )   `,
+  `  \\_\\_Y_/   `,
+]);
 
-const chubbyBase: SpriteGrid = [
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 3, 0, 0, 0, 0, 0, 3, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0],
-];
-const chubbyBlink: SpriteGrid = [
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0],
-];
-const chubbyHappy: SpriteGrid = [
-  [2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 3, 0, 0, 0, 0, 0, 3, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 0, 3, 3, 3, 0, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0],
-];
+const medium = (e: string, m: string, t: string) => f([
+  `  /V\\_____/V\\${t}  `,
+  ` (  ${e} w ${e}  )   `,
+  `   \\__\\_Y__/    `,
+]);
+
+const chubby = (e: string, m: string, t: string) => f([
+  `   /V\\_________/V\\${t}  `,
+  `  (  ${e}  w  ${e}  )    `,
+  `    \\___\\_Y___/     `,
+]);
+
+const thicc = (e: string, m: string, t: string) => f([
+  `    /V\\_____________/V\\${t}  `,
+  `   (  ${e}    w    ${e}  )    `,
+  `     \\____\\_Y____/      `,
+]);
+
+function make(
+  build: (e: string, m: string, t: string) => ReturnType<typeof f>,
+) {
+  return {
+    idle: [
+      build('o', '', '~'),
+      build('-', '', ' '),
+      build('o', '', ' '),
+      build('^', '', '~'),
+    ],
+    busy: [
+      build('o', '', '~'),
+      build('^', '', '~'),
+      build('-', '', '~'),
+      build('^', '', '~'),
+    ],
+    danger: [
+      build('O', '', '!'),
+      build('-', '', '!'),
+      build('O', '', '!'),
+      build('O', '', ' '),
+    ],
+    sleep: [
+      build('-', '', 'z'),
+      build('-', '', 'Z'),
+      build('-', '', 'z'),
+      build('-', '', ' '),
+    ],
+  };
+}
 
 export const fox: AnimalDef = {
   name: 'Fox',
-  sprites: {
-    tiny:   { idle: [tinyBase, tinyBlink, tinyBase, tinyHappy], busy: [tinyBase, tinyHappy, tinyBlink, tinyHappy], danger: [tinyBase, tinyBlink, tinyBase, tinyBlink], sleep: [tinyBlink, tinyBlink, tinyBlink, tinyBlink] },
-    small:  { idle: [tinyBase, tinyBlink, tinyBase, tinyHappy], busy: [tinyBase, tinyHappy, tinyBlink, tinyHappy], danger: [tinyBase, tinyBlink, tinyBase, tinyBlink], sleep: [tinyBlink, tinyBlink, tinyBlink, tinyBlink] },
-    medium: { idle: [medBase, medBlink, medBase, medHappy], busy: [medBase, medHappy, medBlink, medHappy], danger: [medBase, medBlink, medBase, medBlink], sleep: [medBlink, medBlink, medBlink, medBlink] },
-    chubby: { idle: [chubbyBase, chubbyBlink, chubbyBase, chubbyHappy], busy: [chubbyBase, chubbyHappy, chubbyBlink, chubbyHappy], danger: [chubbyBase, chubbyBlink, chubbyBase, chubbyBlink], sleep: [chubbyBlink, chubbyBlink, chubbyBlink, chubbyBlink] },
-    thicc:  { idle: [chubbyBase, chubbyBlink, chubbyBase, chubbyHappy], busy: [chubbyBase, chubbyHappy, chubbyBlink, chubbyHappy], danger: [chubbyBase, chubbyBlink, chubbyBase, chubbyBlink], sleep: [chubbyBlink, chubbyBlink, chubbyBlink, chubbyBlink] },
+  frames: {
+    tiny:   make(tiny),
+    small:  make(small),
+    medium: make(medium),
+    chubby: make(chubby),
+    thicc:  make(thicc),
   },
 };

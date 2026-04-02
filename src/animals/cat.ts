@@ -1,186 +1,83 @@
 import type { AnimalDef } from './types.js';
-import type { SpriteGrid } from '../render/sprite.js';
+import { f } from './types.js';
 
-// Palette: 0=transparent 1=body 2=accent 3=face 4=blush
-// Grid: 6 rows tall (→ 3 terminal lines), width varies by size
+// Template: define shape once, swap eyes/mouth/tail per frame.
+// This guarantees structural alignment across all frames.
 
-// ── tiny: 7 wide ──────────────────────────────────
-const tinyBase: SpriteGrid = [
-  [0, 2, 0, 0, 0, 2, 0],
-  [1, 1, 1, 1, 1, 1, 1],
-  [1, 3, 0, 1, 0, 3, 1],
-  [1, 0, 4, 4, 4, 0, 1],
-  [0, 1, 1, 1, 1, 1, 0],
-  [0, 4, 0, 0, 0, 4, 0],
-];
-const tinyBlink: SpriteGrid = [
-  [0, 2, 0, 0, 0, 2, 0],
-  [1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 1, 0, 0, 1],
-  [1, 0, 4, 4, 4, 0, 1],
-  [0, 1, 1, 1, 1, 1, 0],
-  [0, 4, 0, 0, 0, 4, 0],
-];
-const tinyHappy: SpriteGrid = [
-  [0, 2, 0, 0, 0, 2, 0],
-  [1, 1, 1, 1, 1, 1, 1],
-  [1, 3, 0, 1, 0, 3, 1],
-  [1, 0, 3, 3, 3, 0, 1],
-  [0, 1, 1, 1, 1, 1, 0],
-  [0, 4, 0, 0, 0, 4, 0],
-];
-const tinyDanger: SpriteGrid = [
-  [0, 2, 0, 0, 0, 2, 0],
-  [1, 1, 1, 1, 1, 1, 1],
-  [1, 3, 3, 1, 3, 3, 1],
-  [1, 0, 4, 3, 4, 0, 1],
-  [0, 1, 1, 1, 1, 1, 0],
-  [0, 4, 0, 0, 0, 4, 0],
-];
-const tinySleep: SpriteGrid = [
-  [0, 2, 0, 0, 0, 2, 0],
-  [1, 1, 1, 1, 1, 1, 1],
-  [1, 0, 0, 1, 0, 0, 1],
-  [1, 0, 4, 4, 4, 0, 1],
-  [0, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 0, 4, 0, 0],
-];
+const tiny = (e: string, m: string, t: string) => f([
+  ` /\\_/\\${t}`,
+  `( ${e}w${e} )`,
+  ` (${m})  `,
+]);
 
-// ── small: 9 wide ─────────────────────────────────
-const smallBase: SpriteGrid = [
-  [0, 2, 0, 0, 0, 0, 0, 2, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 3, 0, 1, 0, 3, 1, 1],
-  [1, 1, 0, 4, 4, 4, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 0, 0, 0, 4, 0, 0],
-];
-const smallBlink: SpriteGrid = [
-  [0, 2, 0, 0, 0, 0, 0, 2, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 1, 0, 0, 1, 1],
-  [1, 1, 0, 4, 4, 4, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 0, 0, 0, 4, 0, 0],
-];
-const smallHappy: SpriteGrid = [
-  [0, 2, 0, 0, 0, 0, 0, 2, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 3, 0, 1, 0, 3, 1, 1],
-  [1, 1, 0, 3, 3, 3, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 0, 0, 0, 4, 0, 0],
-];
+const small = (e: string, m: string, t: string) => f([
+  `  /\\_/\\${t} `,
+  ` ( ${e}w${e} ) `,
+  `  (${m})   `,
+]);
 
-// ── medium: 11 wide ───────────────────────────────
-const medBase: SpriteGrid = [
-  [0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 3, 0, 1, 0, 3, 0, 1, 1],
-  [1, 1, 0, 0, 4, 4, 4, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 4, 0, 0, 0, 4, 4, 0, 0],
-];
-const medBlink: SpriteGrid = [
-  [0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 0, 1, 0, 0, 0, 1, 1],
-  [1, 1, 0, 0, 4, 4, 4, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 4, 0, 0, 0, 4, 4, 0, 0],
-];
-const medHappy: SpriteGrid = [
-  [0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 3, 0, 1, 0, 3, 0, 1, 1],
-  [1, 1, 0, 0, 3, 3, 3, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 4, 0, 0, 0, 4, 4, 0, 0],
-];
-const medDanger: SpriteGrid = [
-  [0, 2, 2, 0, 0, 0, 0, 0, 2, 2, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 3, 3, 0, 1, 0, 3, 3, 1, 1],
-  [1, 1, 0, 0, 4, 3, 4, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 4, 4, 0, 0, 0, 4, 4, 0, 0],
-];
+const medium = (e: string, m: string, t: string) => f([
+  `   /\\_/\\${t}  `,
+  ` =( ${e} w ${e} )=`,
+  `   (${m})    `,
+]);
 
-// ── chubby: 15 wide ──────────────────────────────
-const chubbyBase: SpriteGrid = [
-  [0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 3, 0, 0, 1, 0, 0, 3, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 4, 4, 4, 4, 4, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0],
-];
-const chubbyBlink: SpriteGrid = [
-  [0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 4, 4, 4, 4, 4, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0],
-];
-const chubbyHappy: SpriteGrid = [
-  [0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 3, 0, 0, 1, 0, 0, 3, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0],
-];
-const chubbyDanger: SpriteGrid = [
-  [0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 3, 3, 0, 0, 1, 0, 0, 3, 3, 0, 1, 1],
-  [1, 1, 0, 0, 0, 4, 4, 3, 4, 4, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0],
-];
+const chubby = (e: string, m: string, t: string) => f([
+  `    /\\_____/\\${t}  `,
+  ` ==( ${e}  w  ${e} )==`,
+  `    ( ${m} )    `,
+]);
 
-// ── thicc: 19 wide ───────────────────────────────
-const thiccBase: SpriteGrid = [
-  [0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
-];
-const thiccBlink: SpriteGrid = [
-  [0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 0, 0, 4, 4, 4, 4, 4, 0, 0, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
-];
-const thiccHappy: SpriteGrid = [
-  [0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 0, 3, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 0, 0, 3, 3, 3, 3, 3, 0, 0, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
-];
-const thiccDanger: SpriteGrid = [
-  [0, 0, 0, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 2, 0, 0, 0],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [1, 1, 0, 0, 3, 3, 0, 0, 0, 1, 0, 0, 0, 3, 3, 0, 0, 1, 1],
-  [1, 1, 0, 0, 0, 0, 0, 4, 4, 3, 4, 4, 0, 0, 0, 0, 0, 1, 1],
-  [0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 0],
-  [0, 0, 0, 0, 4, 4, 0, 0, 0, 0, 0, 0, 0, 4, 4, 0, 0, 0, 0],
-];
+const thicc = (e: string, m: string, t: string) => f([
+  `     /\\_________/\\${t}  `,
+  ` ===( ${e}    w    ${e} )===`,
+  `     (  ${m}  )    `,
+]);
+
+// Eyes: o=open, -=closed, ^=happy, O=wide
+// Mouth: ^ ^=normal, ~~~=danger
+// Tail: ~=right, (space)=none
+
+function make(
+  build: (e: string, m: string, t: string) => ReturnType<typeof f>,
+  normalMouth: string,
+  dangerMouth: string,
+) {
+  return {
+    idle: [
+      build('o', normalMouth, '~'),
+      build('-', normalMouth, ' '),
+      build('o', normalMouth, ' '),
+      build('^', normalMouth, '~'),
+    ],
+    busy: [
+      build('o', normalMouth, '~'),
+      build('^', normalMouth, '~'),
+      build('-', normalMouth, '~'),
+      build('^', normalMouth, '~'),
+    ],
+    danger: [
+      build('O', dangerMouth, '!'),
+      build('-', dangerMouth, '!'),
+      build('O', dangerMouth, '!'),
+      build('O', dangerMouth, ' '),
+    ],
+    sleep: [
+      build('-', normalMouth, 'z'),
+      build('-', normalMouth, 'Z'),
+      build('-', normalMouth, 'z'),
+      build('-', normalMouth, ' '),
+    ],
+  };
+}
 
 export const cat: AnimalDef = {
   name: 'Cat',
-  sprites: {
-    tiny:   { idle: [tinyBase, tinyBlink, tinyBase, tinyHappy], busy: [tinyBase, tinyHappy, tinyBlink, tinyHappy], danger: [tinyDanger, tinyBlink, tinyDanger, tinyBlink], sleep: [tinyBlink, tinySleep, tinyBlink, tinySleep] },
-    small:  { idle: [smallBase, smallBlink, smallBase, smallHappy], busy: [smallBase, smallHappy, smallBlink, smallHappy], danger: [smallBase, smallBlink, smallBase, smallBlink], sleep: [smallBlink, smallBlink, smallBlink, smallBlink] },
-    medium: { idle: [medBase, medBlink, medBase, medHappy], busy: [medBase, medHappy, medBlink, medHappy], danger: [medDanger, medBlink, medDanger, medBlink], sleep: [medBlink, medBlink, medBlink, medBlink] },
-    chubby: { idle: [chubbyBase, chubbyBlink, chubbyBase, chubbyHappy], busy: [chubbyBase, chubbyHappy, chubbyBlink, chubbyHappy], danger: [chubbyDanger, chubbyBlink, chubbyDanger, chubbyBlink], sleep: [chubbyBlink, chubbyBlink, chubbyBlink, chubbyBlink] },
-    thicc:  { idle: [thiccBase, thiccBlink, thiccBase, thiccHappy], busy: [thiccBase, thiccHappy, thiccBlink, thiccHappy], danger: [thiccDanger, thiccBlink, thiccDanger, thiccBlink], sleep: [thiccBlink, thiccBlink, thiccBlink, thiccBlink] },
+  frames: {
+    tiny:   make(tiny,   '^ ^', '~~~'),
+    small:  make(small,  '^ ^', '~~~'),
+    medium: make(medium, '> ^ <', '> ~ <'),
+    chubby: make(chubby, '> ^^ <', '> ~~ <'),
+    thicc:  make(thicc,  '> ^^^ <', '> ~~~ <'),
   },
 };
