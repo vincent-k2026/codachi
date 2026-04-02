@@ -33,10 +33,24 @@ export function getGitStatus(cwd) {
         ahead = parseInt(aheadStr) || 0;
         behind = parseInt(behindStr) || 0;
     }
+    // Get insertions/deletions for staged + unstaged changes
+    let insertions = 0, deletions = 0;
+    const diffStat = run('git diff --shortstat', cwd);
+    const stagedStat = run('git diff --cached --shortstat', cwd);
+    for (const stat of [diffStat, stagedStat]) {
+        const insMatch = stat.match(/(\d+) insertion/);
+        const delMatch = stat.match(/(\d+) deletion/);
+        if (insMatch)
+            insertions += parseInt(insMatch[1]);
+        if (delMatch)
+            deletions += parseInt(delMatch[1]);
+    }
     return {
         branch,
         isDirty: lines.length > 0,
         ahead, behind,
         modified, added, deleted, untracked,
+        insertions, deletions,
+        fileCount: lines.length,
     };
 }

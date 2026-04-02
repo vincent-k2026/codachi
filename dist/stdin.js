@@ -38,11 +38,64 @@ export function getFiveHourUsage(stdin) {
     const pct = stdin.rate_limits?.five_hour?.used_percentage;
     if (typeof pct !== 'number' || !Number.isFinite(pct))
         return null;
-    return Math.round(Math.min(100, Math.max(0, pct)));
+    const percent = Math.round(Math.min(100, Math.max(0, pct)));
+    let resetsIn = null;
+    const resetAt = stdin.rate_limits?.five_hour?.resets_at;
+    if (typeof resetAt === 'number' && resetAt > 0) {
+        const ms = resetAt * 1000 - Date.now();
+        if (ms > 0) {
+            const mins = Math.floor(ms / 60000);
+            if (mins < 60)
+                resetsIn = `${mins}m`;
+            else
+                resetsIn = `${Math.floor(mins / 60)}h${mins % 60}m`;
+        }
+    }
+    return { percent, resetsIn };
 }
 export function getSevenDayUsage(stdin) {
     const pct = stdin.rate_limits?.seven_day?.used_percentage;
     if (typeof pct !== 'number' || !Number.isFinite(pct))
         return null;
-    return Math.round(Math.min(100, Math.max(0, pct)));
+    const percent = Math.round(Math.min(100, Math.max(0, pct)));
+    let resetsIn = null;
+    const resetAt = stdin.rate_limits?.seven_day?.resets_at;
+    if (typeof resetAt === 'number' && resetAt > 0) {
+        const ms = resetAt * 1000 - Date.now();
+        if (ms > 0) {
+            const hrs = Math.floor(ms / 3600000);
+            if (hrs < 24)
+                resetsIn = `${hrs}h`;
+            else
+                resetsIn = `${Math.floor(hrs / 24)}d${hrs % 24}h`;
+        }
+    }
+    return { percent, resetsIn };
+}
+function formatTokenCount(n) {
+    if (n >= 1_000_000)
+        return `${(n / 1_000_000).toFixed(1)}M`;
+    if (n >= 1_000)
+        return `${(n / 1_000).toFixed(0)}K`;
+    return `${n}`;
+}
+export function getTokenBreakdown(stdin) {
+    const usage = stdin.context_window?.current_usage;
+    const windowSize = stdin.context_window?.context_window_size;
+    if (!usage || !windowSize)
+        return null;
+    const input = usage.input_tokens ?? 0;
+    const output = usage.output_tokens ?? 0;
+    const cacheWrite = usage.cache_creation_input_tokens ?? 0;
+    const cacheRead = usage.cache_read_input_tokens ?? 0;
+    const total = input + cacheWrite + cacheRead;
+    return {
+        input, output, cacheWrite, cacheRead, total, windowSize,
+        inputStr: formatTokenCount(input),
+        outputStr: formatTokenCount(output),
+        cacheWriteStr: formatTokenCount(cacheWrite),
+        cacheReadStr: formatTokenCount(cacheRead),
+        totalStr: formatTokenCount(total),
+        windowStr: formatTokenCount(windowSize),
+    };
 }

@@ -1,4 +1,4 @@
-import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage } from './stdin.js';
+import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage, getTokenBreakdown } from './stdin.js';
 import { getGitStatus } from './git.js';
 import { getAnimalType, getPetColors } from './identity.js';
 import { loadState, saveState, nextFrame } from './state.js';
@@ -10,27 +10,18 @@ async function main() {
             console.log('[claude-pet] Initializing... restart Claude Code to see your pet!');
             return;
         }
-        // Load and advance animation state
         const state = loadState();
         const newState = nextFrame(state);
         saveState(newState);
-        // Compute everything
-        const contextPercent = getContextPercent(stdin);
-        const modelName = getModelName(stdin);
-        const animalType = getAnimalType();
-        const colors = getPetColors();
-        const git = getGitStatus(stdin.cwd);
-        const fiveHourUsage = getFiveHourUsage(stdin);
-        const sevenDayUsage = getSevenDayUsage(stdin);
         render({
-            stdin,
-            contextPercent,
-            modelName,
-            animalType,
-            colors,
-            git,
-            fiveHourUsage,
-            sevenDayUsage,
+            contextPercent: getContextPercent(stdin),
+            modelName: getModelName(stdin),
+            animalType: getAnimalType(),
+            colors: getPetColors(),
+            git: getGitStatus(stdin.cwd),
+            fiveHourUsage: getFiveHourUsage(stdin),
+            sevenDayUsage: getSevenDayUsage(stdin),
+            tokens: getTokenBreakdown(stdin),
             frameIndex: newState.frameIndex,
         });
     }

@@ -61,6 +61,9 @@ export interface GitStatus {
   added: number;
   deleted: number;
   untracked: number;
+  insertions: number;
+  deletions: number;
+  fileCount: number;
 }
 
 export interface PetState {
