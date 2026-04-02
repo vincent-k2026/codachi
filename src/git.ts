@@ -34,7 +34,7 @@ export function getGitStatus(cwd?: string): GitStatus | null {
     behind = parseInt(behindStr) || 0;
   }
 
-  // Get insertions/deletions for staged + unstaged changes
+  // Line-level insertions/deletions
   let insertions = 0, deletions = 0;
   const diffStat = run('git diff --shortstat', cwd);
   const stagedStat = run('git diff --cached --shortstat', cwd);
@@ -45,6 +45,14 @@ export function getGitStatus(cwd?: string): GitStatus | null {
     if (delMatch) deletions += parseInt(delMatch[1]);
   }
 
+  // Last commit message (short, max 40 chars)
+  let lastCommit = run('git log -1 --format=%s', cwd);
+  if (lastCommit.length > 40) lastCommit = lastCommit.slice(0, 37) + '...';
+
+  // Stash count
+  const stashList = run('git stash list', cwd);
+  const stashCount = stashList ? stashList.split('\n').filter(Boolean).length : 0;
+
   return {
     branch,
     isDirty: lines.length > 0,
@@ -52,5 +60,7 @@ export function getGitStatus(cwd?: string): GitStatus | null {
     modified, added, deleted, untracked,
     insertions, deletions,
     fileCount: lines.length,
+    lastCommit,
+    stashCount,
   };
 }

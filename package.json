@@ -1,7 +1,7 @@
 {
-  "name": "claude-pet",
+  "name": "codachi",
   "version": "0.1.0",
-  "description": "A virtual pet statusline for Claude Code",
+  "description": "A tamagotchi-style virtual pet that lives in your Claude Code statusline",
   "type": "module",
   "main": "dist/index.js",
   "scripts": {

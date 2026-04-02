@@ -34,7 +34,12 @@ export function getContextPercent(stdin: StdinData): number {
 }
 
 export function getModelName(stdin: StdinData): string {
-  return stdin.model?.display_name?.trim() || stdin.model?.id?.trim() || 'Unknown';
+  const raw = stdin.model?.display_name?.trim() || stdin.model?.id?.trim() || 'Unknown';
+  // "Opus 4.6 (1M context)" → "Opus 4.6"
+  // "Claude Sonnet 4.5" → "Sonnet 4.5"
+  let name = raw.replace(/\s*\(.*?\)\s*/g, '').trim();
+  name = name.replace(/^Claude\s+/i, '');
+  return name;
 }
 
 export function getFiveHourUsage(stdin: StdinData): { percent: number; resetsIn: string | null } | null {

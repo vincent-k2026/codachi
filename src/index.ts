@@ -1,7 +1,8 @@
-import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage, getTokenBreakdown } from './stdin.js';
+import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage } from './stdin.js';
 import { getGitStatus } from './git.js';
+import { getProjectInfo } from './project.js';
 import { getAnimalType, getPetColors } from './identity.js';
-import { loadState, saveState, nextFrame } from './state.js';
+import { loadState, saveState, nextFrame, animTick, moodTick, sessionUptime } from './state.js';
 import { render } from './render/index.js';
 
 async function main(): Promise<void> {
@@ -23,10 +24,12 @@ async function main(): Promise<void> {
       animalType: getAnimalType(),
       colors: getPetColors(),
       git: getGitStatus(stdin.cwd),
+      project: getProjectInfo(stdin.cwd),
       fiveHourUsage: getFiveHourUsage(stdin),
       sevenDayUsage: getSevenDayUsage(stdin),
-      tokens: getTokenBreakdown(stdin),
-      frameIndex: newState.frameIndex,
+      animTick: animTick(),
+      moodTick: moodTick(),
+      uptime: sessionUptime(newState),
     });
   } catch (error) {
     console.log('[claude-pet] Error:', error instanceof Error ? error.message : 'Unknown error');

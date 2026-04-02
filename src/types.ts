@@ -64,9 +64,12 @@ export interface GitStatus {
   insertions: number;
   deletions: number;
   fileCount: number;
+  lastCommit: string;
+  stashCount: number;
 }
 
 export interface PetState {
   frameIndex: number;
   lastUpdate: number;
+  sessionStart?: number;
 }
