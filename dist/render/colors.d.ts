@@ -1,0 +1,13 @@
+export declare const RESET = "\u001B[0m";
+export declare const DIM = "\u001B[2m";
+export declare const BOLD = "\u001B[1m";
+export declare function rgb(r: number, g: number, b: number): string;
+export declare function bgRgb(r: number, g: number, b: number): string;
+export declare function hslToRgb(h: number, s: number, l: number): [number, number, number];
+export declare function hsl(h: number, s: number, l: number): string;
+export declare function colorize(text: string, color: string): string;
+export declare function dim(text: string): string;
+export declare function bold(text: string): string;
+export declare function getContextColor(percent: number): string;
+export declare function getUsageColor(percent: number): string;
+export declare function progressBar(percent: number, width: number, colorFn: (p: number) => string): string;
