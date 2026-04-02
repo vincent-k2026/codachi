@@ -7,6 +7,9 @@ const STATE_FILE = path.join(STATE_DIR, 'state.json');
 
 interface DiskState {
   sessionStart?: number;
+  lastSeen?: number;
+  animalIndex?: number;
+  paletteIndex?: number;
 }
 
 function loadDiskState(): DiskState {
@@ -27,31 +30,46 @@ function saveDiskState(state: DiskState): void {
   }
 }
 
-let sessionStart: number | null = null;
+let diskState: DiskState = {};
 
-/** Initialize session tracking. Call once at startup. */
+const SESSION_TIMEOUT_MS = 5 * 60 * 1000; // 5 min gap = new session
+
+/** Initialize session. New animal + palette if session expired or first run. */
 export function initSession(): void {
-  const disk = loadDiskState();
-  sessionStart = disk.sessionStart ?? Date.now();
-  if (!disk.sessionStart) {
-    saveDiskState({ sessionStart });
+  diskState = loadDiskState();
+  const now = Date.now();
+  const isNewSession = diskState.sessionStart == null
+    || diskState.lastSeen == null
+    || (now - diskState.lastSeen) > SESSION_TIMEOUT_MS;
+
+  if (isNewSession) {
+    diskState.sessionStart = now;
+    diskState.animalIndex = Math.floor(Math.random() * 6);
+    diskState.paletteIndex = Math.floor(Math.random() * 10);
   }
+  diskState.lastSeen = now;
+  saveDiskState(diskState);
 }
 
-/** Animation tick based on wall-clock time. Changes every ~1.5 seconds. */
+export function getSessionAnimalIndex(): number {
+  return diskState.animalIndex ?? 0;
+}
+
+export function getSessionPaletteIndex(): number {
+  return diskState.paletteIndex ?? 0;
+}
+
 export function animTick(): number {
   return Math.floor(Date.now() / 1500);
 }
 
-/** Mood tick based on wall-clock time. Changes every ~10 seconds. */
 export function moodTick(): number {
   return Math.floor(Date.now() / 10000);
 }
 
-/** Session uptime string. */
 export function sessionUptime(): string {
-  if (!sessionStart) return '<1m';
-  const ms = Date.now() - sessionStart;
+  const start = diskState.sessionStart ?? Date.now();
+  const ms = Date.now() - start;
   const mins = Math.floor(ms / 60000);
   if (mins < 1) return '<1m';
   if (mins < 60) return `${mins}m`;

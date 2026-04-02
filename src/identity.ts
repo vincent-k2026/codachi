@@ -1,25 +1,14 @@
-import os from 'node:os';
 import type { AnimalType, PetColors } from './types.js';
 import { rgb } from './render/colors.js';
-
-function hashString(str: string): number {
-  let hash = 5381;
-  for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) + hash + str.charCodeAt(i)) >>> 0;
-  }
-  return hash;
-}
+import { getSessionAnimalIndex, getSessionPaletteIndex } from './state.js';
 
 const ANIMALS: AnimalType[] = ['cat', 'dog', 'rabbit', 'panda', 'penguin', 'fox'];
 
-export function getAnimalType(username?: string): AnimalType {
-  const name = username || os.userInfo().username || 'default';
-  const hash = hashString(name);
-  return ANIMALS[hash % ANIMALS.length];
+export function getAnimalType(): AnimalType {
+  return ANIMALS[getSessionAnimalIndex() % ANIMALS.length];
 }
 
-// Vibrant, saturated palettes — every color pops
-const PALETTES: Array<{ body: string; accent: string; face: string; blush: string }> = [
+const PALETTES: PetColors[] = [
   { // Coral Flame
     body:   rgb(255, 127, 80),
     accent: rgb(255, 99, 71),
@@ -82,8 +71,6 @@ const PALETTES: Array<{ body: string; accent: string; face: string; blush: strin
   },
 ];
 
-export function getPetColors(username?: string): PetColors {
-  const name = username || os.userInfo().username || 'default';
-  const hash = hashString(name);
-  return PALETTES[(hash >>> 8) % PALETTES.length];
+export function getPetColors(): PetColors {
+  return PALETTES[getSessionPaletteIndex() % PALETTES.length];
 }
