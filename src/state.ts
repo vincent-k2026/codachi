@@ -1,23 +1,24 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
-import type { PetState } from './types.js';
 
 const STATE_DIR = path.join(os.homedir(), '.claude', 'plugins', 'claude-pet');
 const STATE_FILE = path.join(STATE_DIR, 'state.json');
 
-export function loadState(): PetState {
+interface DiskState {
+  sessionStart?: number;
+}
+
+function loadDiskState(): DiskState {
   try {
     const raw = fs.readFileSync(STATE_FILE, 'utf8');
-    const parsed = JSON.parse(raw) as PetState;
-    // Keep sessionStart from disk, update frameIndex from time
-    return { ...parsed, frameIndex: 0, lastUpdate: Date.now() };
+    return JSON.parse(raw) as DiskState;
   } catch {
-    return { frameIndex: 0, lastUpdate: Date.now(), sessionStart: Date.now() };
+    return {};
   }
 }
 
-export function saveState(state: PetState): void {
+function saveDiskState(state: DiskState): void {
   try {
     fs.mkdirSync(STATE_DIR, { recursive: true });
     fs.writeFileSync(STATE_FILE, JSON.stringify(state));
@@ -26,19 +27,18 @@ export function saveState(state: PetState): void {
   }
 }
 
-export function nextFrame(state: PetState): PetState {
-  return {
-    frameIndex: (state.frameIndex + 1) % 3600,
-    lastUpdate: Date.now(),
-    sessionStart: state.sessionStart,
-  };
+let sessionStart: number | null = null;
+
+/** Initialize session tracking. Call once at startup. */
+export function initSession(): void {
+  const disk = loadDiskState();
+  sessionStart = disk.sessionStart ?? Date.now();
+  if (!disk.sessionStart) {
+    saveDiskState({ sessionStart });
+  }
 }
 
-/**
- * Animation tick based on wall-clock time, not frame counter.
- * Changes every ~1.5 seconds regardless of refresh rate.
- * This means the pet "moves" between refreshes too.
- */
+/** Animation tick based on wall-clock time. Changes every ~1.5 seconds. */
 export function animTick(): number {
   return Math.floor(Date.now() / 1500);
 }
@@ -48,14 +48,15 @@ export function moodTick(): number {
   return Math.floor(Date.now() / 10000);
 }
 
-/** Session uptime string */
-export function sessionUptime(state: PetState): string {
-  const start = state.sessionStart ?? state.lastUpdate;
-  const ms = Date.now() - start;
+/** Session uptime string. */
+export function sessionUptime(): string {
+  if (!sessionStart) return '<1m';
+  const ms = Date.now() - sessionStart;
   const mins = Math.floor(ms / 60000);
   if (mins < 1) return '<1m';
   if (mins < 60) return `${mins}m`;
   const hours = Math.floor(mins / 60);
   const rem = mins % 60;
+  if (rem === 0) return `${hours}h`;
   return `${hours}h${rem}m`;
 }

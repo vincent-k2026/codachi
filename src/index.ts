@@ -2,7 +2,7 @@ import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenD
 import { getGitStatus } from './git.js';
 import { getProjectInfo } from './project.js';
 import { getAnimalType, getPetColors } from './identity.js';
-import { loadState, saveState, nextFrame, animTick, moodTick, sessionUptime } from './state.js';
+import { initSession, animTick, moodTick, sessionUptime } from './state.js';
 import { render } from './render/index.js';
 
 async function main(): Promise<void> {
@@ -10,13 +10,11 @@ async function main(): Promise<void> {
     const stdin = await readStdin();
 
     if (!stdin) {
-      console.log('[claude-pet] Initializing... restart Claude Code to see your pet!');
+      console.log('[codachi] Initializing... restart Claude Code to see your pet!');
       return;
     }
 
-    const state = loadState();
-    const newState = nextFrame(state);
-    saveState(newState);
+    initSession();
 
     render({
       contextPercent: getContextPercent(stdin),
@@ -29,10 +27,10 @@ async function main(): Promise<void> {
       sevenDayUsage: getSevenDayUsage(stdin),
       animTick: animTick(),
       moodTick: moodTick(),
-      uptime: sessionUptime(newState),
+      uptime: sessionUptime(),
     });
   } catch (error) {
-    console.log('[claude-pet] Error:', error instanceof Error ? error.message : 'Unknown error');
+    console.log('[codachi] Error:', error instanceof Error ? error.message : 'Unknown error');
   }
 }
 

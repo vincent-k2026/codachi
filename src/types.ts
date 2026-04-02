@@ -39,12 +39,6 @@ export interface AnimalFrame {
   width: number;     // visual width of the widest line
 }
 
-export interface Animal {
-  name: string;
-  type: AnimalType;
-  getFrame(size: BodySize, animation: Animation, frameIndex: number): AnimalFrame;
-}
-
 export interface PetColors {
   body: string;       // ANSI escape for body
   accent: string;     // ANSI escape for ears/tail/features
@@ -68,8 +62,3 @@ export interface GitStatus {
   stashCount: number;
 }
 
-export interface PetState {
-  frameIndex: number;
-  lastUpdate: number;
-  sessionStart?: number;
-}
