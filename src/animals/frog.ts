@@ -2,37 +2,36 @@ import type { AnimalDef } from './types.js';
 import { f } from './types.js';
 
 // Frog: @..@ eyes on top, (----) wide mouth, ( >__< ) legs
-// All 3 lines centered on same axis
 
 const tiny = (e: string, t: string) => f([
-  `  @${e}${e}@   ${t}`,
-  ` (-----) `,
-  ` ( >__< ) `,
-]);
+  `@${e}${e}@`,
+  `(-----)`,
+  `( >__< )`,
+], t);
 
 const small = (e: string, t: string) => f([
-  `   @${e} ${e}@    ${t}`,
-  `  (--------)  `,
-  `  ( >____< )  `,
-]);
+  `@${e} ${e}@`,
+  `(--------)`,
+  `( >____< )`,
+], t);
 
 const medium = (e: string, t: string) => f([
-  `    @${e}   ${e}@     ${t}`,
-  `   (----------)   `,
-  `   ( >______< )   `,
-]);
+  `@${e}   ${e}@`,
+  `(-----------)`,
+  `( >______< )`,
+], t);
 
 const chubby = (e: string, t: string) => f([
-  `      @${e}     ${e}@       ${t}`,
-  `    (----------------)    `,
-  `    (  >__________<  )    `,
-]);
+  `@${e}      ${e}@`,
+  `(----------------)`,
+  `(  >__________<  )`,
+], t);
 
 const thicc = (e: string, t: string) => f([
-  `        @${e}        ${e}@         ${t}`,
-  `     (------------------------)    `,
-  `     (   >________________<   )    `,
-]);
+  `@${e}          ${e}@`,
+  `(----------------------)`,
+  `(   >________________<   )`,
+], t);
 
 function make(build: (e: string, t: string) => ReturnType<typeof f>) {
   return {

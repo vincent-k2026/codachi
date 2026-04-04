@@ -2,37 +2,36 @@ import type { AnimalDef } from './types.js';
 import { f } from './types.js';
 
 // Bunny: (\ /) tall ears, ( o.o ) face, c(")(") feet
-// All 3 lines centered on same axis
 
 const tiny = (e: string, t: string) => f([
-  `  (\\  /)  ${t}`,
-  `  ( ${e}.${e} )  `,
-  `  c(")(")  `,
-]);
+  `(\\  /)`,
+  `( ${e}.${e} )`,
+  `c(")(")`,
+], t);
 
 const small = (e: string, t: string) => f([
-  `   (\\   /)   ${t}`,
-  `   ( ${e} . ${e} )  `,
-  `   c(")(")   `,
-]);
+  `(\\   /)`,
+  `( ${e} . ${e} )`,
+  `c(")(")`,
+], t);
 
 const medium = (e: string, t: string) => f([
-  `    (\\     /)    ${t}`,
-  `   (  ${e}  .  ${e}  )  `,
-  `    c(")(")(")    `,
-]);
+  `(\\     /)`,
+  `(  ${e}  .  ${e}  )`,
+  `c(")(")(")`,
+], t);
 
 const chubby = (e: string, t: string) => f([
-  `     (\\         /)      ${t}`,
-  `    (  ${e}      .      ${e}  ) `,
-  `     c(")(")(")(")(")   `,
-]);
+  `(\\         /)`,
+  `(  ${e}      .      ${e}  )`,
+  `c(")(")(")(")`,
+], t);
 
 const thicc = (e: string, t: string) => f([
-  `      (\\             /)       ${t}`,
-  `     (  ${e}         .         ${e}  ) `,
-  `      c(")(")(")(")(")(")      `,
-]);
+  `(\\             /)`,
+  `(  ${e}          .          ${e}  )`,
+  `c(")(")(")(")(")`,
+], t);
 
 function make(build: (e: string, t: string) => ReturnType<typeof f>) {
   return {

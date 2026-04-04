@@ -1,60 +1,47 @@
 import type { AnimalDef } from './types.js';
 import { f } from './types.js';
+import { stringWidth } from '../width.js';
 
-// Cat: body line is widest (whiskers), ears+paws pad to match
-// Body: ====( ... )==== is the reference width
-// Ears: /\_/\ centered above body center
-// Paws: ( ... ) centered below body center
+// Cat: dynamic ears that match body width, eyes and mouth same width
 
-const tiny = (e: string, m: string, t: string) => f([
-  ` /\\_/\\  ${t}`,
-  `( ${e}w${e} )  `,
-  ` ( ${m} ) `,
-]);
+function makeCat(w: string, e: string, m: string, t: string) {
+  // w = whisker string like '' '=' '==' etc
+  const face = `${w}( ${e} )${w}`;
+  const paws = `${w}( ${m} )${w}`;
+  const bodyW = Math.max(stringWidth(face), stringWidth(paws));
+  // Ears: /\____/\ matching body width
+  const uCount = Math.max(1, bodyW - 4);
+  const ears = '/\\' + '_'.repeat(uCount) + '/\\';
+  return f([ears, face, paws], t);
+}
 
-const small = (e: string, m: string, t: string) => f([
-  `  /\\_/\\   ${t}`,
-  `=( ${e} w ${e} )=`,
-  `  ( ${m} )  `,
-]);
-
-const medium = (e: string, m: string, t: string) => f([
-  `   /\\_/\\    ${t}`,
-  `==( ${e}  w  ${e} )==`,
-  `  (  ${m}  ) `,
-]);
-
-const chubby = (e: string, m: string, t: string) => f([
-  `     /\\_____/\\      ${t}`,
-  `===( ${e}    w    ${e} )===`,
-  `    (  ${m}  )   `,
-]);
-
-const thicc = (e: string, m: string, t: string) => f([
-  `       /\\_________/\\        ${t}`,
-  `====( ${e}      w      ${e} )====`,
-  `      (   ${m}   )     `,
-]);
+const tiny = (e: string, m: string, t: string) => makeCat('', e, m, t);
+const small = (e: string, m: string, t: string) => makeCat('=', e, m, t);
+const medium = (e: string, m: string, t: string) => makeCat('==', e, m, t);
+const chubby = (e: string, m: string, t: string) => makeCat('===', e, m, t);
+const thicc = (e: string, m: string, t: string) => makeCat('====', e, m, t);
 
 function make(
   build: (e: string, m: string, t: string) => ReturnType<typeof f>,
-  nm: string, dm: string,
+  ne: string, nm: string, de: string, dm: string,
 ) {
   return {
-    idle:   [build('o', nm, '~'), build('-', nm, ' '), build('o', nm, ' '), build('^', nm, '~')],
-    busy:   [build('o', nm, '~'), build('^', nm, '~'), build('-', nm, '~'), build('^', nm, '~')],
-    danger: [build('O', dm, '!'), build('-', dm, '!'), build('O', dm, '!'), build('O', dm, ' ')],
-    sleep:  [build('-', nm, 'z'), build('-', nm, 'Z'), build('-', nm, 'z'), build('-', nm, ' ')],
+    idle:   [build('o'+ne, nm, '~'), build('-'+ne, nm, ' '), build('o'+ne, nm, ' '), build('^'+ne, nm, '~')],
+    busy:   [build('o'+ne, nm, '~'), build('^'+ne, nm, '~'), build('-'+ne, nm, '~'), build('^'+ne, nm, '~')],
+    danger: [build('O'+de, dm, '!'), build('-'+de, dm, '!'), build('O'+de, dm, '!'), build('O'+de, dm, ' ')],
+    sleep:  [build('-'+ne, nm, 'z'), build('-'+ne, nm, 'Z'), build('-'+ne, nm, 'z'), build('-'+ne, nm, ' ')],
   };
 }
 
 export const cat: AnimalDef = {
   name: 'Cat',
   frames: {
-    tiny:   make(tiny,   '^.^', '~.~'),
-    small:  make(small,  '> ^ <', '> ~ <'),
-    medium: make(medium, '> ^.^ <', '> ~.~ <'),
-    chubby: make(chubby, '>  ^..^  <', '>  ~..~  <'),
-    thicc:  make(thicc,  '>  ^....^  <', '>  ~....~  <'),
+    // ne/nm must be same string length as de/dm for alignment
+    // eyes: "o w o", mouth: "^ . ^" — same length each size
+    tiny:   make(tiny,   ' w o', '^ . ^', ' w O', '~ . ~'),
+    small:  make(small,  '  w  o', ' ^ . ^ ', '  w  O', ' ~ . ~ '),
+    medium: make(medium, '   w   o', '  ^ . ^  ', '   w   O', '  ~ . ~  '),
+    chubby: make(chubby, '     w     o', '   ^  .  ^   ', '     w     O', '   ~  .  ~   '),
+    thicc:  make(thicc,  '       w       o', '    ^   .   ^    ', '       w       O', '    ~   .   ~    '),
   },
 };

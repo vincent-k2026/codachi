@@ -2,37 +2,36 @@ import type { AnimalDef } from './types.js';
 import { f } from './types.js';
 
 // Octopus: ,---. dome, ( o.o ) face, '/|||\' tentacles
-// All 3 lines centered, dome=face=tentacles same width
 
 const tiny = (e: string, t: string) => f([
-  `  ,---.   ${t}`,
-  ` ( ${e}.${e} )  `,
-  ` '/|||\\'  `,
-]);
+  `,---.`,
+  `( ${e}.${e} )`,
+  `'/|||\\'`,
+], t);
 
 const small = (e: string, t: string) => f([
-  `   ,-------.   ${t}`,
-  `  ( ${e}  .  ${e} )  `,
-  `  '/|||||||\\'  `,
-]);
+  `,-------.`,
+  `( ${e}  .  ${e} )`,
+  `'/|||||||\\'`,
+], t);
 
 const medium = (e: string, t: string) => f([
-  `    ,-----------.    ${t}`,
-  `   ( ${e}    .    ${e} )   `,
-  `   '/|||||||||||\\'   `,
-]);
+  `,-----------.`,
+  `( ${e}    .    ${e} )`,
+  `'/|||||||||||\\'`,
+], t);
 
 const chubby = (e: string, t: string) => f([
-  `     ,-----------------.     ${t}`,
-  `    ( ${e}       .       ${e} )    `,
-  `    '/|||||||||||||||||||\\'   `,
-]);
+  `,-----------------.`,
+  `( ${e}       .       ${e} )`,
+  `'/|||||||||||||||||||\\'`,
+], t);
 
 const thicc = (e: string, t: string) => f([
-  `      ,-------------------------.      ${t}`,
-  `     ( ${e}          .          ${e} )     `,
-  `     '/|||||||||||||||||||||||||||\\'    `,
-]);
+  `,-------------------------.`,
+  `( ${e}          .          ${e} )`,
+  `'/|||||||||||||||||||||||||||\\'`,
+], t);
 
 function make(build: (e: string, t: string) => ReturnType<typeof f>) {
   return {
