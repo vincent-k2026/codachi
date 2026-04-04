@@ -5,9 +5,9 @@ export interface AnimalDef {
     frames: Record<BodySize, Record<Animation, AnimalFrame[]>>;
 }
 /**
- * Build a frame from content lines + optional tail character.
- * Each line is auto-centered to the widest line's width.
- * The tail is placed to the right of the first line, outside the centered area.
+ * Build a frame from content lines + optional tail.
+ * Forces all content to the same width (even), then centers each line.
+ * Tail goes to the right of line 0.
  */
 export declare function f(contentLines: string[], tail?: string): AnimalFrame;
 /** Pick a frame. Normalizes all frames in the same animation to equal width. */

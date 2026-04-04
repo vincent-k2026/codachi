@@ -1,6 +1,6 @@
 import { rgb } from './render/colors.js';
 import { getSessionAnimalIndex, getSessionPaletteIndex } from './state.js';
-const ANIMALS = ['cat', 'penguin', 'frog', 'octopus', 'bunny'];
+const ANIMALS = ['cat', 'penguin', 'duck', 'octopus', 'bunny'];
 export function getAnimalType() {
     return ANIMALS[getSessionAnimalIndex() % ANIMALS.length];
 }

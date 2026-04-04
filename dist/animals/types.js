@@ -1,22 +1,23 @@
 import { stringWidth } from '../width.js';
 /**
- * Build a frame from content lines + optional tail character.
- * Each line is auto-centered to the widest line's width.
- * The tail is placed to the right of the first line, outside the centered area.
+ * Build a frame from content lines + optional tail.
+ * Forces all content to the same width (even), then centers each line.
+ * Tail goes to the right of line 0.
  */
 export function f(contentLines, tail = '') {
-    // First, find the max content width (ignoring tail)
-    const contentWidths = contentLines.map(l => stringWidth(l));
-    const maxContent = Math.max(...contentWidths);
-    // Center each line within maxContent width
+    const widths = contentLines.map(l => stringWidth(l));
+    let targetW = Math.max(...widths);
+    // Force even width so centering is always symmetric
+    if (targetW % 2 !== 0)
+        targetW += 1;
     const centered = contentLines.map(l => {
         const w = stringWidth(l);
-        const totalPad = maxContent - w;
-        const leftPad = Math.floor(totalPad / 2);
-        const rightPad = totalPad - leftPad;
-        return ' '.repeat(leftPad) + l + ' '.repeat(rightPad);
+        const gap = targetW - w;
+        // Distribute gap: half left, half right. If odd gap, extra goes right.
+        const left = Math.floor(gap / 2);
+        const right = gap - left;
+        return ' '.repeat(left) + l + ' '.repeat(right);
     });
-    // Add tail to first line, pad others to match
     const tailStr = tail || ' ';
     const lines = centered.map((l, i) => i === 0 ? l + tailStr : l + ' '.repeat(stringWidth(tailStr)));
     const width = Math.max(...lines.map(l => stringWidth(l)));
