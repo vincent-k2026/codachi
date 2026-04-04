@@ -2,12 +2,12 @@
 
 A tamagotchi-style virtual pet that lives in your [Claude Code](https://docs.anthropic.com/en/docs/claude-code) statusline.
 
-Your pet grows fatter as your context window fills up, reacts to your git activity, shows you useful dev info at a glance, and keeps you company while you code.
+Your pet grows fatter as your context window fills up, reacts to your git activity, remembers you across sessions, and keeps you company while you code.
 
 ```
-   /\_/\~      [Opus 4.6] ██████░░░░ 55% | 5h ██░░░░ 32% ~2h | 7d █░░░░ 25%
+   /\_/\~      [Opus 4.6] ██████░░░░ 55% ^3%/m cache:80% | 5h ██░░░░ 32% ~2h
  =( o w o )=   git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug
-   (> ^ <)     Cat Purring softly... | myapp [Node] | 2026-04-02 17:22 | up 45m
+   (> ^ <)     Cat Purring softly... | myapp [Node] | 2026-04-04 15:00 | up 45m
 ```
 
 ## Features
@@ -40,16 +40,16 @@ Body size scales with context window usage — from tiny to thicc.
 
 ### 6 Animals, 10 Color Palettes
 
-Your username hash determines your pet and color scheme.
+Each session gets a random animal and color palette — a fresh companion every conversation.
 
-| Animal | Ears | Face | Feature |
-|--------|------|------|---------|
-| Cat | `/\_/\` | `( owo )` | Pointy ears, tail `~` |
-| Dog | `U\_/U` | `( owo )` | Floppy ears |
-| Rabbit | `(\  (\` | `( o.o )` | Long ears, feet `o(")("` |
-| Panda | `(@)(@)` | `( o.o )` | Round ear patches |
-| Penguin | | `( ovo )` | Flippers `/\|  \|\\` |
-| Fox | `/V\_/V\` | `( owo )` | Pointy ears, tail `\_Y_/` |
+| Animal | Look | Signature |
+|--------|------|-----------|
+| Cat | `/\_/\` `( owo )` | Pointy ears, waving tail `~` |
+| Dog | `U    U` `( owo )` | Floppy U ears, nose `w` |
+| Rabbit | `() ()` `( o.o )` | Tall ears, bunny feet `(")` |
+| Panda | `(●)(●)` `( o.o )` | Dark eye patches |
+| Penguin | `( ovo )` `<(  )>` | Flippers `< >`, beak `v` |
+| Fox | `/V V\` `( owo )` | Sharp ears, bushy tail `~~` |
 
 Palettes: Coral Flame, Electric Blue, Neon Mint, Purple Haze, Hot Pink, Golden Sun, Ice Violet, Cherry Blossom, Cyan Surge, Tangerine.
 
@@ -57,35 +57,64 @@ Palettes: Coral Flame, Electric Blue, Neon Mint, Purple Haze, Hot Pink, Golden S
 
 | State | Trigger | What changes |
 |-------|---------|--------------|
-| **Idle** | Normal | Eyes blink (`o` -> `-`), tail wags (`~`), happy face (`^`) |
+| **Idle** | Normal | Eyes blink `o`->`-`, tail wags `~`, happy face `^` |
 | **Busy** | Claude working | Rapid eye/tail cycling |
-| **Danger** | Context > 85% | Wide eyes (`O`), `!` warning |
-| **Sleep** | Context < 10% | Closed eyes (`-`), `z` / `Z` |
+| **Danger** | Context > 85% | Wide eyes `O`, warning `!` |
+| **Sleep** | Context < 10% | Closed eyes `-`, snoring `z`/`Z` |
 
-Animations are time-based (`Date.now()`), so the pet changes pose every ~1.5s whenever the statusline refreshes.
+Animations are time-based — the pet changes pose every ~1.5s whenever the statusline refreshes.
 
 ### 3-Line Info Display
 
 | Line | Content |
 |------|---------|
-| **Claude** | Model, context bar + %, 5h usage + reset countdown, 7d usage |
-| **Git** | Branch, file changes, line +/-, ahead/behind, last commit, stash |
-| **Pet** | Name, mood, project [lang], datetime, session uptime |
+| **Claude** | Model, context bar + %, burn speed `^3%/m`, cache hit rate `cache:80%`, 5h/7d usage + reset countdown |
+| **Git** | Branch, file changes (`~mod +add -del ?new`), line diffs, ahead/behind, last commit, stash count |
+| **Pet** | Name, mood message, project name + language, datetime, session uptime |
 
-### 100+ Mood Messages
+### Context Velocity
+
+Shows how fast your context window is filling up: `^5%/m` means 5% per minute. Color-coded green (slow) / yellow (moderate) / red (burning fast). Helps you predict when to `/compact`.
+
+### Cache Hit Rate
+
+Displays `cache:73%` — what percentage of input tokens come from cache reads vs. fresh creation. High cache = efficient session. This metric isn't shown anywhere else in Claude Code.
+
+### Pet Memory
+
+Your pet remembers you across sessions. A persistent `memory.json` tracks:
+
+- Total sessions together
+- Total time spent coding
+- Relationship tier: **stranger** -> **acquaintance** -> **friend** -> **bestie**
+
+Each tier unlocks warmer messages. New pets say "Oh! A new friend!" while besties say "BESTIE! You're here! #47".
+
+### 150+ Mood Messages
+
+Your pet reacts to what's happening:
 
 | Trigger | Examples |
 |---------|----------|
-| Git dirty | "Work in progress~ looking good!" |
-| Clean repo | "Everything's tidy~ feels nice" |
+| Relationship | "Welcome back! #47" (friend), "Oh! A new friend!" (stranger) |
+| Context velocity | "Whoa, burning through context!", "Nice steady pace~" |
+| Cache efficiency | "Great cache hits! So efficient~" |
+| File types | "Writing tests! So responsible~", "Documentation hero!" |
+| Git state | "Work in progress~ looking good!", "Everything's tidy~ feels nice" |
 | Context size | "Maximum floof achieved!", "Smol but mighty!" |
-| Time of day | "Burning the midnight oil..." |
-| Easter eggs | "Found a bug! ...it's kinda cute tho" |
-| Per-animal | Cat: "\*slow blink\* ...I love you" |
+| Time of day | "Burning the midnight oil...", "Lunch time vibes~" |
+| Easter eggs | "Found a bug! ...it's kinda cute tho", "import antigravity" |
+| Per-animal | Cat: "\*slow blink\* ...I love you", Dog: "You're my favorite human!" |
+
+### File Type Awareness
+
+The pet watches what files you're changing and reacts:
+
+TypeScript, JavaScript, Python, Rust, Go, Ruby, Java, Kotlin, Swift, C/C++, CSS, HTML, Vue, Svelte, Shell, SQL, Proto, GraphQL, Config files, Docs, Tests — each with unique messages.
 
 ### Language Detection
 
-Auto-detects: Rust, Go, Python, Node, Deno, Ruby, Java, Kotlin, Elixir, Dart, Swift, C/C++, Nix, Docker, Terraform.
+Auto-detects project language from config files: Rust, Go, Python, Node, Deno, Ruby, Java, Kotlin, Elixir, Dart, Swift, C/C++, Nix, Docker, Terraform, and more.
 
 ## Installation
 
@@ -107,7 +136,7 @@ Add to `~/.claude/settings.json`:
 }
 ```
 
-Restart Claude Code.
+Restart Claude Code. Your pet will appear below the input box.
 
 ## How It Works
 
@@ -115,27 +144,30 @@ Restart Claude Code.
 Claude Code --stdin:JSON--> codachi --stdout:ANSI--> statusline
 ```
 
-Statusline refreshes during active rendering (streaming, tool execution). Animation uses wall-clock time so each refresh shows the correct frame.
+Claude Code passes session data (model, context window, rate limits, cwd, transcript path) via stdin as JSON. Codachi computes git status, animation frame, mood message, and outputs 3 lines of ANSI-colored text.
+
+Animation is driven by `Date.now()` so each refresh shows the correct frame. Git results are cached for 2 seconds to stay within the refresh budget.
 
 ## Project Structure
 
 ```
 src/
 ├── index.ts            # Entry: stdin -> compute -> render
-├── stdin.ts            # Parse Claude Code JSON
-├── git.ts              # Branch, diff stats, stash (4 git commands)
-├── state.ts            # Wall-clock animation, session uptime
-├── identity.ts         # Username hash -> animal + palette
-├── mood.ts             # 100+ context-aware messages
-├── project.ts          # Language detection
-├── width.ts            # Terminal width calculation
+├── stdin.ts            # Parse Claude Code JSON, cache hit rate
+├── git.ts              # Branch, diff stats, stash, file type detection
+├── state.ts            # Session binding, animation ticks, context velocity,
+│                       #   pet memory (cross-session), relationship tiers
+├── identity.ts         # Session-random animal + palette selection
+├── mood.ts             # 150+ mood messages with 11-tier priority system
+├── project.ts          # Language/framework detection
+├── width.ts            # Terminal character width (East Asian Width)
 ├── types.ts            # TypeScript interfaces
 ├── animals/
 │   ├── index.ts        # Registry, body size, animation state
 │   ├── types.ts        # Template frame builder with auto-alignment
-│   ├── cat.ts          # Template: shape once, swap eyes/mouth/tail
-│   ├── dog.ts
-│   ├── rabbit.ts
+│   ├── cat.ts          # Template: define shape once, swap eyes/mouth/tail
+│   ├── dog.ts          #   Each animal has unique structural features
+│   ├── rabbit.ts       #   5 sizes × 4 states × 4 frames = 80 frames
 │   ├── panda.ts
 │   ├── penguin.ts
 │   └── fox.ts
