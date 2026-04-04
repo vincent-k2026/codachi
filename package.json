@@ -22,7 +22,7 @@
     "cli"
   ],
   "author": "vincent-k2026",
-  "license": "ISC",
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/vincent-k2026/codachi.git"
