@@ -1,13 +1,13 @@
 import { pickFrame } from './types.js';
 import { cat } from './cat.js';
-import { dog } from './dog.js';
-import { rabbit } from './rabbit.js';
-import { panda } from './panda.js';
 import { penguin } from './penguin.js';
-import { fox } from './fox.js';
+import { frog } from './frog.js';
+import { octopus } from './octopus.js';
+import { bunny } from './bunny.js';
 const REGISTRY = {
-    cat, dog, rabbit, panda, penguin, fox,
+    cat, penguin, frog, octopus, bunny,
 };
+export const ANIMAL_COUNT = Object.keys(REGISTRY).length;
 export function getAnimalName(type) {
     return REGISTRY[type].name;
 }

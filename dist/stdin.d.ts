@@ -10,3 +10,4 @@ export declare function getSevenDayUsage(stdin: StdinData): {
     percent: number;
     resetsIn: string | null;
 } | null;
+export declare function getCacheHitRate(stdin: StdinData): number | null;

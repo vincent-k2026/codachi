@@ -68,11 +68,44 @@ function compute(cwd) {
         // stash count
         stashCount = parts[2] ? parts[2].split('\n').filter(Boolean).length : 0;
     }
+    // 3. Detect dominant file type from changed file paths
+    const extMap = {
+        '.ts': 'TypeScript', '.tsx': 'TypeScript', '.js': 'JavaScript', '.jsx': 'JavaScript',
+        '.py': 'Python', '.rs': 'Rust', '.go': 'Go', '.rb': 'Ruby', '.java': 'Java',
+        '.kt': 'Kotlin', '.swift': 'Swift', '.c': 'C', '.cpp': 'C++', '.h': 'C',
+        '.css': 'Styles', '.scss': 'Styles', '.html': 'HTML', '.vue': 'Vue', '.svelte': 'Svelte',
+        '.md': 'Docs', '.json': 'Config', '.yaml': 'Config', '.yml': 'Config', '.toml': 'Config',
+        '.test.ts': 'Tests', '.test.js': 'Tests', '.spec.ts': 'Tests', '.spec.js': 'Tests',
+        '.sh': 'Shell', '.sql': 'SQL', '.proto': 'Proto', '.graphql': 'GraphQL',
+    };
+    const typeCounts = {};
+    for (const line of fileLines) {
+        const filePath = line.slice(3).trim().split(' -> ').pop() || '';
+        // Check longer extensions first (.test.ts before .ts)
+        let matched = false;
+        for (const ext of Object.keys(extMap).sort((a, b) => b.length - a.length)) {
+            if (filePath.endsWith(ext)) {
+                typeCounts[extMap[ext]] = (typeCounts[extMap[ext]] ?? 0) + 1;
+                matched = true;
+                break;
+            }
+        }
+        if (!matched)
+            typeCounts['Other'] = (typeCounts['Other'] ?? 0) + 1;
+    }
+    let dominantFileType = null;
+    let maxCount = 0;
+    for (const [type, count] of Object.entries(typeCounts)) {
+        if (count > maxCount) {
+            maxCount = count;
+            dominantFileType = type;
+        }
+    }
     return {
         branch, isDirty: fileLines.length > 0,
         ahead, behind, modified, added, deleted, untracked,
         insertions, deletions, fileCount: fileLines.length,
-        lastCommit, stashCount,
+        lastCommit, stashCount, dominantFileType,
     };
 }
 export function getGitStatus(cwd) {

@@ -1,29 +1,30 @@
 import { f } from './types.js';
-// Penguin: round head (no ears), bowtie/beak v, flippers <  >
+// Penguin: round head, v beak, < > flippers, " " feet
+// All centered, flippers grow symmetrically
 const tiny = (e, t) => f([
-    ` (${e}v${e})${t}`,
-    `<(   )>`,
-    `  " "  `,
+    `  (${e}v${e}) ${t}`,
+    ` <(   )> `,
+    `  (" ") `,
 ]);
 const small = (e, t) => f([
-    `  (${e} v ${e})${t} `,
-    ` <(     )> `,
-    `   "   "   `,
+    `   (${e} v ${e})  ${t}`,
+    ` <<(     )>> `,
+    `   ("   ")   `,
 ]);
 const medium = (e, t) => f([
-    `   (${e}  v  ${e})${t}  `,
-    `  <(         )> `,
-    `    "       "   `,
+    `    (${e}  v  ${e})   ${t}`,
+    ` <<<(        )>>> `,
+    `    ("      ")    `,
 ]);
 const chubby = (e, t) => f([
-    `    (${e}    v    ${e})${t}  `,
-    `   <(             )> `,
-    `     "           "   `,
+    `     (${e}    v    ${e})    ${t}`,
+    ` <<<<(             )>>>> `,
+    `     ("           ")     `,
 ]);
 const thicc = (e, t) => f([
-    `     (${e}       v       ${e})${t}  `,
-    `    <(                     )> `,
-    `      "                 "    `,
+    `      (${e}       v       ${e})     ${t}`,
+    ` <<<<<(                     )>>>>> `,
+    `      ("                   ")      `,
 ]);
 function make(build) {
     return {

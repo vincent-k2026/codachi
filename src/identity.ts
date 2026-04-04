@@ -2,7 +2,7 @@ import type { AnimalType, PetColors } from './types.js';
 import { rgb } from './render/colors.js';
 import { getSessionAnimalIndex, getSessionPaletteIndex } from './state.js';
 
-const ANIMALS: AnimalType[] = ['cat', 'dog', 'rabbit', 'panda', 'penguin', 'fox'];
+const ANIMALS: AnimalType[] = ['cat', 'penguin', 'frog', 'octopus', 'bunny'];
 
 export function getAnimalType(): AnimalType {
   return ANIMALS[getSessionAnimalIndex() % ANIMALS.length];

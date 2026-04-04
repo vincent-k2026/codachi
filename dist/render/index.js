@@ -85,9 +85,11 @@ export function render(input) {
     const frame = getAnimalFrame(animalType, size, animation, animTick);
     const petLines = frame.lines.map(l => colorizePetLine(l, colors));
     const petW = frame.width + 2;
+    const { contextVelocity, cacheHitRate, relationshipTier, sessionNumber } = input;
     const mood = getMoodMessage({
         contextPercent, size, animation, animalType, git,
-        fiveHourUsage: fiveHourUsage?.percent ?? null, moodTick,
+        fiveHourUsage: fiveHourUsage?.percent ?? null,
+        contextVelocity, cacheHitRate, relationshipTier, sessionNumber, moodTick,
     });
     const { body: C, accent: A, face: F, blush: B } = colors;
     const SEP = `${DIM}|${RESET}`;
@@ -95,7 +97,19 @@ export function render(input) {
     const ctxBar = progressBar(contextPercent, 10, getContextColor);
     const ctxColor = contextPercent >= 85 ? rgb(255, 80, 80)
         : contextPercent >= 70 ? rgb(255, 200, 50) : rgb(80, 220, 120);
-    let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}`;
+    // Context velocity indicator
+    let velStr = '';
+    if (contextVelocity > 0.5) {
+        const vColor = contextVelocity > 5 ? rgb(255, 80, 80) : contextVelocity > 2 ? rgb(255, 200, 50) : rgb(80, 220, 120);
+        velStr = ` ${vColor}^${contextVelocity}%/m${RESET}`;
+    }
+    // Cache hit rate
+    let cacheStr = '';
+    if (cacheHitRate !== null) {
+        const cColor = cacheHitRate >= 60 ? rgb(80, 220, 120) : cacheHitRate >= 30 ? rgb(255, 200, 50) : rgb(255, 80, 80);
+        cacheStr = ` ${cColor}cache:${cacheHitRate}%${RESET}`;
+    }
+    let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}${velStr}${cacheStr}`;
     if (fiveHourUsage) {
         const u = fiveHourUsage;
         const uBar = progressBar(u.percent, 6, getUsageColor);

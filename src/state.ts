@@ -39,7 +39,7 @@ export function initSession(transcriptPath?: string): void {
     diskState = {
       transcriptPath: transcriptPath ?? '',
       sessionStart: Date.now(),
-      animalIndex: Math.floor(Math.random() * 6),
+      animalIndex: Math.floor(Math.random() * 5),
       paletteIndex: Math.floor(Math.random() * 10),
     };
     saveJSON(STATE_FILE, diskState);

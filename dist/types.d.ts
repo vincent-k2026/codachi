@@ -28,7 +28,7 @@ export interface StdinData {
     };
 }
 export type BodySize = 'tiny' | 'small' | 'medium' | 'chubby' | 'thicc';
-export type AnimalType = 'cat' | 'dog' | 'rabbit' | 'panda' | 'penguin' | 'fox';
+export type AnimalType = 'cat' | 'penguin' | 'frog' | 'octopus' | 'bunny';
 export type Animation = 'idle' | 'busy' | 'danger' | 'sleep';
 export interface AnimalFrame {
     lines: string[];
@@ -54,4 +54,5 @@ export interface GitStatus {
     fileCount: number;
     lastCommit: string;
     stashCount: number;
+    dominantFileType: string | null;
 }

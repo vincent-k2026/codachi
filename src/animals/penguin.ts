@@ -1,36 +1,37 @@
 import type { AnimalDef } from './types.js';
 import { f } from './types.js';
 
-// Penguin: round head (no ears), bowtie/beak v, flippers <  >
+// Penguin: round head, v beak, < > flippers, " " feet
+// All centered, flippers grow symmetrically
 
 const tiny = (e: string, t: string) => f([
-  ` (${e}v${e})${t}`,
-  `<(   )>`,
-  `  " "  `,
+  `  (${e}v${e}) ${t}`,
+  ` <(   )> `,
+  `  (" ") `,
 ]);
 
 const small = (e: string, t: string) => f([
-  `  (${e} v ${e})${t} `,
-  ` <(     )> `,
-  `   "   "   `,
+  `   (${e} v ${e})  ${t}`,
+  ` <<(     )>> `,
+  `   ("   ")   `,
 ]);
 
 const medium = (e: string, t: string) => f([
-  `   (${e}  v  ${e})${t}  `,
-  `  <(         )> `,
-  `    "       "   `,
+  `    (${e}  v  ${e})   ${t}`,
+  ` <<<(        )>>> `,
+  `    ("      ")    `,
 ]);
 
 const chubby = (e: string, t: string) => f([
-  `    (${e}    v    ${e})${t}  `,
-  `   <(             )> `,
-  `     "           "   `,
+  `     (${e}    v    ${e})    ${t}`,
+  ` <<<<(             )>>>> `,
+  `     ("           ")     `,
 ]);
 
 const thicc = (e: string, t: string) => f([
-  `     (${e}       v       ${e})${t}  `,
-  `    <(                     )> `,
-  `      "                 "    `,
+  `      (${e}       v       ${e})     ${t}`,
+  ` <<<<<(                     )>>>>> `,
+  `      ("                   ")      `,
 ]);
 
 function make(build: (e: string, t: string) => ReturnType<typeof f>) {

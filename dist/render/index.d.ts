@@ -1,5 +1,6 @@
 import type { PetColors, AnimalType, GitStatus } from '../types.js';
 import type { ProjectInfo } from '../project.js';
+import type { RelationshipTier } from '../state.js';
 interface RenderInput {
     contextPercent: number;
     modelName: string;
@@ -15,6 +16,10 @@ interface RenderInput {
         percent: number;
         resetsIn: string | null;
     } | null;
+    contextVelocity: number;
+    cacheHitRate: number | null;
+    relationshipTier: RelationshipTier;
+    sessionNumber: number;
     animTick: number;
     moodTick: number;
     uptime: string;

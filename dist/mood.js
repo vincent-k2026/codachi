@@ -139,36 +139,6 @@ const IDLE_MESSAGES = {
         '*stretches luxuriously*',
         'Your code smells nice today~',
     ],
-    dog: [
-        '*tail wag intensifies*',
-        'You\'re my favorite human!',
-        'Every line you write is amazing!',
-        'I fetched you some good vibes~',
-        'Who\'s coding? You\'re coding!',
-        '*happy tippy taps*',
-        'Best. Coder. Ever.',
-        'Can we go for a walk... through the repo?',
-    ],
-    rabbit: [
-        '*nose twitch twitch*',
-        'Nibbling on some syntax~',
-        'Ears up! Something interesting...',
-        'Hop hop hop through the code!',
-        '*thump thump* (that means happy)',
-        'Binkying through the functions!',
-        'Found a cozy spot in your code~',
-        'Everything is so interesting!',
-    ],
-    panda: [
-        'Munching bamboo peacefully...',
-        '*rolls over contentedly*',
-        'Zen mode activated~',
-        'Inner peace loading... 99%',
-        'Bamboo and code. Life is good.',
-        '*gentle contemplation*',
-        'Being round is an art form~',
-        'Serenity in every semicolon...',
-    ],
     penguin: [
         '*happy waddle*',
         'Sliding through the codebase!',
@@ -179,15 +149,35 @@ const IDLE_MESSAGES = {
         'I like it here with you!',
         'Chillin\' and codin\'~',
     ],
-    fox: [
-        'What does the fox say? ...meow?',
-        'Sneaky sneaky through the code~',
-        '*ears perk up* Ooh, interesting!',
-        'Fluffy tail = good luck charm',
-        'Sly and supportive~',
-        '*floofy tail swish*',
-        'Curious about everything!',
-        'The quick brown fox loves your code~',
+    frog: [
+        '*ribbit ribbit*',
+        'Sitting on a lily pad of code~',
+        'Catching bugs! Literally!',
+        '*blink blink* ...big frog eyes',
+        'Leap of faith into the codebase!',
+        'It\'s not easy being green~',
+        '*tongue zap* Got a bug!',
+        'Frog and code, a classic combo~',
+    ],
+    octopus: [
+        '*wiggles tentacles*',
+        'Eight arms, infinite possibilities!',
+        'Multi-tasking like a pro~',
+        'Ink-redibly good code today!',
+        '*squish squish* Comfy in here~',
+        'Tentacles on the keyboard!',
+        'Ocean-deep concentration...',
+        'I can hold 8 files at once!',
+    ],
+    bunny: [
+        '*nose twitch twitch*',
+        'Nibbling on some syntax~',
+        'Ears up! Something interesting...',
+        'Hop hop hop through the code!',
+        '*thump thump* (that means happy)',
+        'Binkying through the functions!',
+        'Found a cozy spot in your code~',
+        'Everything is so interesting!',
     ],
 };
 const BUSY_MESSAGES = [
@@ -217,9 +207,52 @@ const USAGE_HIGH_MESSAGES = [
     'Rest is part of the journey~',
     'Even pets need nap breaks!',
 ];
+// ─── Context velocity messages ───────────────────────────────
+const VELOCITY_FAST = [
+    'Whoa, burning through context!',
+    'Speed coding session!',
+    'Context going brrrr~',
+    'Full throttle mode!',
+];
+const VELOCITY_SLOW = [
+    'Nice steady pace~',
+    'Slow and thoughtful, I like it',
+    'Taking our time... smart!',
+];
+// ─── Cache messages ──────────────────────────────────────────
+const CACHE_GOOD = [
+    'Great cache hits! So efficient~',
+    'Cache is cooking! Snappy session~',
+    'High cache = fast vibes!',
+];
+const CACHE_BAD = [
+    'Lots of fresh context flowing in~',
+    'Cache miss... new territory!',
+    'Exploring uncharted tokens~',
+];
+// ─── File type messages ──────────────────────────────────────
+const FILE_TYPE_MESSAGES = {
+    Tests: ['Writing tests! So responsible~', 'Testing testing 1 2 3~', 'Test-driven? I respect that!'],
+    Docs: ['Documentation hero!', 'Docs day! Future you says thanks~', 'README vibes~'],
+    Styles: ['Making things pretty~', 'CSS wizardry in progress!', 'Pixel-perfect pursuit~'],
+    Config: ['Ooh, tinkering under the hood~', 'Config tweaks... careful now~', 'The foundation matters!'],
+    Shell: ['Shell scripting! Powerful stuff~', 'bash bash bash~', 'Automating all the things!'],
+    SQL: ['Database whisperer~', 'Query crafting mode!', 'SELECT * FROM awesome~'],
+    TypeScript: ['Type safety feels good~', 'TypeScript gang!', 'Types are love, types are life~'],
+    Python: ['Pythonic elegance~', 'import antigravity', 'Beautiful is better than ugly~'],
+    Rust: ['Fearless concurrency!', 'The borrow checker approves~', 'Zero-cost abstractions!'],
+    Go: ['Go go go!', 'Simplicity is the ultimate sophistication~', 'Goroutines go brrr~'],
+};
+// ─── Relationship-tier messages ──────────────────────────────
+const WELCOME_MESSAGES = {
+    stranger: ['Oh! A new friend! Hi!', 'Nice to meet you!', 'First time here? Welcome!'],
+    acquaintance: ['Hey, good to see you again!', 'Welcome back~', 'Missed you!'],
+    friend: ['My favorite human is back!', 'Yay, we\'re coding together again!', 'I saved your spot~'],
+    bestie: ['BESTIE! You\'re here!', 'The dream team reunites!', 'You + me = unstoppable~'],
+};
 // ─── Main mood function ──────────────────────────────────────
 export function getMoodMessage(ctx) {
-    const { contextPercent, size, animation, animalType, git, fiveHourUsage, moodTick: tick } = ctx;
+    const { contextPercent, size, animation, animalType, git, fiveHourUsage, contextVelocity, cacheHitRate, relationshipTier, sessionNumber, moodTick: tick, } = ctx;
     // Priority 1: danger state
     if (animation === 'danger') {
         return DANGER_MESSAGES[tick % DANGER_MESSAGES.length];
@@ -232,23 +265,49 @@ export function getMoodMessage(ctx) {
     if (animation === 'busy') {
         return BUSY_MESSAGES[tick % BUSY_MESSAGES.length];
     }
-    // Priority 4: rare easter eggs
+    // Priority 4: welcome back (first few ticks of session)
+    if (tick % 60 < 2) {
+        const msgs = WELCOME_MESSAGES[relationshipTier];
+        const base = msgs[tick % msgs.length];
+        return sessionNumber > 1 ? `${base} #${sessionNumber}` : base;
+    }
+    // Priority 5: rare easter eggs
     if (tick % 30 === 7) {
         return RARE_EVENTS[tick % RARE_EVENTS.length];
     }
-    // Priority 5: time-of-day vibes
+    // Priority 6: context velocity (when burning fast)
+    if (contextVelocity > 5 && tick % 6 === 1) {
+        return VELOCITY_FAST[tick % VELOCITY_FAST.length];
+    }
+    if (contextVelocity > 0 && contextVelocity <= 1 && tick % 8 === 2) {
+        return VELOCITY_SLOW[tick % VELOCITY_SLOW.length];
+    }
+    // Priority 7: cache hit rate
+    if (cacheHitRate !== null && tick % 10 === 4) {
+        if (cacheHitRate >= 60)
+            return CACHE_GOOD[tick % CACHE_GOOD.length];
+        if (cacheHitRate < 30)
+            return CACHE_BAD[tick % CACHE_BAD.length];
+    }
+    // Priority 8: time-of-day vibes
     if (tick % 12 === 3) {
         const timeMsg = getTimeGreeting();
         if (timeMsg)
             return timeMsg;
     }
-    // Priority 6: git mood
+    // Priority 9: file type awareness
+    if (git?.dominantFileType && tick % 5 === 0) {
+        const ftMsgs = FILE_TYPE_MESSAGES[git.dominantFileType];
+        if (ftMsgs)
+            return ftMsgs[tick % ftMsgs.length];
+    }
+    // Priority 10: git mood
     if (tick % 3 === 0) {
         const gitMsg = getGitMood(git, tick);
         if (gitMsg)
             return gitMsg;
     }
-    // Priority 7: size messages
+    // Priority 11: size messages
     if ((size === 'tiny' || size === 'thicc') && tick % 4 < 2) {
         return SIZE_MESSAGES[size][tick % SIZE_MESSAGES[size].length];
     }

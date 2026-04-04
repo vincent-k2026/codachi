@@ -1,5 +1,5 @@
 import { stringWidth } from '../width.js';
-/** Build a frame. Auto-pads all lines to the widest line's width. */
+/** Build a frame. Pads all lines to the widest line (right-pad only). */
 export function f(rawLines) {
     const width = Math.max(...rawLines.map(l => stringWidth(l)));
     const lines = rawLines.map(l => {
