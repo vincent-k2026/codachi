@@ -71,3 +71,13 @@ export function getSevenDayUsage(stdin: StdinData): { percent: number; resetsIn:
     resetsIn: formatResetTime(stdin.rate_limits?.seven_day?.resets_at),
   };
 }
+
+export function getCacheHitRate(stdin: StdinData): number | null {
+  const usage = stdin.context_window?.current_usage;
+  if (!usage) return null;
+  const read = usage.cache_read_input_tokens ?? 0;
+  const create = usage.cache_creation_input_tokens ?? 0;
+  const total = read + create;
+  if (total === 0) return null;
+  return Math.round((read / total) * 100);
+}

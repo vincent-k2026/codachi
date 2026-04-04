@@ -1,4 +1,5 @@
 import type { BodySize, Animation, AnimalType, GitStatus } from './types.js';
+import type { RelationshipTier } from './state.js';
 
 interface MoodContext {
   contextPercent: number;
@@ -7,6 +8,10 @@ interface MoodContext {
   animalType: AnimalType;
   git: GitStatus | null;
   fiveHourUsage: number | null;
+  contextVelocity: number;
+  cacheHitRate: number | null;
+  relationshipTier: RelationshipTier;
+  sessionNumber: number;
   moodTick: number;
 }
 
@@ -238,9 +243,60 @@ const USAGE_HIGH_MESSAGES = [
   'Even pets need nap breaks!',
 ];
 
+// ─── Context velocity messages ───────────────────────────────
+const VELOCITY_FAST = [
+  'Whoa, burning through context!',
+  'Speed coding session!',
+  'Context going brrrr~',
+  'Full throttle mode!',
+];
+const VELOCITY_SLOW = [
+  'Nice steady pace~',
+  'Slow and thoughtful, I like it',
+  'Taking our time... smart!',
+];
+
+// ─── Cache messages ──────────────────────────────────────────
+const CACHE_GOOD = [
+  'Great cache hits! So efficient~',
+  'Cache is cooking! Snappy session~',
+  'High cache = fast vibes!',
+];
+const CACHE_BAD = [
+  'Lots of fresh context flowing in~',
+  'Cache miss... new territory!',
+  'Exploring uncharted tokens~',
+];
+
+// ─── File type messages ──────────────────────────────────────
+const FILE_TYPE_MESSAGES: Record<string, string[]> = {
+  Tests:      ['Writing tests! So responsible~', 'Testing testing 1 2 3~', 'Test-driven? I respect that!'],
+  Docs:       ['Documentation hero!', 'Docs day! Future you says thanks~', 'README vibes~'],
+  Styles:     ['Making things pretty~', 'CSS wizardry in progress!', 'Pixel-perfect pursuit~'],
+  Config:     ['Ooh, tinkering under the hood~', 'Config tweaks... careful now~', 'The foundation matters!'],
+  Shell:      ['Shell scripting! Powerful stuff~', 'bash bash bash~', 'Automating all the things!'],
+  SQL:        ['Database whisperer~', 'Query crafting mode!', 'SELECT * FROM awesome~'],
+  TypeScript: ['Type safety feels good~', 'TypeScript gang!', 'Types are love, types are life~'],
+  Python:     ['Pythonic elegance~', 'import antigravity', 'Beautiful is better than ugly~'],
+  Rust:       ['Fearless concurrency!', 'The borrow checker approves~', 'Zero-cost abstractions!'],
+  Go:         ['Go go go!', 'Simplicity is the ultimate sophistication~', 'Goroutines go brrr~'],
+};
+
+// ─── Relationship-tier messages ──────────────────────────────
+const WELCOME_MESSAGES: Record<string, string[]> = {
+  stranger:     ['Oh! A new friend! Hi!', 'Nice to meet you!', 'First time here? Welcome!'],
+  acquaintance: ['Hey, good to see you again!', 'Welcome back~', 'Missed you!'],
+  friend:       ['My favorite human is back!', 'Yay, we\'re coding together again!', 'I saved your spot~'],
+  bestie:       ['BESTIE! You\'re here!', 'The dream team reunites!', 'You + me = unstoppable~'],
+};
+
 // ─── Main mood function ──────────────────────────────────────
 export function getMoodMessage(ctx: MoodContext): string {
-  const { contextPercent, size, animation, animalType, git, fiveHourUsage, moodTick: tick } = ctx;
+  const {
+    contextPercent, size, animation, animalType, git,
+    fiveHourUsage, contextVelocity, cacheHitRate,
+    relationshipTier, sessionNumber, moodTick: tick,
+  } = ctx;
 
   // Priority 1: danger state
   if (animation === 'danger') {
@@ -257,24 +313,51 @@ export function getMoodMessage(ctx: MoodContext): string {
     return BUSY_MESSAGES[tick % BUSY_MESSAGES.length];
   }
 
-  // Priority 4: rare easter eggs
+  // Priority 4: welcome back (first few ticks of session)
+  if (tick % 60 < 2) {
+    const msgs = WELCOME_MESSAGES[relationshipTier];
+    const base = msgs[tick % msgs.length];
+    return sessionNumber > 1 ? `${base} #${sessionNumber}` : base;
+  }
+
+  // Priority 5: rare easter eggs
   if (tick % 30 === 7) {
     return RARE_EVENTS[tick % RARE_EVENTS.length];
   }
 
-  // Priority 5: time-of-day vibes
+  // Priority 6: context velocity (when burning fast)
+  if (contextVelocity > 5 && tick % 6 === 1) {
+    return VELOCITY_FAST[tick % VELOCITY_FAST.length];
+  }
+  if (contextVelocity > 0 && contextVelocity <= 1 && tick % 8 === 2) {
+    return VELOCITY_SLOW[tick % VELOCITY_SLOW.length];
+  }
+
+  // Priority 7: cache hit rate
+  if (cacheHitRate !== null && tick % 10 === 4) {
+    if (cacheHitRate >= 60) return CACHE_GOOD[tick % CACHE_GOOD.length];
+    if (cacheHitRate < 30) return CACHE_BAD[tick % CACHE_BAD.length];
+  }
+
+  // Priority 8: time-of-day vibes
   if (tick % 12 === 3) {
     const timeMsg = getTimeGreeting();
     if (timeMsg) return timeMsg;
   }
 
-  // Priority 6: git mood
+  // Priority 9: file type awareness
+  if (git?.dominantFileType && tick % 5 === 0) {
+    const ftMsgs = FILE_TYPE_MESSAGES[git.dominantFileType];
+    if (ftMsgs) return ftMsgs[tick % ftMsgs.length];
+  }
+
+  // Priority 10: git mood
   if (tick % 3 === 0) {
     const gitMsg = getGitMood(git, tick);
     if (gitMsg) return gitMsg;
   }
 
-  // Priority 7: size messages
+  // Priority 11: size messages
   if ((size === 'tiny' || size === 'thicc') && tick % 4 < 2) {
     return SIZE_MESSAGES[size][tick % SIZE_MESSAGES[size].length];
   }

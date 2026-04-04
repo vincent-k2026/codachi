@@ -5,6 +5,8 @@ import { getAnimalFrame, getAnimalName, getBodySize, getAnimation } from '../ani
 import { getMoodMessage } from '../mood.js';
 import { stringWidth } from '../width.js';
 
+import type { RelationshipTier } from '../state.js';
+
 interface RenderInput {
   contextPercent: number;
   modelName: string;
@@ -14,6 +16,10 @@ interface RenderInput {
   project: ProjectInfo;
   fiveHourUsage: { percent: number; resetsIn: string | null } | null;
   sevenDayUsage: { percent: number; resetsIn: string | null } | null;
+  contextVelocity: number;
+  cacheHitRate: number | null;
+  relationshipTier: RelationshipTier;
+  sessionNumber: number;
   animTick: number;
   moodTick: number;
   uptime: string;
@@ -100,9 +106,12 @@ export function render(input: RenderInput): void {
   const petLines = frame.lines.map(l => colorizePetLine(l, colors));
   const petW = frame.width + 2;
 
+  const { contextVelocity, cacheHitRate, relationshipTier, sessionNumber } = input;
+
   const mood = getMoodMessage({
     contextPercent, size, animation, animalType, git,
-    fiveHourUsage: fiveHourUsage?.percent ?? null, moodTick,
+    fiveHourUsage: fiveHourUsage?.percent ?? null,
+    contextVelocity, cacheHitRate, relationshipTier, sessionNumber, moodTick,
   });
 
   const { body: C, accent: A, face: F, blush: B } = colors;
@@ -112,7 +121,21 @@ export function render(input: RenderInput): void {
   const ctxBar = progressBar(contextPercent, 10, getContextColor);
   const ctxColor = contextPercent >= 85 ? rgb(255, 80, 80)
     : contextPercent >= 70 ? rgb(255, 200, 50) : rgb(80, 220, 120);
-  let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}`;
+  // Context velocity indicator
+  let velStr = '';
+  if (contextVelocity > 0.5) {
+    const vColor = contextVelocity > 5 ? rgb(255, 80, 80) : contextVelocity > 2 ? rgb(255, 200, 50) : rgb(80, 220, 120);
+    velStr = ` ${vColor}^${contextVelocity}%/m${RESET}`;
+  }
+
+  // Cache hit rate
+  let cacheStr = '';
+  if (cacheHitRate !== null) {
+    const cColor = cacheHitRate >= 60 ? rgb(80, 220, 120) : cacheHitRate >= 30 ? rgb(255, 200, 50) : rgb(255, 80, 80);
+    cacheStr = ` ${cColor}cache:${cacheHitRate}%${RESET}`;
+  }
+
+  let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}${velStr}${cacheStr}`;
   if (fiveHourUsage) {
     const u = fiveHourUsage;
     const uBar = progressBar(u.percent, 6, getUsageColor);

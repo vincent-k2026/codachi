@@ -60,5 +60,6 @@ export interface GitStatus {
   fileCount: number;
   lastCommit: string;
   stashCount: number;
+  dominantFileType: string | null;
 }
 
