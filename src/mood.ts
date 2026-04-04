@@ -283,7 +283,7 @@ const WELCOME_MESSAGES: Record<string, string[]> = {
 // ─── Main mood function ──────────────────────────────────────
 export function getMoodMessage(ctx: MoodContext): string {
   const {
-    contextPercent, size, animation, animalType, git,
+    size, animation, animalType, git,
     fiveHourUsage, contextVelocity, cacheHitRate,
     relationshipTier, sessionNumber, moodTick: tick,
   } = ctx;

@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
-const STATE_DIR = path.join(os.homedir(), '.claude', 'plugins', 'claude-pet');
+const STATE_DIR = path.join(os.homedir(), '.claude', 'plugins', 'codachi');
 const STATE_FILE = path.join(STATE_DIR, 'state.json');
 const MEMORY_FILE = path.join(STATE_DIR, 'memory.json');
 

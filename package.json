@@ -1,16 +1,35 @@
 {
   "name": "codachi",
   "version": "0.1.0",
-  "description": "A tamagotchi-style virtual pet that lives in your Claude Code statusline",
+  "description": "A tamagotchi that lives in your Claude Code statusline",
   "type": "module",
   "main": "dist/index.js",
+  "files": [
+    "dist",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "tamagotchi",
+    "pet",
+    "claude-code",
+    "statusline",
+    "ascii-art",
+    "terminal",
+    "cli"
+  ],
+  "author": "vincent-k2026",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vincent-k2026/codachi.git"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@types/node": "^25.5.0",
     "typescript": "^6.0.2"

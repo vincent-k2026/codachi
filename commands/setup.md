@@ -1,11 +1,11 @@
 ---
 allowed-tools: ["Bash", "Read", "Edit", "Write"]
-description: "Set up claude-pet as your statusline"
+description: "Set up codachi as your statusline"
 ---
 
-# Claude Pet Setup
+# Codachi Setup
 
-You are setting up claude-pet as the user's Claude Code statusline.
+You are setting up codachi as the user's Claude Code statusline.
 
 ## Steps
 
