@@ -6,6 +6,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { atomicWrite } from './fs-utils.js';
 
 const EVENTS_FILE = path.join(os.homedir(), '.claude', 'plugins', 'codachi', 'events.json');
 
@@ -62,7 +63,7 @@ function loadEvents(): RawEvent[] {
 /** Clear events file — called on new session to prevent cross-session bleed. */
 export function clearEvents(): void {
   try {
-    fs.writeFileSync(EVENTS_FILE, JSON.stringify({ events: [] }));
+    atomicWrite(EVENTS_FILE, JSON.stringify({ events: [] }));
   } catch { /* best-effort */ }
 }
 

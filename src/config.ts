@@ -4,6 +4,7 @@ import os from 'node:os';
 import type { AnimalType } from './types.js';
 
 export interface CodachiConfig {
+  name?: string;             // custom pet name (default: species name)
   animal?: AnimalType;       // force a specific animal (overrides random)
   palette?: number;          // force a specific palette index 0-9
   showTokens?: boolean;      // show token summary "550K/1M" (default: true)

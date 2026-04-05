@@ -39,6 +39,7 @@ function make(build: (e: string, t: string) => ReturnType<typeof f>) {
     busy:   [build('o', '~'), build('^', '~'), build('-', '~'), build('^', '~')],
     danger: [build('O', '!'), build('-', '!'), build('O', '!'), build('O', ' ')],
     sleep:  [build('-', 'z'), build('-', 'Z'), build('-', 'z'), build('-', ' ')],
+    happy:  [build('^', '~'), build('^', ' '), build('^', '~'), build('-', '~')],
   };
 }
 

@@ -32,7 +32,7 @@ export type BodySize = 'tiny' | 'small' | 'medium' | 'chubby' | 'thicc';
 
 export type AnimalType = 'cat' | 'penguin' | 'owl' | 'octopus' | 'bunny';
 
-export type Animation = 'idle' | 'busy' | 'danger' | 'sleep';
+export type Animation = 'idle' | 'busy' | 'danger' | 'sleep' | 'happy';
 
 export interface AnimalFrame {
   lines: string[];   // 3 lines of raw ASCII (no color)

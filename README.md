@@ -18,7 +18,13 @@ reacts to your work, and remembers you between sessions.
 ```bash
 git clone https://github.com/vincent-k2026/codachi.git
 cd codachi && npm install && npm run build
+node dist/index.js init
 ```
+
+That's it. Restart Claude Code and your pet will hatch.
+
+<details>
+<summary>Manual setup</summary>
 
 Add to `~/.claude/settings.json`:
 
@@ -39,7 +45,9 @@ Add to `~/.claude/settings.json`:
 }
 ```
 
-Restart Claude Code. Your pet will hatch.
+</details>
+
+Try the demo before installing: `node dist/index.js demo`
 
 ---
 
@@ -180,6 +188,7 @@ Optional. Create `~/.config/codachi/config.json`:
 
 ```json
 {
+  "name": "Mochi",
   "animal": "cat",
   "palette": 0,
   "animationSpeed": 1.5
@@ -188,6 +197,7 @@ Optional. Create `~/.config/codachi/config.json`:
 
 | Option | Default | Values |
 |:-------|:--------|:-------|
+| `name` | species | Custom pet name |
 | `animal` | random | `cat` `penguin` `owl` `octopus` `bunny` |
 | `palette` | random | `0`-`9` |
 | `showTokens` | `true` | Token count display |

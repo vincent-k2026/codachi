@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { clearEvents } from './events.js';
+import { atomicWrite } from './fs-utils.js';
 
 const STATE_DIR = path.join(os.homedir(), '.claude', 'plugins', 'codachi');
 const STATE_FILE = path.join(STATE_DIR, 'state.json');
@@ -24,7 +25,7 @@ function loadJSON<T>(file: string): T | null {
 function saveJSON(file: string, data: unknown): void {
   try {
     fs.mkdirSync(STATE_DIR, { recursive: true });
-    fs.writeFileSync(file, JSON.stringify(data));
+    atomicWrite(file, JSON.stringify(data));
   } catch {}
 }
 
@@ -94,6 +95,19 @@ export function getContextVelocity(): number {
   return Math.round(((recent.pct - oldest.pct) / dtMin) * 10) / 10;
 }
 
+/** Estimate minutes remaining before context is full. Returns null if velocity <= 0 or unstable. */
+export function getContextTimeRemaining(currentPct: number): string | null {
+  const vel = getContextVelocity();
+  if (vel <= 0.3) return null; // not growing or too slow to predict
+  const remaining = 100 - currentPct;
+  const mins = Math.round(remaining / vel);
+  if (mins <= 0) return null;
+  if (mins < 60) return `~${mins}m`;
+  const h = Math.floor(mins / 60);
+  const m = mins % 60;
+  return m > 0 ? `~${h}h${m}m` : `~${h}h`;
+}
+
 // ── Pet memory (cross-session persistence) ───────────
 
 export interface PetMemory {
@@ -101,9 +115,11 @@ export interface PetMemory {
   totalUptimeMin: number;
   firstMet: number; // timestamp
   lastSeen: number;
+  lastShownTier?: string; // for tier upgrade notifications
 }
 
 let memory: PetMemory | null = null;
+let tierJustUpgraded: boolean = false;
 
 function loadMemory(): PetMemory {
   return loadJSON<PetMemory>(MEMORY_FILE) ?? {
@@ -123,6 +139,15 @@ function updateMemory(): void {
   if (diskState.sessionStart) {
     m.totalUptimeMin += Math.floor((Date.now() - diskState.sessionStart) / 60000);
   }
+
+  // Check for tier upgrade
+  const oldTier = m.lastShownTier ?? 'stranger';
+  const newTier = tierFromSessions(m.totalSessions);
+  if (newTier !== oldTier && tierRank(newTier) > tierRank(oldTier)) {
+    tierJustUpgraded = true;
+    m.lastShownTier = newTier;
+  }
+
   saveJSON(MEMORY_FILE, m);
   memory = m;
 }
@@ -132,12 +157,29 @@ export function getMemory(): PetMemory {
   return memory;
 }
 
+/** Returns true once when a tier upgrade just happened, then resets. */
+export function didTierUpgrade(): boolean {
+  if (tierJustUpgraded) {
+    tierJustUpgraded = false;
+    return true;
+  }
+  return false;
+}
+
 export type RelationshipTier = 'stranger' | 'acquaintance' | 'friend' | 'bestie';
 
-export function getRelationshipTier(): RelationshipTier {
-  const m = getMemory();
-  if (m.totalSessions >= 50) return 'bestie';
-  if (m.totalSessions >= 15) return 'friend';
-  if (m.totalSessions >= 3) return 'acquaintance';
+function tierFromSessions(n: number): RelationshipTier {
+  if (n >= 50) return 'bestie';
+  if (n >= 15) return 'friend';
+  if (n >= 3) return 'acquaintance';
   return 'stranger';
+}
+
+function tierRank(tier: string): number {
+  const ranks: Record<string, number> = { stranger: 0, acquaintance: 1, friend: 2, bestie: 3 };
+  return ranks[tier] ?? 0;
+}
+
+export function getRelationshipTier(): RelationshipTier {
+  return tierFromSessions(getMemory().totalSessions);
 }

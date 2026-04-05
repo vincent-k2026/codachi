@@ -1,7 +1,7 @@
 import type { PetColors, AnimalType, BodySize, Animation, GitStatus } from '../types.js';
 import type { ProjectInfo } from '../project.js';
 import { RESET, DIM, rgb, progressBar, getContextColor, getUsageColor } from './colors.js';
-import { getAnimalFrame, getAnimalName, getBodySize, getAnimation } from '../animals/index.js';
+import { getAnimalFrame, getBodySize, getAnimation } from '../animals/index.js';
 import { getMoodMessage } from '../mood.js';
 import { stringWidth } from '../width.js';
 
@@ -26,6 +26,9 @@ interface RenderInput {
   moodTick: number;
   uptime: string;
   eventContext: EventContext;
+  petName: string;
+  contextTimeRemaining: string | null;
+  tierUpgraded: boolean;
 }
 
 function visualLength(str: string): number {
@@ -82,6 +85,8 @@ function colorizePetLine(line: string, colors: PetColors): string {
       targetColor = colors.face;
     } else if (ch === '"') {
       targetColor = colors.blush;
+    } else if (ch === '*') {
+      targetColor = colors.face;
     } else {
       targetColor = '';
     }
@@ -95,6 +100,12 @@ function colorizePetLine(line: string, colors: PetColors): string {
   return result;
 }
 
+// Events that make the pet happy (squinting eyes, wagging tail)
+const HAPPY_EVENTS = new Set([
+  'test_passed', 'build_passed', 'recovered', 'git_commit', 'git_push',
+  'many_edits', 'many_actions', 'first_action',
+]);
+
 export function render(input: RenderInput): void {
   const {
     contextPercent, modelName, animalType, colors, git,
@@ -104,19 +115,27 @@ export function render(input: RenderInput): void {
   const rawTermWidth = getTerminalWidth();
   const termWidth = Math.max(60, rawTermWidth); // minimum 60 cols
   const size: BodySize = getBodySize(contextPercent);
-  const animation: Animation = getAnimation(contextPercent, false);
+  let animation: Animation = getAnimation(contextPercent, false);
+
+  // Event-driven expression: happy eyes when positive event is hot
+  const { eventContext, tierUpgraded } = input;
+  if (animation === 'idle' && eventContext.freshness === 'hot' && eventContext.category) {
+    if (HAPPY_EVENTS.has(eventContext.category) || tierUpgraded) {
+      animation = 'happy';
+    }
+  }
 
   const frame = getAnimalFrame(animalType, size, animation, animTick);
   const petLines = frame.lines.map(l => colorizePetLine(l, colors));
   const petW = frame.width + 2;
 
-  const { contextVelocity, cacheHitRate, relationshipTier, sessionNumber, eventContext } = input;
+  const { contextVelocity, cacheHitRate, relationshipTier, sessionNumber, petName, contextTimeRemaining } = input;
 
   const mood = getMoodMessage({
     contextPercent, size, animation, animalType, git,
     fiveHourUsage: fiveHourUsage?.percent ?? null,
     contextVelocity, cacheHitRate, relationshipTier, sessionNumber, moodTick,
-    eventContext,
+    eventContext, tierUpgraded,
   });
 
   const { body: C, accent: A, face: F, blush: B } = colors;
@@ -133,6 +152,12 @@ export function render(input: RenderInput): void {
     velStr = ` ${vColor}^${contextVelocity}%/m${RESET}`;
   }
 
+  // Context time remaining
+  let timeLeftStr = '';
+  if (contextTimeRemaining) {
+    timeLeftStr = ` ${DIM}${contextTimeRemaining}${RESET}`;
+  }
+
   // Cache hit rate
   let cacheStr = '';
   if (cacheHitRate !== null) {
@@ -145,7 +170,7 @@ export function render(input: RenderInput): void {
   let tokStr = '';
   if (tokenSummary) tokStr = ` ${DIM}${tokenSummary}${RESET}`;
 
-  let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}${tokStr}${velStr}${cacheStr}`;
+  let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}${tokStr}${velStr}${timeLeftStr}${cacheStr}`;
   if (fiveHourUsage) {
     const u = fiveHourUsage;
     const uBar = progressBar(u.percent, 6, getUsageColor);
@@ -191,11 +216,10 @@ export function render(input: RenderInput): void {
   }
 
   // Line 3: Pet
-  const animalName = getAnimalName(animalType);
   const now = new Date();
   const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   const { project, uptime } = input;
-  let line3 = `${A}${animalName}${RESET} ${F}${mood}${RESET}`;
+  let line3 = `${A}${petName}${RESET} ${F}${mood}${RESET}`;
   line3 += ` ${SEP} ${C}${project.name}${RESET}`;
   if (project.lang) line3 += ` ${A}[${project.lang}]${RESET}`;
   line3 += ` ${SEP} ${B}${timeStr}${RESET}`;

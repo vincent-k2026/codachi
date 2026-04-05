@@ -15,7 +15,27 @@ interface MoodContext {
   sessionNumber: number;
   moodTick: number;
   eventContext: EventContext;
+  tierUpgraded: boolean;
 }
+
+// ── Tier upgrade celebration messages ──
+const TIER_UPGRADE: Record<string, string[]> = {
+  acquaintance: [
+    'We\'re acquaintances now! Getting to know you~',
+    'Hey, we\'re not strangers anymore!',
+    'Friendship level UP!',
+  ],
+  friend: [
+    'We\'re FRIENDS now! This means so much~',
+    'Official friend status! *happy tears*',
+    'Best thing that happened today: we\'re friends!',
+  ],
+  bestie: [
+    'BESTIE STATUS UNLOCKED! WE DID IT!',
+    'BEST FRIENDS FOREVER! *explodes with joy*',
+    'From strangers to besties... what a journey!',
+  ],
+};
 
 // ── Helper: resolve message (string or template function) ──
 
@@ -1063,11 +1083,17 @@ export function getMoodMessage(ctx: MoodContext): string {
     size, animation, animalType, git,
     fiveHourUsage, contextVelocity, cacheHitRate,
     relationshipTier, sessionNumber, moodTick: tick,
-    eventContext,
+    eventContext, tierUpgraded,
   } = ctx;
 
   // Use a faster tick for hot events (3s cycle) vs normal (10s)
   const eventTick = Math.floor(Date.now() / 3000);
+
+  // Priority 0: tier upgrade celebration (one-time)
+  if (tierUpgraded) {
+    const msgs = TIER_UPGRADE[relationshipTier];
+    if (msgs) return msgs[tick % msgs.length];
+  }
 
   // Priority 1: danger state
   if (animation === 'danger') {

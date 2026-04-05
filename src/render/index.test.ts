@@ -31,6 +31,9 @@ function makeRenderInput(overrides: Record<string, unknown> = {}) {
     moodTick: 5,
     uptime: '5m',
     eventContext: noEvent,
+    petName: 'Cat',
+    contextTimeRemaining: null,
+    tierUpgraded: false,
     ...overrides,
   };
 }

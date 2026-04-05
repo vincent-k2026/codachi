@@ -16,7 +16,8 @@
     "build": "tsc",
     "dev": "tsc --watch",
     "test": "vitest run",
-    "test:cov": "vitest run --coverage"
+    "test:cov": "vitest run --coverage",
+    "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [
     "tamagotchi",

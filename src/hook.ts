@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { atomicWrite } from './fs-utils.js';
 
 const EVENTS_DIR = path.join(os.homedir(), '.claude', 'plugins', 'codachi');
 const EVENTS_FILE = path.join(EVENTS_DIR, 'events.json');
@@ -84,7 +85,7 @@ function appendEvent(event: CodachiEvent): void {
 
   try {
     fs.mkdirSync(EVENTS_DIR, { recursive: true });
-    fs.writeFileSync(EVENTS_FILE, JSON.stringify({ events }));
+    atomicWrite(EVENTS_FILE, JSON.stringify({ events }));
   } catch { /* best-effort write */ }
 }
 
