@@ -7,11 +7,7 @@
 Your pet hatches when you start coding, grows as context fills up,<br>
 reacts to your work, and remembers you between sessions.
 
-```
-/\_____________/\ ~  [Opus 4.6] 55% 555K/1.0M cache:78% | 5h 32% ~2h
-==( o   w   o )==    git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug
-==( "       " )==    Cat *slow blink* ...I love you | myapp [Node] | up 45m
-```
+![codachi statusline](codachi.png)
 
 </div>
 
