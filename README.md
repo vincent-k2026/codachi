@@ -8,9 +8,9 @@ Your pet hatches when you start coding, grows as context fills up,<br>
 reacts to your work, and remembers you between sessions.
 
 ```
-/\_____________/\  ~   [Opus 4.6] ██████░░░░ 55% 555K/1M cache:80% | 5h ██░░░░ 32% ~2h
-==( o   w   o  )==    git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug
-==( "       "  )==    Cat *slow blink* ...I love you | myapp [Node] | up 45m
+/\_____________/\ ~  [Opus 4.6] ██████░░░░ 55% 555K/1.0M cache:78% | 5h ██░░░░ 32% ~2h
+==( o   w   o )==    git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug
+==( "       " )==    Cat *slow blink* ...I love you | myapp [Node] | up 45m
 ```
 
 </div>
@@ -96,8 +96,8 @@ Each session gets a random species and color palette.
 ## What you see
 
 ```
-Line 1   [Model] ██████░░░░ 55% 555K/1M ^3%/m cache:80% | 5h ██░░░░ 32% ~2h
-Line 2   git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug | stash:3
+Line 1   [Opus 4.6] ██████░░░░ 55% 555K/1.0M ^3%/m cache:78% | 5h ██░░░░ 32% ~2h
+Line 2   git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug
 Line 3   Cat *slow blink* ...I love you | myapp [Node] | up 45m
 ```
 
