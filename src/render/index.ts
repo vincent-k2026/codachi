@@ -18,6 +18,7 @@ interface RenderInput {
   sevenDayUsage: { percent: number; resetsIn: string | null } | null;
   contextVelocity: number;
   cacheHitRate: number | null;
+  tokenSummary: string | null;
   relationshipTier: RelationshipTier;
   sessionNumber: number;
   animTick: number;
@@ -136,7 +137,12 @@ export function render(input: RenderInput): void {
     cacheStr = ` ${cColor}cache:${cacheHitRate}%${RESET}`;
   }
 
-  let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}${velStr}${cacheStr}`;
+  // Token summary (e.g., "550K/1M")
+  const { tokenSummary } = input;
+  let tokStr = '';
+  if (tokenSummary) tokStr = ` ${DIM}${tokenSummary}${RESET}`;
+
+  let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}${tokStr}${velStr}${cacheStr}`;
   if (fiveHourUsage) {
     const u = fiveHourUsage;
     const uBar = progressBar(u.percent, 6, getUsageColor);
@@ -192,11 +198,12 @@ export function render(input: RenderInput): void {
   line3 += ` ${SEP} ${B}${timeStr}${RESET}`;
   line3 += ` ${SEP} ${F}up ${uptime}${RESET}`;
 
-  // Compose
+  // Compose — output pet on left, info on right
+  const infoWidth = Math.max(1, termWidth - petW);
   const infos = [line1, line2, line3];
   for (let i = 0; i < 3; i++) {
     const pet = petLines[i] ?? '';
     const pad = ' '.repeat(Math.max(0, petW - visualLength(pet)));
-    console.log(`${RESET}${pet}${pad}${truncate(infos[i] || '', termWidth - petW)}`);
+    console.log(`${RESET}${pet}${pad}${truncate(infos[i] || '', infoWidth)}`);
   }
 }

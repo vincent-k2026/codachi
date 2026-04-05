@@ -72,6 +72,24 @@ export function getSevenDayUsage(stdin: StdinData): { percent: number; resetsIn:
   };
 }
 
+function formatTokens(n: number): string {
+  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
+  if (n >= 1_000) return `${Math.round(n / 1000)}K`;
+  return `${n}`;
+}
+
+/** Returns human-readable token usage like "550K/1M" */
+export function getTokenSummary(stdin: StdinData): string | null {
+  const usage = stdin.context_window?.current_usage;
+  const windowSize = stdin.context_window?.context_window_size;
+  if (!usage || !windowSize) return null;
+  const used = (usage.input_tokens ?? 0) +
+    (usage.cache_creation_input_tokens ?? 0) +
+    (usage.cache_read_input_tokens ?? 0);
+  if (used === 0) return null;
+  return `${formatTokens(used)}/${formatTokens(windowSize)}`;
+}
+
 export function getCacheHitRate(stdin: StdinData): number | null {
   const usage = stdin.context_window?.current_usage;
   if (!usage) return null;
