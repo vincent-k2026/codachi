@@ -4,6 +4,9 @@
   "description": "A tamagotchi that lives in your Claude Code statusline",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "codachi": "dist/index.js"
+  },
   "files": [
     "dist",
     "LICENSE"

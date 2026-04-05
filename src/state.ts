@@ -95,7 +95,6 @@ export function getContextVelocity(): number {
 export interface PetMemory {
   totalSessions: number;
   totalUptimeMin: number;
-  totalCommits: number;
   firstMet: number; // timestamp
   lastSeen: number;
 }
@@ -106,7 +105,6 @@ function loadMemory(): PetMemory {
   return loadJSON<PetMemory>(MEMORY_FILE) ?? {
     totalSessions: 0,
     totalUptimeMin: 0,
-    totalCommits: 0,
     firstMet: Date.now(),
     lastSeen: Date.now(),
   };

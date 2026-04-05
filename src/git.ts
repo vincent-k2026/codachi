@@ -36,8 +36,23 @@ function compute(cwd?: string): GitStatus | null {
   const branchLine = lines[0] || '';
   const fileLines = lines.slice(1).filter(Boolean);
 
+  // Handle "## No commits yet on master" for fresh repos
+  if (branchLine.includes('No commits yet')) {
+    const initMatch = branchLine.match(/on\s+(\S+)/);
+    return {
+      branch: initMatch ? initMatch[1] : 'init',
+      isDirty: fileLines.length > 0,
+      ahead: 0, behind: 0, modified: 0, added: 0, deleted: 0,
+      untracked: fileLines.length, insertions: 0, deletions: 0,
+      fileCount: fileLines.length, lastCommit: '', stashCount: 0,
+      dominantFileType: null,
+    };
+  }
+
   const branchMatch = branchLine.match(/^## ([^\s.]+)/);
-  const branch = branchMatch ? branchMatch[1] : 'HEAD';
+  let branch = branchMatch ? branchMatch[1] : 'HEAD';
+  // Truncate long branch names
+  if (branch.length > 25) branch = branch.slice(0, 22) + '...';
 
   let ahead = 0, behind = 0;
   const abMatch = branchLine.match(/\[(?:ahead (\d+))?(?:, )?(?:behind (\d+))?\]/);

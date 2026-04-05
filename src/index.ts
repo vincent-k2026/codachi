@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage, getCacheHitRate } from './stdin.js';
 import { getGitStatus } from './git.js';
 import { getProjectInfo } from './project.js';

@@ -98,7 +98,8 @@ export function render(input: RenderInput): void {
     fiveHourUsage, sevenDayUsage, animTick, moodTick,
   } = input;
 
-  const termWidth = getTerminalWidth();
+  const rawTermWidth = getTerminalWidth();
+  const termWidth = Math.max(60, rawTermWidth); // minimum 60 cols
   const size: BodySize = getBodySize(contextPercent);
   const animation: Animation = getAnimation(contextPercent, false);
 
