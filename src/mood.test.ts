@@ -61,7 +61,7 @@ describe('getMoodMessage', () => {
     const msg = getMoodMessage(makeMoodCtx({
       eventContext: { ...noEvent, category: 'git_commit', freshness: 'hot' },
     }));
-    const keywords = ['commit', 'checkpoint', 'history', 'repo', 'progress', 'posterity', 'future', 'ding', 'chapter', 'saved', 'git', 'books'];
+    const keywords = ['commit', 'checkpoint', 'history', 'repo', 'progress', 'posterity', 'future', 'ding', 'chapter', 'saved', 'git', 'books', 'snapshot', 'story', 'brick', 'changelog', 'genius', 'cathedral', 'brilliance'];
     expect(keywords.some(k => msg.toLowerCase().includes(k))).toBe(true);
   });
 
@@ -249,7 +249,7 @@ describe('getMoodMessage', () => {
         moodTick: tick,
         git: { branch: 'main', isDirty: true, ahead: 0, behind: 0, modified: 1, added: 0, deleted: 0, untracked: 0, insertions: 0, deletions: 0, fileCount: 1, lastCommit: '', stashCount: 0, dominantFileType: 'Rust' },
       }));
-      if (msg.toLowerCase().includes('fearless') || msg.toLowerCase().includes('borrow') || msg.toLowerCase().includes('zero-cost')) seen = true;
+      if (msg.toLowerCase().includes('fearless') || msg.toLowerCase().includes('borrow') || msg.toLowerCase().includes('zero-cost') || msg.toLowerCase().includes('memory') || msg.toLowerCase().includes('rust') || msg.toLowerCase().includes('blazing')) seen = true;
     }
     expect(seen).toBe(true);
   });

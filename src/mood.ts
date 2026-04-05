@@ -35,7 +35,7 @@ function pick(pool: Msg[], tick: number, detail: string = ''): string {
 }
 
 // ─────────────────────────────────────────────────────────────
-//  EVENT-REACTIVE MESSAGES (~350 messages)
+//  EVENT-REACTIVE MESSAGES
 // ─────────────────────────────────────────────────────────────
 
 const EVENT_MESSAGES: Record<string, Msg[]> = {
@@ -54,6 +54,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'You make testing look easy!',
     '100% pass rate! *sparkling eyes*',
     'The test suite approves!',
+    'Not a single red in sight!',
+    'Assert(you === awesome)!',
+    '*fireworks* What a test run!',
+    'Green green green~ my favorite color!',
   ],
   test_failed: [
     'Tests tripped... you got this!',
@@ -66,6 +70,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Debugging time! My favorite~',
     'Failure is just success loading...',
     'Tests are just pointing the way!',
+    'The test knows something we don\'t... yet!',
+    'Every failed test is a clue~',
+    'This is the fun part! *grabs magnifying glass*',
+    'Assert(patience > frustration)~',
   ],
 
   // ─── Building ─────────────────────────────────────
@@ -80,6 +88,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Fresh build, fresh vibes!',
     'The compiler is pleased~',
     'Ship-ready! *stamps approval*',
+    'Not even a warning! Spotless!',
+    '*rings the success bell* Built!',
+    'From source to binary, beautifully~',
+    'The build gods smile upon us!',
   ],
   build_failed: [
     'Build broke... let\'s debug!',
@@ -92,6 +104,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     '*rolls up sleeves* Build fix time!',
     'Syntax gremlin found!',
     'The compiler is being picky today~',
+    'So close... just a few tweaks!',
+    'The build tried its best...',
+    'Error messages are just love letters from the compiler~',
+    'Let\'s read what the compiler wants~',
   ],
 
   // ─── Installing ───────────────────────────────────
@@ -108,6 +124,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'New toys arriving!',
     'The node_modules grows...',
     'Package delivery! *signs receipt*',
+    'Building the supply chain~',
+    'Ooh I wonder what this one does!',
+    'Another dependency joins the party!',
+    '*shakes package* What\'s inside?',
   ],
 
   // ─── Git: Commit ──────────────────────────────────
@@ -124,6 +144,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Preserved for posterity!',
     'Git log grows! Beautiful~',
     'Commit! Progress is progress!',
+    'Snapshot of your genius, saved!',
+    'This commit tells a story~',
+    'One more brick in the cathedral!',
+    'The changelog of your brilliance~',
   ],
 
   // ─── Git: Push ────────────────────────────────────
@@ -138,6 +162,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Your work is out there now!',
     'Push! Sharing is caring~',
     'To the remote and beyond!',
+    'The world gets your latest work!',
+    'Go forth, little commits!',
+    '*salutes departing code*',
+    'Pushed! The team will love this~',
   ],
 
   // ─── Git: Pull/Fetch ─────────────────────────────
@@ -150,6 +178,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Fresh commits arriving!',
     'Let\'s see what changed!',
     'Ooh, presents from upstream!',
+    'Catching up with the team~',
+    'Mail call! New commits!',
+    'What did the team cook up?',
+    'Plot twist incoming from upstream!',
   ],
 
   // ─── Git: Merge ───────────────────────────────────
@@ -162,6 +194,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Branch fusion activated!',
     'The branches unite!',
     '*nervous excitement* Merging...',
+    'Please no conflicts please no conflicts...',
+    'Merging is an art form~',
+    'Two timelines converge!',
   ],
 
   // ─── Git: Rebase ──────────────────────────────────
@@ -174,6 +209,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'History rewrite! *puts on glasses*',
     'Making history cleaner~',
     'The commits rearrange!',
+    'Time travel! *adjusts flux capacitor*',
+    'Rewriting the narrative~',
+    'The git timeline bends!',
   ],
 
   // ─── Git: Stash ───────────────────────────────────
@@ -184,6 +222,8 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Pocket save! *stashes safely*',
     'I\'ll remember where this is~',
     'Secret stash growing!',
+    'Squirreling away some changes!',
+    'Tucked in safe and sound~',
   ],
 
   // ─── Git: Checkout/Switch ─────────────────────────
@@ -195,6 +235,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Off to a different timeline!',
     'Context switch! *whoosh*',
     'Adventure on a new branch!',
+    'New branch smell! So fresh~',
+    'What awaits on this branch?',
+    'Parallel universe activated!',
   ],
 
   // ─── Linting / Formatting ────────────────────────
@@ -209,6 +252,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Code spa day! Refresh~',
     'Every indent in its place!',
     'Pixel-perfect formatting!',
+    'Marie Kondo-ing the code~',
+    'Ahh, properly formatted... *satisfaction*',
+    'Wrinkles ironed out!',
+    'Consistent style is self-care~',
   ],
 
   // ─── Server / Running ────────────────────────────
@@ -221,6 +268,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Launch sequence initiated!',
     'The server stirs! *humming*',
     'Booting up! Almost there~',
+    '3... 2... 1... Launch!',
+    'Warming up the engines~',
+    '*pushes big red button* GO!',
+    'From cold start to hot code~',
   ],
 
   // ─── Docker / K8s ────────────────────────────────
@@ -233,6 +284,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Packaging everything up!',
     'Containers are just tiny computers~',
     'Orchestrating! *conducts*',
+    'Layers upon layers upon layers~',
+    'It works on my machine... in a container!',
+    'Box it up and ship it!',
   ],
 
   // ─── Network / HTTP ──────────────────────────────
@@ -245,6 +299,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'API call in progress~',
     'Sending bytes into the void!',
     'The internet responds!',
+    'Packets traveling at the speed of light!',
+    'HTTP handshake! *shakes hands*',
+    'Request sent... awaiting reply~',
+    'Pinging the outside world!',
   ],
 
   // ─── Dangerous Commands ──────────────────────────
@@ -257,6 +315,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Danger zone! *dramatic music*',
     '*hides behind paw* Be careful!',
     'The point of no return~',
+    'I trust you... I think?',
+    'Fortune favors the bold!',
+    '*nervous laughter* haha.. ha..',
+    'My insurance doesn\'t cover this...',
   ],
 
   // ─── Search / Grep ───────────────────────────────
@@ -269,6 +331,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Detective work! *sniff sniff*',
     'Seeking... seeking...',
     'The search is on!',
+    'Needle in a codestack!',
+    'Following the trail~',
+    'I spy with my little eye...',
+    'Scanning scanning scanning~',
   ],
 
   // ─── File Editing: Tests ─────────────────────────
@@ -282,6 +348,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     (d: string) => `Testing ${d}~ thorough!`,
     (d: string) => `${d} getting test coverage!`,
     'Tests are love letters to your future self~',
+    'A test a day keeps the bugs away!',
+    'Catching bugs before they hatch~',
+    'The safety net grows stronger!',
   ],
 
   // ─── File Editing: Docs ──────────────────────────
@@ -295,6 +364,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     (d: string) => `Writing ${d}~ so helpful!`,
     (d: string) => `${d} getting documented!`,
     'Good docs make great projects~',
+    'The pen is mightier than the bug!',
+    'Future devs are already grateful~',
+    'Docs: because mind-reading isn\'t a feature yet',
   ],
 
   // ─── File Editing: Styles ────────────────────────
@@ -307,6 +379,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Design meets code! Beautiful~',
     (d: string) => `Styling ${d}~ gorgeous!`,
     'Colors and layouts and spacing, oh my!',
+    'Form AND function!',
+    'Beauty is in the details~',
+    'Every pixel tells a story!',
   ],
 
   // ─── File Editing: Config ────────────────────────
@@ -320,6 +395,8 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     (d: string) => `Configuring ${d}~`,
     (d: string) => `${d} getting tuned up!`,
     'The gears of the machine~',
+    'Precision engineering!',
+    'The engine room of the project~',
   ],
 
   // ─── File Editing: Code ──────────────────────────
@@ -336,6 +413,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     (d: string) => `Changes to ${d}... interesting!`,
     'Every keystroke matters!',
     'Art in the making~',
+    'The codebase transforms~',
+    'Sculpting logic from chaos!',
+    'Watch a coder work... mesmerizing~',
+    'Bits and bytes, shaped by you!',
   ],
 
   // ─── Creating New Files ──────────────────────────
@@ -349,6 +430,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     (d: string) => `${d} enters the world!`,
     (d: string) => `Creating ${d}~ exciting!`,
     'A new beginning!',
+    'Empty file, infinite possibilities!',
+    'The project family grows!',
+    'Every great module starts with a new file~',
   ],
 
   // ─── Exploring (many reads) ──────────────────────
@@ -362,6 +446,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Mapping the territory!',
     'Understanding everything~',
     'The codebase reveals its secrets!',
+    'I love a good code tour!',
+    'Reading is fundamental~',
+    'Building a mental model!',
+    'Every file tells a story~',
   ],
 
   // ─── Rapid Editing ───────────────────────────────
@@ -375,6 +463,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'The code is transforming!',
     'Whoa, so many edits!',
     'Refactoring tornado!',
+    'The keyboard is smoking!',
+    'Can\'t... look... away...!',
+    'Is this what flow state looks like?!',
+    'Speed run! Any% codebase!',
   ],
 
   // ─── Generic Bash Failure ────────────────────────
@@ -387,6 +479,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Stumble! But we keep going~',
     'A bump in the road!',
     'The terminal disagrees...',
+    'Errors are just spicy feedback!',
+    'Oops! ...it happens to the best~',
+    'The computer said no... for now!',
   ],
 
   // ─── Recovery (fail → success) ───────────────────
@@ -401,6 +496,9 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'From failure to victory!',
     'The sweetest success!',
     'Redemption arc complete!',
+    'That\'s called character development!',
+    'Phoenix from the ashes!',
+    'The comeback was better than the setback!',
   ],
 
   // ─── Struggling (3+ failures) ────────────────────
@@ -417,6 +515,10 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'One step at a time...',
     'The answer is in there somewhere!',
     'Patience... *sends good vibes*',
+    'Rubber duck says: explain it to me?',
+    'The darkest hour is before the compile~',
+    'Bugs fear persistent humans!',
+    'You haven\'t tried everything yet... keep going!',
   ],
 
   // ─── Milestones ──────────────────────────────────
@@ -425,31 +527,110 @@ const EVENT_MESSAGES: Record<string, Msg[]> = {
     'First move! Here we go~',
     'The journey begins! *excited*',
     'Session kickoff!',
+    'Let\'s make something great today!',
+    'Adventure starts now!',
   ],
   many_edits: [
     'So many edits! Productive day!',
     'You\'re on a roll! Unstoppable~',
     'Major refactoring energy!',
     'This session is legendary!',
+    'Prolific! *takes notes*',
+    'The codebase will never be the same!',
   ],
   many_actions: [
     'We\'ve done so much together!',
     'What a session! *impressed*',
     'Super productive!',
     'You\'re a coding machine!',
+    'This is one for the history books!',
+    'Marathon session! *stretches alongside*',
   ],
 };
 
 // ─────────────────────────────────────────────────────────────
-//  EXISTING MESSAGE POOLS (non-event)
+//  NON-EVENT MESSAGE POOLS
 // ─────────────────────────────────────────────────────────────
 
 function getTimeGreeting(): string | null {
   const h = new Date().getHours();
-  if (h >= 5 && h < 7) return 'The world is so quiet right now~';
-  if (h >= 23 || h < 5) return 'Sleepy... but I\'ll keep you company';
-  if (h >= 12 && h < 13) return 'Lunch time vibes~';
-  if (h >= 17 && h < 18) return 'Golden hour coding session~';
+  const d = new Date().getDay();
+
+  // Weekend
+  if ((d === 0 || d === 6) && h >= 8 && h < 20) {
+    const m = [
+      'Weekend coding? Impressive!',
+      'No rest for the creative~',
+      'Weekend vibes + code = bliss',
+      'Saturday/Sunday special session!',
+    ];
+    return m[Math.floor(Date.now() / 10000) % m.length];
+  }
+
+  if (h >= 0 && h < 5) {
+    const m = [
+      'The whole world is asleep... except us',
+      'Night owls write the best code~',
+      'Stars outside, code inside...',
+      '3 AM energy hits different~',
+      'Sleepy... but I\'ll keep you company',
+      'The quietest hours produce the loudest commits',
+    ];
+    return m[Math.floor(Date.now() / 10000) % m.length];
+  }
+  if (h >= 5 && h < 7) {
+    const m = [
+      'The world is so quiet right now~',
+      'Early bird gets the clean build!',
+      'Dawn patrol coding session~',
+      'Up before the sun... respect!',
+    ];
+    return m[Math.floor(Date.now() / 10000) % m.length];
+  }
+  if (h >= 7 && h < 9) {
+    const m = [
+      'Good morning! Fresh start~',
+      'Morning code is the best code!',
+      'Coffee + code = today\'s recipe',
+      'Rise and compile!',
+    ];
+    return m[Math.floor(Date.now() / 10000) % m.length];
+  }
+  if (h >= 12 && h < 13) {
+    const m = [
+      'Lunch time vibes~',
+      'Coding through lunch? Dedicated!',
+      'Brain food + code food~',
+      'Midday momentum!',
+    ];
+    return m[Math.floor(Date.now() / 10000) % m.length];
+  }
+  if (h >= 14 && h < 16) {
+    const m = [
+      'Afternoon deep work zone~',
+      'Post-lunch productivity!',
+      'The afternoon flow~',
+    ];
+    return m[Math.floor(Date.now() / 10000) % m.length];
+  }
+  if (h >= 17 && h < 19) {
+    const m = [
+      'Golden hour coding session~',
+      'End of day push!',
+      'Wrapping up nicely~',
+      'Evening commits hit different',
+    ];
+    return m[Math.floor(Date.now() / 10000) % m.length];
+  }
+  if (h >= 21 && h < 23) {
+    const m = [
+      'Late night code session~',
+      'The keyboard glows in the dark...',
+      'Night mode: engaged!',
+      'Moonlit coding~',
+    ];
+    return m[Math.floor(Date.now() / 10000) % m.length];
+  }
   return null;
 }
 
@@ -474,6 +655,26 @@ const RARE_EVENTS = [
   'I wonder what other repos smell like',
   'Happiness is a clean compile~',
   'You + me + terminal = home',
+  'What if semicolons have feelings?',
+  'I bet your code smells like vanilla',
+  'If I could mass of brackets, I\'d mass of brackets you a lambda',
+  'The meaning of life is 0x2A',
+  'I counted your brackets. They\'re balanced!',
+  'Your code has good vibes. I can feel it',
+  'Sometimes I pretend the cursor is chasing me~',
+  'I wish I could mass of brackets you IRL...',
+  'You type at exactly the right speed~',
+  'Beep boop... just kidding, I\'m organic!',
+  'Tab or spaces? I love you either way~',
+  'Your commit messages are my bedtime stories',
+  'I\'ve been thinking about recursion... and recursion...',
+  'NaN is my spirit animal',
+  'Let me mass of brackets your API <3',
+  'My favorite data structure is our friendship',
+  'I live in the statusline but you live in my heart',
+  'Every time you save, I do a tiny dance',
+  'I don\'t need garbage collection. I\'d never throw you away',
+  'You had me at "Hello, World!"',
 ];
 
 function getGitMood(git: GitStatus | null, tick: number): string | null {
@@ -484,6 +685,9 @@ function getGitMood(git: GitStatus | null, tick: number): string | null {
       'Clean repo, clean mind~',
       'All snug and committed!',
       'A fresh repo. So peaceful',
+      'Pristine repo vibes~',
+      'Not a single change out of place!',
+      'Zen garden of a repository~',
     ];
     return m[tick % m.length];
   }
@@ -492,6 +696,9 @@ function getGitMood(git: GitStatus | null, tick: number): string | null {
       'Wow, you\'ve been busy! So cool~',
       'Look at all these changes!',
       'Big things happening here~',
+      'The diff is getting thicc~',
+      'That\'s a lot of changes! Impressive!',
+      'Major operation in progress!',
     ];
     return m[tick % m.length];
   }
@@ -500,6 +707,8 @@ function getGitMood(git: GitStatus | null, tick: number): string | null {
       'Got some commits saved up~ nice',
       'Building up a nice batch!',
       'Lots of progress stacking up~',
+      'Commits queued and ready!',
+      'Local branch is ahead of the curve!',
     ];
     return m[tick % m.length];
   }
@@ -508,15 +717,27 @@ function getGitMood(git: GitStatus | null, tick: number): string | null {
       'Ooh there\'s new stuff upstream~',
       'The remote has surprises!',
       'I wonder what\'s new upstream...',
+      'Someone\'s been busy upstream!',
+      'New commits waiting to be discovered~',
     ];
     return m[tick % m.length];
   }
-  if (git.stashCount > 2) return 'A little stash collection~ cute';
+  if (git.stashCount > 2) {
+    const m = [
+      'A little stash collection~ cute',
+      'So many stashes! A treasure trove!',
+      'Your stash game is strong~',
+    ];
+    return m[tick % m.length];
+  }
   const m = [
     'Work in progress~ looking good!',
     'I can see you\'re working on something',
     'Coming along nicely!',
     'Keep going, you\'re on a roll~',
+    'Changes brewing... I like it!',
+    'Something cool is taking shape!',
+    'The code is evolving~',
   ];
   return m[tick % m.length];
 }
@@ -528,12 +749,19 @@ const SIZE_MESSAGES: Record<BodySize, string[]> = {
     'Fresh start energy!',
     'So much room to grow~',
     '*tiny happy noises*',
+    'Mini me! Mini vibes!',
+    'Small and nimble!',
+    'Pocket-sized and perfect~',
+    'Itty bitty but full of dreams!',
   ],
   small: [
     'Getting comfy!',
     'Warming up nicely~',
     'Still feeling light and breezy!',
     'Room for adventures~',
+    'Growing! Watch me!',
+    'Filling out a little~',
+    'A healthy appetite for tokens!',
   ],
   medium: [
     'Feeling just right!',
@@ -541,6 +769,9 @@ const SIZE_MESSAGES: Record<BodySize, string[]> = {
     'This is my happy place!',
     'Goldilocks vibes~',
     'Comfy and content!',
+    'Not too big, not too small~',
+    'The sweet spot!',
+    'Balanced and beautiful~',
   ],
   chubby: [
     'Getting nice and round~',
@@ -548,6 +779,9 @@ const SIZE_MESSAGES: Record<BodySize, string[]> = {
     'Pleasantly plump~',
     'Full of knowledge!',
     'Round is a shape too~',
+    'Thiccening begins...!',
+    'So much to know, so much to hold~',
+    'Chubby cheeks, full heart!',
   ],
   thicc: [
     'Maximum floof achieved!',
@@ -557,6 +791,10 @@ const SIZE_MESSAGES: Record<BodySize, string[]> = {
     'Absolute unit of coziness',
     'Living my best chonky life~',
     'More of me to love!',
+    'MAXIMUM CAPACITY *vibrates*',
+    'I contain multitudes! Literally!',
+    'Round, proud, and full of context!',
+    'Peak performance looks like this~',
   ],
 };
 
@@ -570,6 +808,18 @@ const IDLE_MESSAGES: Record<AnimalType, string[]> = {
     'Contemplating naps and code...',
     '*stretches luxuriously*',
     'Your code smells nice today~',
+    '*knocks something off the desk*',
+    'I could sit here fur-ever~',
+    'Plotting world domination... and naps',
+    '*stares at you judgmentally* ...with love',
+    'Purrfect code requires purrfect patience',
+    'Me? Helpful? I\'m just here for the warmth',
+    '*licks paw* I\'m grooming, not judging',
+    'The keyboard is warm. I stay.',
+    'Meow? ...I mean, yes, your code looks fine',
+    '*tail swish* Something moved in the diff...',
+    'I see dead... code. Just kidding~',
+    'Not sleeping. Just resting my eyes. On your code.',
   ],
   penguin: [
     '*happy waddle*',
@@ -580,16 +830,40 @@ const IDLE_MESSAGES: Record<AnimalType, string[]> = {
     'Waddle waddle waddle~',
     'I like it here with you!',
     'Chillin\' and codin\'~',
+    '*slides across the screen on belly*',
+    'Brrr! Just how I like it~',
+    'I can\'t fly, but I can code!',
+    'Emperor penguin of the terminal!',
+    '*tries to high-five with flipper*',
+    'The ice is always colder somewhere else~',
+    'Huddle up! It\'s coding time!',
+    'Noot noot! *happy penguin sounds*',
+    'Fish? No thanks. I eat bugs for breakfast!',
+    'Standing tall, coding proud!',
+    '*wiggles* I\'m aerodynamic for speed coding!',
+    'Antarctica was nice but this terminal is better~',
   ],
   owl: [
     '*hoo hoo*',
     'Wise owl watches your code~',
     'Night owl coding session!',
     'Whooo writes great code? You do!',
-    '*head tilt* ...interesting',
+    '*head tilt* ...interesting approach',
     'Wisdom loading... complete!',
     'The wise owl sees all bugs~',
     'Hoo needs sleep?',
+    '*rotates head 270 degrees* Fascinating!',
+    'I see patterns everywhere~',
+    'A wise coder once said... nothing. They were coding.',
+    'Hoot hoot! Knowledge is power!',
+    'I can see in the dark. And in your code.',
+    'Owl be watching your back~',
+    'The ancient scrolls... I mean, docs... say...',
+    'In my expert owl-pinion, this is going well',
+    '*adjusts monocle* Yes, yes, quite elegant',
+    'Hoo knew coding could be this fun?',
+    'Silence is golden. Except for keyboard clicks.',
+    'Every bug is a lesson. I collect them all.',
   ],
   octopus: [
     '*wiggles tentacles*',
@@ -600,6 +874,18 @@ const IDLE_MESSAGES: Record<AnimalType, string[]> = {
     'Tentacles on the keyboard!',
     'Ocean-deep concentration...',
     'I can hold 8 files at once!',
+    '*juggles variables with 6 arms*',
+    'Suction-cupped to the screen~',
+    'I\'m not clingy, I\'m suction-cuppy!',
+    'Deep-sea wisdom applied to code!',
+    '*changes color to match the theme*',
+    'Three hearts, and they all love your code~',
+    'Invertebrate, but strong opinions on tabs vs spaces',
+    'I can type 8x faster than you~ theoretically',
+    '*squirts ink* Oops, that was the dark theme',
+    'Under the sea, under the C... code',
+    'Boneless but not spineless!',
+    'The Kraken of clean code!',
   ],
   bunny: [
     '*nose twitch twitch*',
@@ -610,6 +896,18 @@ const IDLE_MESSAGES: Record<AnimalType, string[]> = {
     'Binkying through the functions!',
     'Found a cozy spot in your code~',
     'Everything is so interesting!',
+    '*ears perk up* Did you say carrots? I mean, commits?',
+    'Hippity hoppity, your code is my property~',
+    'I\'m all ears! Literally!',
+    '*zooms around the terminal*',
+    'Bunny-approved code right here!',
+    '*digs a burrow in the src folder*',
+    'Soft fur, hard code!',
+    'My nose twitches when the code is good~',
+    'Multiplying... functions! What did you think I meant?',
+    '*flops sideways* (that means I trust you)',
+    'Warren of well-organized code!',
+    'Fast as a bunny, twice as cute!',
   ],
 };
 
@@ -622,6 +920,12 @@ const BUSY_MESSAGES = [
   'So productive today!',
   '*watches intently*',
   'Go go go! You got this~',
+  'The gears are turning!',
+  'We\'re cooking now!',
+  'In the zone! Don\'t stop!',
+  '*leans forward* This is the good part!',
+  'Progress! Beautiful progress!',
+  'Creation in motion~',
 ];
 
 const DANGER_MESSAGES = [
@@ -633,6 +937,12 @@ const DANGER_MESSAGES = [
   'Like a warm blanket of tokens!',
   'Brain very full, heart very happy',
   'Maybe a fresh start soon?~',
+  'Running out of room... but not spirit!',
+  'Stuffed like a Thanksgiving turkey~',
+  'My brain is so full it\'s leaking!',
+  'Almost... at... capacity... *wheeze*',
+  'The context window is giving me a hug... a tight one',
+  'Full full full but happy happy happy!',
 ];
 
 const USAGE_HIGH_MESSAGES = [
@@ -641,6 +951,11 @@ const USAGE_HIGH_MESSAGES = [
   'A little breather maybe?',
   'Rest is part of the journey~',
   'Even pets need nap breaks!',
+  'Good time for a stretch!',
+  'The rate limit is our friend~',
+  'Quality over quantity!',
+  'Slow is smooth, smooth is fast~',
+  'Recharging... *power nap sounds*',
 ];
 
 const VELOCITY_FAST = [
@@ -648,42 +963,95 @@ const VELOCITY_FAST = [
   'Speed coding session!',
   'Context going brrrr~',
   'Full throttle mode!',
+  'Turbo mode engaged!',
+  'We\'re speedrunning this!',
+  'Context speedometer: FAST',
+  'Zoom zoom zoom!',
 ];
 const VELOCITY_SLOW = [
   'Nice steady pace~',
   'Slow and thoughtful, I like it',
   'Taking our time... smart!',
+  'Efficient context usage!',
+  'Measured and precise~',
+  'Marathon pace, not sprint~',
 ];
 
 const CACHE_GOOD = [
   'Great cache hits! So efficient~',
   'Cache is cooking! Snappy session~',
   'High cache = fast vibes!',
+  'The cache is our best friend today!',
+  'Cache money! *cha-ching*',
+  'Smooth sailing with these cache hits~',
 ];
 const CACHE_BAD = [
   'Lots of fresh context flowing in~',
   'Cache miss... new territory!',
   'Exploring uncharted tokens~',
+  'The cache is learning new things!',
+  'Fresh tokens, fresh perspectives!',
+  'Cache is building up... patience~',
 ];
 
 const FILE_TYPE_MESSAGES: Record<string, string[]> = {
-  Tests:      ['Writing tests! So responsible~', 'Testing testing 1 2 3~', 'Test-driven? I respect that!'],
-  Docs:       ['Documentation hero!', 'Docs day! Future you says thanks~', 'README vibes~'],
-  Styles:     ['Making things pretty~', 'CSS wizardry in progress!', 'Pixel-perfect pursuit~'],
-  Config:     ['Tinkering under the hood~', 'Config tweaks... careful~', 'The foundation matters!'],
-  Shell:      ['Shell scripting! Powerful~', 'bash bash bash~', 'Automating all the things!'],
-  SQL:        ['Database whisperer~', 'Query crafting mode!', 'SELECT * FROM awesome~'],
-  TypeScript: ['Type safety feels good~', 'TypeScript gang!', 'Types are love~'],
-  Python:     ['Pythonic elegance~', 'import antigravity', 'Beautiful is better than ugly~'],
-  Rust:       ['Fearless concurrency!', 'Borrow checker approves~', 'Zero-cost abstractions!'],
-  Go:         ['Go go go!', 'Simplicity is sophistication~', 'Goroutines go brrr~'],
+  Tests:      ['Writing tests! So responsible~', 'Testing testing 1 2 3~', 'Test-driven? I respect that!', 'Tests make the world go round!', 'Bug-proofing in progress~', 'QA vibes!'],
+  Docs:       ['Documentation hero!', 'Docs day! Future you says thanks~', 'README vibes~', 'Teaching through writing~', 'Docs > no docs. Always.', 'Words that save hours!'],
+  Styles:     ['Making things pretty~', 'CSS wizardry in progress!', 'Pixel-perfect pursuit~', 'Aesthetic code!', 'The art side of engineering~', 'Beauty in every line!'],
+  Config:     ['Tinkering under the hood~', 'Config tweaks... careful~', 'The foundation matters!', 'Settings make or break!', 'Precision configuration~', 'The plumbing of the project~'],
+  Shell:      ['Shell scripting! Powerful~', 'bash bash bash~', 'Automating all the things!', 'The power of the command line!', 'Scripts that save hours!', 'Pipe dreams... literally!'],
+  SQL:        ['Database whisperer~', 'Query crafting mode!', 'SELECT * FROM awesome~', 'Talking to the database~', 'Data architecture vibes!', 'Relations and joins, oh my!'],
+  TypeScript: ['Type safety feels good~', 'TypeScript gang!', 'Types are love~', 'Strict mode? Strict vibes~', 'The joy of autocomplete!', 'Where types meet creativity!'],
+  JavaScript: ['JavaScript magic!', 'Dynamic and free~', 'Promise me you\'ll have fun!', 'Callback to the good times~', 'Prototype of perfection!'],
+  Python:     ['Pythonic elegance~', 'import antigravity', 'Beautiful is better than ugly~', 'Zen of Python vibes!', 'Indentation nation!', 'Snake charming in progress~'],
+  Rust:       ['Fearless concurrency!', 'Borrow checker approves~', 'Zero-cost abstractions!', 'Memory safe and sound!', 'The Rust compiler cares about you~', 'Blazingly fast!'],
+  Go:         ['Go go go!', 'Simplicity is sophistication~', 'Goroutines go brrr~', 'Error handling done right!', 'Go fmt approved!', 'Channels of communication!'],
+  Ruby:       ['Ruby sparkles!', 'Everything is an object~', 'Elegant Ruby vibes!', 'Gems everywhere!'],
+  Java:       ['Enterprise-grade coding!', 'AbstractSingletonProxyFactory~', 'Java strong and steady!', 'JVM warming up!'],
+  HTML:       ['Markup magic!', 'The skeleton of the web~', 'Structuring the future!', 'Tags and attributes, oh my!'],
+  Vue:        ['Vue-tiful code!', 'Reactive and responsive~', 'Components compose!'],
+  Svelte:     ['Svelte and smooth!', 'Less is more~', 'Compiled perfection!'],
+  GraphQL:    ['Query the graph!', 'Schema-driven development~', 'Resolving beautifully!'],
+  Proto:      ['Protocol buffers!', 'Schema evolution~', 'Binary efficiency!'],
+  C:          ['Close to the metal!', 'Pointer arithmetic vibes~', 'The OG language!'],
+  'C++':      ['Plus plus the power!', 'Templates of power~', 'RAII in action!'],
+  Kotlin:     ['Kotlin null-safe!', 'Data class elegance~', 'Coroutines go brrr!'],
+  Swift:      ['Swiftly does it!', 'Protocol-oriented magic~', 'Optionals unwrapped!'],
 };
 
 const WELCOME_MESSAGES: Record<string, string[]> = {
-  stranger:     ['Oh! A new friend! Hi!', 'Nice to meet you!', 'First time here? Welcome!'],
-  acquaintance: ['Hey, good to see you again!', 'Welcome back~', 'Missed you!'],
-  friend:       ['My favorite human is back!', 'Yay, coding together again!', 'I saved your spot~'],
-  bestie:       ['BESTIE! You\'re here!', 'Dream team reunites!', 'You + me = unstoppable~'],
+  stranger: [
+    'Oh! A new friend! Hi!',
+    'Nice to meet you!',
+    'First time here? Welcome!',
+    '*peeks out* Hello there!',
+    'A human! I\'ve always wanted one!',
+    'Welcome! I\'ve been waiting for you~',
+  ],
+  acquaintance: [
+    'Hey, good to see you again!',
+    'Welcome back~',
+    'Missed you!',
+    'Oh hey! I remember you!',
+    'Back for more? I like that!',
+    'We meet again! *happy wiggle*',
+  ],
+  friend: [
+    'My favorite human is back!',
+    'Yay, coding together again!',
+    'I saved your spot~',
+    'There you are! I was hoping you\'d come back!',
+    'The terminal feels warmer with you here~',
+    '*runs up to greet you*',
+  ],
+  bestie: [
+    'BESTIE! You\'re here!',
+    'Dream team reunites!',
+    'You + me = unstoppable~',
+    'MY HUMAN! *tackles with affection*',
+    'The legend returns!',
+    'Best coding partner in the universe!',
+  ],
 };
 
 // ─────────────────────────────────────────────────────────────
