@@ -4,6 +4,7 @@ import { getGitStatus } from './git.js';
 import { getProjectInfo } from './project.js';
 import { getAnimalType, getPetColors } from './identity.js';
 import { initSession, animTick, moodTick, sessionUptime, recordContextPercent, getContextVelocity, getMemory, getRelationshipTier } from './state.js';
+import { loadConfig, getConfig } from './config.js';
 import { render } from './render/index.js';
 
 async function main(): Promise<void> {
@@ -15,8 +16,10 @@ async function main(): Promise<void> {
       return;
     }
 
+    loadConfig();
     initSession(stdin.transcript_path);
 
+    const cfg = getConfig();
     const contextPercent = getContextPercent(stdin);
     recordContextPercent(contextPercent);
 
@@ -25,18 +28,18 @@ async function main(): Promise<void> {
       modelName: getModelName(stdin),
       animalType: getAnimalType(),
       colors: getPetColors(),
-      git: getGitStatus(stdin.cwd),
+      git: cfg.showGit !== false ? getGitStatus(stdin.cwd) : null,
       project: getProjectInfo(stdin.cwd),
       fiveHourUsage: getFiveHourUsage(stdin),
       sevenDayUsage: getSevenDayUsage(stdin),
-      contextVelocity: getContextVelocity(),
-      cacheHitRate: getCacheHitRate(stdin),
-      tokenSummary: getTokenSummary(stdin),
+      contextVelocity: cfg.showVelocity !== false ? getContextVelocity() : 0,
+      cacheHitRate: cfg.showCache !== false ? getCacheHitRate(stdin) : null,
+      tokenSummary: cfg.showTokens !== false ? getTokenSummary(stdin) : null,
       relationshipTier: getRelationshipTier(),
       sessionNumber: getMemory().totalSessions,
-      animTick: animTick(),
+      animTick: animTick(cfg.animationSpeed),
       moodTick: moodTick(),
-      uptime: sessionUptime(),
+      uptime: cfg.showUptime !== false ? sessionUptime() : '',
     });
   } catch (error) {
     console.log('[codachi] Error:', error instanceof Error ? error.message : 'Unknown error');

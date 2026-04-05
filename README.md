@@ -152,6 +152,36 @@ Claude Code invokes the statusline command during active rendering. It passes se
 - Git commands cached for 2 seconds — fits within refresh budget
 - Session identity bound to `transcript_path` — same conversation = same pet
 
+## Configuration
+
+Optional. Create `~/.config/codachi/config.json` (or `~/.codachi.json`):
+
+```json
+{
+  "animal": "cat",
+  "palette": 0,
+  "showTokens": true,
+  "showVelocity": true,
+  "showCache": true,
+  "showUptime": true,
+  "showGit": true,
+  "animationSpeed": 1.5
+}
+```
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `animal` | random | Force a species: `cat`, `penguin`, `owl`, `octopus`, `bunny` |
+| `palette` | random | Force a color palette (0-9) |
+| `showTokens` | `true` | Show token count `550K/1M` |
+| `showVelocity` | `true` | Show context burn speed `^3%/m` |
+| `showCache` | `true` | Show cache hit rate `cache:80%` |
+| `showUptime` | `true` | Show session uptime `up 45m` |
+| `showGit` | `true` | Show git status line |
+| `animationSpeed` | `1.5` | Seconds per animation frame |
+
+All fields are optional. Omitted fields use defaults.
+
 <details>
 <summary>Project structure</summary>
 
@@ -161,7 +191,8 @@ src/
 ├── stdin.ts            # Parse Claude Code JSON, cache hit rate
 ├── git.ts              # Branch, diff stats, stash, file type detection
 ├── state.ts            # Session binding, context velocity, pet memory
-├── identity.ts         # Session-random animal + palette
+├── config.ts           # User configuration (~/.config/codachi/config.json)
+├── identity.ts         # Session-random animal + palette (config override)
 ├── mood.ts             # 150+ messages, 11-tier priority system
 ├── project.ts          # Language/framework detection
 ├── width.ts            # Terminal character width

@@ -49,7 +49,9 @@ export function initSession(transcriptPath?: string): void {
 export function getSessionAnimalIndex(): number { return diskState.animalIndex ?? 0; }
 export function getSessionPaletteIndex(): number { return diskState.paletteIndex ?? 0; }
 
-export function animTick(): number { return Math.floor(Date.now() / 1500); }
+export function animTick(speedSec: number = 1.5): number {
+  return Math.floor(Date.now() / (speedSec * 1000));
+}
 export function moodTick(): number { return Math.floor(Date.now() / 10000); }
 
 export function sessionUptime(): string {

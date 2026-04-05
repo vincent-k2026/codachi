@@ -1,10 +1,13 @@
 import type { AnimalType, PetColors } from './types.js';
 import { rgb } from './render/colors.js';
 import { getSessionAnimalIndex, getSessionPaletteIndex } from './state.js';
+import { getConfig } from './config.js';
 
 const ANIMALS: AnimalType[] = ['cat', 'penguin', 'owl', 'octopus', 'bunny'];
 
 export function getAnimalType(): AnimalType {
+  const cfg = getConfig();
+  if (cfg.animal && ANIMALS.includes(cfg.animal)) return cfg.animal;
   return ANIMALS[getSessionAnimalIndex() % ANIMALS.length];
 }
 
@@ -72,5 +75,9 @@ const PALETTES: PetColors[] = [
 ];
 
 export function getPetColors(): PetColors {
+  const cfg = getConfig();
+  if (cfg.palette != null && cfg.palette >= 0 && cfg.palette < PALETTES.length) {
+    return PALETTES[cfg.palette];
+  }
   return PALETTES[getSessionPaletteIndex() % PALETTES.length];
 }
