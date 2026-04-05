@@ -4,24 +4,18 @@
 
 **A tamagotchi that lives in your [Claude Code](https://docs.anthropic.com/en/docs/claude-code) statusline.**
 
-Your pet hatches when you start coding, grows as your context fills up, reacts to your git activity, and remembers you between sessions.
+Your pet hatches when you start coding, grows as context fills up,<br>
+reacts to your work, and remembers you between sessions.
 
 ```
-/\_____________/\  ~                                                        
-==( o   w   o  )==   [Opus 4.6] ██████░░░░ 55% ^3%/m cache:80% | 5h ██░░░░ 32% ~2h
-==( "       "  )==   Cat *slow blink* ...I love you | myapp [Node] | up 45m        
+/\_____________/\  ~   [Opus 4.6] ██████░░░░ 55% 555K/1M cache:80% | 5h ██░░░░ 32% ~2h
+==( o   w   o  )==    git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug
+==( "       "  )==    Cat *slow blink* ...I love you | myapp [Node] | up 45m
 ```
 
 </div>
 
-## What it does
-
-- Your pet **grows fatter** as context fills up — from tiny to thicc
-- It **blinks, wags its tail**, and changes pose every 1.5 seconds
-- It **reacts to your git activity** — celebrates clean repos, notices big diffs
-- It shows **context burn speed** `^3%/m` and **cache efficiency** `cache:80%` — info shown nowhere else
-- It **remembers you** across sessions — relationship evolves from stranger to bestie
-- It **knows what files you're editing** and comments on them
+---
 
 ## Install
 
@@ -43,171 +37,172 @@ Add to `~/.claude/settings.json`:
 
 Restart Claude Code. Your pet will hatch.
 
+---
+
 ## Your pet grows
 
-Body scales with context window usage. The fatter your context, the fatter your pet.
+The fatter your context, the fatter your pet.
 
 ```
-/\_____/\ ~     /\_________/\ ~     /\_____________/\ ~     /\___________________/\ ~
-( o w o )       =( o  w  o )=       ==( o   w   o )==       ===( o     w     o )===
-( "   " )       =( "     " )=       ==( "       " )==       ===( "           " )===
-   tiny              small               medium                    chubby
+/\_____/\  ~            tiny    (~20% context)
+( o w o )
+( "   " )
 
-                          /\_________________________/\ ~
-                          ====( o       w       o )====
-                          ====( "               " )====
-                                      thicc
+/\_________/\  ~         small   (~35%)
+=( o  w  o )=
+=( "     " )=
+
+/\_____________/\  ~     medium  (~55%)
+==( o   w   o )==
+==( "       " )==
+
+/\___________________/\  ~     chubby  (~75%)
+===( o     w     o )===
+===( "           " )===
+
+/\_________________________/\  ~     thicc   (~95%)
+====( o       w       o )====
+====( "               " )====
 ```
 
-## 5 animals
+---
 
-Each session randomly assigns a species and color palette — a fresh companion every conversation.
+## 5 species
+
+Each session gets a random species and color palette.
 
 ```
-  /\_____/\ ~       (ovo)         {O,O}         ,---.         (\  /)  
-  ( o w o )        <(   )>       /)--(\\       ( O.O )       ( oYo ) 
-  ( "   " )         (" ")         " "         /|~|~|\\        (")(") 
-     Cat           Penguin         Owl        Octopus         Bunny  
+/\_____/\  ~       (ovo)        {O,O}        ,---.        (\  /)
+( o w o )         <(   )>      /)--(\\      ( O.O )      ( oYo )
+( "   " )          (" ")        " "        /|~|~|\\       (")(")
+   Cat            Penguin        Owl       Octopus        Bunny
 ```
 
-10 color palettes: Coral Flame, Electric Blue, Neon Mint, Purple Haze, Hot Pink, Golden Sun, Ice Violet, Cherry Blossom, Cyan Surge, Tangerine.
+10 palettes: Coral Flame · Electric Blue · Neon Mint · Purple Haze · Hot Pink · Golden Sun · Ice Violet · Cherry Blossom · Cyan Surge · Tangerine
+
+---
 
 ## 4 moods
 
-| | Trigger | Eyes | Tail |
-|---|---------|------|------|
-| **Idle** | Normal | Blinks `o` `^` `-` | Wags `~` |
-| **Busy** | Claude streaming | Rapid cycling | `~` |
-| **Danger** | Context > 85% | Wide `O` | `!` |
-| **Sleep** | Context < 10% | Closed `-` | `z` `Z` |
+| State | When | Eyes | Tail |
+|:------|:-----|:-----|:-----|
+| **Idle** | Normal | `o`  `^`  `-` blink | `~` wag |
+| **Busy** | Claude streaming | Rapid cycle | `~` |
+| **Danger** | Context > 85% | `O` wide | `!` |
+| **Sleep** | Context < 10% | `-` closed | `z` `Z` |
 
-## What you see at a glance
+---
+
+## What you see
 
 ```
-Line 1:  [Model] ██████░░░░ 55% ^3%/m cache:80% | 5h ██░░░░ 32% ~2h | 7d █░░░░ 20%
-Line 2:  git:(main*) ~12 ?3 | +489 -84 lines | ↑2 | last: fix auth bug | stash:3
-Line 3:  Cat *slow blink* ...I love you | myapp [Node] | 2026-04-04 15:00 | up 45m
+Line 1   [Model] ██████░░░░ 55% 555K/1M ^3%/m cache:80% | 5h ██░░░░ 32% ~2h
+Line 2   git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug | stash:3
+Line 3   Cat *slow blink* ...I love you | myapp [Node] | up 45m
 ```
 
-| What | Why it matters |
-|------|----------------|
-| Context bar `██░░ 55%` | How full is your context window |
-| Burn speed `^3%/m` | How fast context is filling — predict when to `/compact` |
-| Cache hit `cache:80%` | Token efficiency — not shown anywhere else in Claude Code |
-| 5h / 7d usage bars | Rate limits with reset countdown |
-| Git status | Branch, file changes, line diffs, unpushed commits, last commit |
-| Mood message | 150+ messages reacting to git, context, file types, time of day |
-| Project `[Node]` | Auto-detected language from config files |
-| Uptime `up 45m` | How long this session has been running |
+| Metric | What it tells you |
+|:-------|:------------------|
+| `██████░░░░ 55%` | Context window usage |
+| `555K/1M` | Tokens used / window size |
+| `^3%/m` | Context burn speed — predict when to `/compact` |
+| `cache:80%` | Token cache efficiency — unique to codachi |
+| `5h ██░░ 32% ~2h` | Rate limit usage + reset countdown |
+| `git:(main*) ~12 ?3` | Branch, modified/untracked files |
+| `+489 -84 lines` | Insertions / deletions |
+| `Cat *slow blink*` | Pet name + mood message (150+ messages) |
+| `myapp [Node]` | Project name + auto-detected language |
+| `up 45m` | Session uptime |
+
+---
 
 ## Pet memory
 
-Your pet remembers you. A persistent `memory.json` tracks sessions across conversations.
+Your pet remembers you across sessions.
 
-| Tier | After | Greeting |
-|------|-------|----------|
-| **Stranger** | 0 sessions | "Oh! A new friend!" |
-| **Acquaintance** | 3 sessions | "Hey, good to see you again!" |
-| **Friend** | 15 sessions | "My favorite human is back!" |
-| **Bestie** | 50 sessions | "BESTIE! You're here! #50" |
+| Tier | Sessions | Greeting |
+|:-----|:---------|:---------|
+| Stranger | 0 | *"Oh! A new friend!"* |
+| Acquaintance | 3+ | *"Hey, good to see you again!"* |
+| Friend | 15+ | *"My favorite human is back!"* |
+| Bestie | 50+ | *"BESTIE! You're here! #50"* |
+
+---
 
 ## 150+ mood messages
 
-Your pet is context-aware. It reacts to what's happening:
-
-| Trigger | Example |
-|---------|---------|
-| Fast context burn | "Whoa, burning through context!" |
-| Good cache hits | "Great cache hits! So efficient~" |
-| Editing tests | "Writing tests! So responsible~" |
-| Clean repo | "Everything's tidy~ feels nice" |
-| Midnight coding | "Burning the midnight oil..." |
-| Easter egg (rare) | "Found a bug! ...it's kinda cute tho" |
-| Cat personality | "\*slow blink\* ...I love you" |
-| Owl personality | "Whooo writes great code? You do!" |
+| When | Example |
+|:-----|:--------|
+| Fast context burn | *"Whoa, burning through context!"* |
+| Good cache hits | *"Great cache hits! So efficient~"* |
+| Editing tests | *"Writing tests! So responsible~"* |
+| Clean repo | *"Everything's tidy~ feels nice"* |
+| Midnight | *"Burning the midnight oil..."* |
+| Easter egg | *"Found a bug! ...it's kinda cute tho"* |
+| Cat | *"\*slow blink\* ...I love you"* |
+| Owl | *"Whooo writes great code? You do!"* |
 
 <details>
-<summary>Supported file types for mood reactions</summary>
+<summary>Supported file types</summary>
 
-TypeScript, JavaScript, Python, Rust, Go, Ruby, Java, Kotlin, Swift, C/C++, CSS/SCSS, HTML, Vue, Svelte, Shell, SQL, Proto, GraphQL, Config (JSON/YAML/TOML), Docs (Markdown), Tests.
+TypeScript · JavaScript · Python · Rust · Go · Ruby · Java · Kotlin · Swift · C/C++ · CSS · HTML · Vue · Svelte · Shell · SQL · Proto · GraphQL · Config · Docs · Tests
 
 </details>
 
-<details>
-<summary>Supported project language detection</summary>
-
-Rust, Go, Python, Node, Deno, Ruby, Java, Kotlin, Elixir, Dart, Swift, C/C++, Make, Nix, Docker, Terraform.
-
-</details>
-
-## How it works
-
-```
-Claude Code ──stdin:JSON──> codachi ──stdout:ANSI──> statusline
-```
-
-Claude Code invokes the statusline command during active rendering. It passes session data (model, context, rate limits, cwd) via stdin. Codachi computes git status, picks the animation frame, generates a mood message, and outputs 3 lines of ANSI-colored text.
-
-- Animation driven by `Date.now()` — correct frame on every refresh
-- Git commands cached for 2 seconds — fits within refresh budget
-- Session identity bound to `transcript_path` — same conversation = same pet
+---
 
 ## Configuration
 
-Optional. Create `~/.config/codachi/config.json` (or `~/.codachi.json`):
+Optional. Create `~/.config/codachi/config.json`:
 
 ```json
 {
   "animal": "cat",
   "palette": 0,
-  "showTokens": true,
-  "showVelocity": true,
-  "showCache": true,
-  "showUptime": true,
-  "showGit": true,
   "animationSpeed": 1.5
 }
 ```
 
-| Option | Default | Description |
-|--------|---------|-------------|
-| `animal` | random | Force a species: `cat`, `penguin`, `owl`, `octopus`, `bunny` |
-| `palette` | random | Force a color palette (0-9) |
-| `showTokens` | `true` | Show token count `550K/1M` |
-| `showVelocity` | `true` | Show context burn speed `^3%/m` |
-| `showCache` | `true` | Show cache hit rate `cache:80%` |
-| `showUptime` | `true` | Show session uptime `up 45m` |
-| `showGit` | `true` | Show git status line |
-| `animationSpeed` | `1.5` | Seconds per animation frame |
+| Option | Default | Values |
+|:-------|:--------|:-------|
+| `animal` | random | `cat` `penguin` `owl` `octopus` `bunny` |
+| `palette` | random | `0`-`9` |
+| `showTokens` | `true` | Token count display |
+| `showVelocity` | `true` | Context burn speed |
+| `showCache` | `true` | Cache hit rate |
+| `showGit` | `true` | Git status line |
+| `showUptime` | `true` | Session uptime |
+| `animationSpeed` | `1.5` | Seconds per frame |
 
-All fields are optional. Omitted fields use defaults.
+---
+
+## How it works
+
+```
+Claude Code ──stdin:JSON──▶ codachi ──stdout:ANSI──▶ statusline
+```
+
+- Animation driven by wall clock — correct frame on every refresh
+- Git results cached 2 seconds
+- Session bound to `transcript_path`
 
 <details>
 <summary>Project structure</summary>
 
 ```
 src/
-├── index.ts            # Entry: stdin → compute → render
-├── stdin.ts            # Parse Claude Code JSON, cache hit rate
-├── git.ts              # Branch, diff stats, stash, file type detection
-├── state.ts            # Session binding, context velocity, pet memory
-├── config.ts           # User configuration (~/.config/codachi/config.json)
-├── identity.ts         # Session-random animal + palette (config override)
-├── mood.ts             # 150+ messages, 11-tier priority system
-├── project.ts          # Language/framework detection
-├── width.ts            # Terminal character width
-├── types.ts            # TypeScript interfaces
-├── animals/
-│   ├── index.ts        # Registry, body size, animation state
-│   ├── types.ts        # Frame builder with auto-centering
-│   ├── cat.ts          # 5 sizes × 4 states × 4 frames each
-���   ├── penguin.ts
-│   ├── owl.ts
-│   ├── octopus.ts
-│   └── bunny.ts
-└── render/
-    ├── index.ts        # 3-line compositor, per-char colorizer
-    └── colors.ts       # Truecolor RGB, progress bars
+├── index.ts          # Entry point
+├── stdin.ts          # Parse Claude Code JSON
+├── git.ts            # Git status + file type detection
+├── state.ts          # Session, velocity, memory
+├── config.ts         # User configuration
+├── identity.ts       # Animal + palette selection
+├── mood.ts           # 150+ messages, 11-tier priority
+├── project.ts        # Language detection
+├── width.ts          # Terminal char width
+├── types.ts          # TypeScript types
+├── animals/          # 5 species × 5 sizes × 4 states × 4 frames
+└── render/           # 3-line compositor + truecolor
 ```
 
 </details>
