@@ -6,6 +6,7 @@ import { getMoodMessage } from '../mood.js';
 import { stringWidth } from '../width.js';
 
 import type { RelationshipTier } from '../state.js';
+import type { EventContext } from '../events.js';
 
 interface RenderInput {
   contextPercent: number;
@@ -24,6 +25,7 @@ interface RenderInput {
   animTick: number;
   moodTick: number;
   uptime: string;
+  eventContext: EventContext;
 }
 
 function visualLength(str: string): number {
@@ -108,12 +110,13 @@ export function render(input: RenderInput): void {
   const petLines = frame.lines.map(l => colorizePetLine(l, colors));
   const petW = frame.width + 2;
 
-  const { contextVelocity, cacheHitRate, relationshipTier, sessionNumber } = input;
+  const { contextVelocity, cacheHitRate, relationshipTier, sessionNumber, eventContext } = input;
 
   const mood = getMoodMessage({
     contextPercent, size, animation, animalType, git,
     fiveHourUsage: fiveHourUsage?.percent ?? null,
     contextVelocity, cacheHitRate, relationshipTier, sessionNumber, moodTick,
+    eventContext,
   });
 
   const { body: C, accent: A, face: F, blush: B } = colors;

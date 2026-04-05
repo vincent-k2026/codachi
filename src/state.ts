@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
+import { clearEvents } from './events.js';
 
 const STATE_DIR = path.join(os.homedir(), '.claude', 'plugins', 'codachi');
 const STATE_FILE = path.join(STATE_DIR, 'state.json');
@@ -34,8 +35,9 @@ export function initSession(transcriptPath?: string): void {
   const isSameSession = transcriptPath && diskState.transcriptPath === transcriptPath;
 
   if (!isSameSession) {
-    // New session: update memory, reset state
+    // New session: update memory, reset state, clear stale events
     updateMemory();
+    clearEvents();
     diskState = {
       transcriptPath: transcriptPath ?? '',
       sessionStart: Date.now(),

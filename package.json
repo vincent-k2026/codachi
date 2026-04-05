@@ -5,7 +5,8 @@
   "type": "module",
   "main": "dist/index.js",
   "bin": {
-    "codachi": "dist/index.js"
+    "codachi": "dist/index.js",
+    "codachi-hook": "dist/hook.js"
   },
   "files": [
     "dist",
@@ -13,7 +14,9 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc --watch"
+    "dev": "tsc --watch",
+    "test": "vitest run",
+    "test:cov": "vitest run --coverage"
   },
   "keywords": [
     "tamagotchi",
@@ -35,6 +38,8 @@
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
-    "typescript": "^6.0.2"
+    "@vitest/coverage-v8": "^2.1.9",
+    "typescript": "^6.0.2",
+    "vitest": "^2.1.9"
   }
 }

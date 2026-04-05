@@ -5,6 +5,7 @@ import { getProjectInfo } from './project.js';
 import { getAnimalType, getPetColors } from './identity.js';
 import { initSession, animTick, moodTick, sessionUptime, recordContextPercent, getContextVelocity, getMemory, getRelationshipTier } from './state.js';
 import { loadConfig, getConfig } from './config.js';
+import { getEventContext } from './events.js';
 import { render } from './render/index.js';
 
 async function main(): Promise<void> {
@@ -40,6 +41,7 @@ async function main(): Promise<void> {
       animTick: animTick(cfg.animationSpeed),
       moodTick: moodTick(),
       uptime: cfg.showUptime !== false ? sessionUptime() : '',
+      eventContext: getEventContext(),
     });
   } catch (error) {
     console.log('[codachi] Error:', error instanceof Error ? error.message : 'Unknown error');
