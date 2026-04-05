@@ -23,6 +23,8 @@ node dist/index.js init
 
 That's it. Restart Claude Code and your pet will hatch.
 
+Try the demo first: `node dist/index.js demo`
+
 <details>
 <summary>Manual setup</summary>
 
@@ -46,8 +48,6 @@ Add to `~/.claude/settings.json`:
 ```
 
 </details>
-
-Try the demo before installing: `node dist/index.js demo`
 
 ---
 
@@ -94,11 +94,14 @@ Each session gets a random species and color palette.
 
 ---
 
-## 4 moods
+## 5 moods
+
+Your pet's expression changes based on what's happening.
 
 | State | When | Eyes | Tail |
 |:------|:-----|:-----|:-----|
-| **Idle** | Normal | `o`  `^`  `-` blink | `~` wag |
+| **Idle** | Normal | `o` `^` `-` blink | `~` wag |
+| **Happy** | Tests pass, commit, recovery | `^` squint | `~` wag |
 | **Busy** | Claude streaming | Rapid cycle | `~` |
 | **Danger** | Context > 85% | `O` wide | `!` |
 | **Sleep** | Context < 10% | `-` closed | `z` `Z` |
@@ -108,21 +111,22 @@ Each session gets a random species and color palette.
 ## What you see
 
 ```
-Line 1   [Opus 4.6] [======----] 55% 555K/1.0M ^3%/m cache:78% | 5h [==----] 32% ~2h
+Line 1   [Opus 4.6] [======----] 55% 555K/1.0M ^3%/m ~15m cache:78% | 5h [==----] 32% ~2h
 Line 2   git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug
-Line 3   Cat *slow blink* ...I love you | myapp [Node] | up 45m
+Line 3   Mochi *slow blink* ...I love you | myapp [Node] | up 45m
 ```
 
 | Metric | What it tells you |
 |:-------|:------------------|
-| `██████░░░░ 55%` | Context window usage |
+| `[======----] 55%` | Context window usage |
 | `555K/1M` | Tokens used / window size |
-| `^3%/m` | Context burn speed — predict when to `/compact` |
-| `cache:80%` | Token cache efficiency — unique to codachi |
-| `5h ██░░ 32% ~2h` | Rate limit usage + reset countdown |
+| `^3%/m` | Context burn speed |
+| `~15m` | Estimated time until context is full |
+| `cache:78%` | Token cache efficiency |
+| `5h [==----] 32% ~2h` | Rate limit usage + reset countdown |
 | `git:(main*) ~12 ?3` | Branch, modified/untracked files |
 | `+489 -84 lines` | Insertions / deletions |
-| `Cat *slow blink*` | Pet name + mood message (350+ messages) |
+| `Mochi *slow blink*` | Pet name + mood message (850+ messages) |
 | `myapp [Node]` | Project name + auto-detected language |
 | `up 45m` | Session uptime |
 
@@ -130,7 +134,7 @@ Line 3   Cat *slow blink* ...I love you | myapp [Node] | up 45m
 
 ## Pet memory
 
-Your pet remembers you across sessions.
+Your pet remembers you across sessions. When you level up, your pet celebrates.
 
 | Tier | Sessions | Greeting |
 |:-----|:---------|:---------|
@@ -139,11 +143,13 @@ Your pet remembers you across sessions.
 | Friend | 15+ | *"My favorite human is back!"* |
 | Bestie | 50+ | *"BESTIE! You're here! #50"* |
 
+Tier upgrades trigger a one-time celebration: *"BESTIE STATUS UNLOCKED! WE DID IT!"*
+
 ---
 
-## 350+ mood messages
+## 850+ mood messages
 
-Your pet watches what Claude does and reacts in real time via hooks.
+Your pet watches what Claude does via hooks and reacts in real time.
 
 | When | Example |
 |:-----|:--------|
@@ -158,25 +164,32 @@ Your pet watches what Claude does and reacts in real time via hooks.
 | Creating new file | *"A new file is born! \*celebrates\*"* |
 | Writing tests | *"Testing is caring!"* |
 | Writing docs | *"Documentation hero! \*salutes\*"* |
-| Editing CSS | *"Making things pretty! \*admires\*"* |
 | Linting/formatting | *"Code spa day! Refresh~"* |
 | Multiple failures | *"Hang in there! \*warm hug\*"* |
-| Fix after failure | *"From failure to victory!"* |
+| Fix after failure | *"Redemption arc complete!"* |
 | Rapid editing | *"Flow state detected! Beautiful~"* |
 | Exploring code | *"Code archaeology in progress!"* |
-| Dangerous commands | *"Living on the edge!"* |
-| Docker | *"Container time! \*packs boxes\*"* |
-| Fast context burn | *"Whoa, burning through context!"* |
-| Good cache hits | *"Cache is cooking! Snappy session~"* |
-| Clean repo | *"Everything's tidy~ feels nice"* |
-| Easter egg | *"Found a bug! ...it's kinda cute tho"* |
-| Cat idle | *"\*slow blink\* ...I love you"* |
-| Owl idle | *"Whooo writes great code? You do!"* |
+| Dangerous commands | *"My insurance doesn't cover this..."* |
+| Cat idle | *"\*knocks something off the desk\*"* |
+| Owl idle | *"In my expert owl-pinion, this is going well"* |
+| Penguin idle | *"Noot noot! \*happy penguin sounds\*"* |
+| Octopus idle | *"\*squirts ink\* Oops, that was the dark theme"* |
+| Bunny idle | *"\*flops sideways\* (that means I trust you)"* |
+| Late night | *"The whole world is asleep... except us"* |
+| Weekend | *"Weekend coding? Impressive!"* |
+| Easter egg | *"I live in the statusline but you live in my heart"* |
 
 <details>
 <summary>All event categories</summary>
 
-Testing · Building · Installing · Git commit/push/pull/merge/rebase/stash/checkout · Linting · Server start · Docker · Network/HTTP · Dangerous commands · Search · File editing by type (tests/docs/styles/config/code) · New file creation · Rapid editing · Code exploration · Recovery from errors · Struggling pattern · Session milestones
+Testing · Building · Installing · Git commit/push/pull/merge/rebase/stash/checkout · Linting · Server start · Docker/K8s · Network/HTTP · Dangerous commands · Search · File editing by type (tests/docs/styles/config/code) · New file creation · Rapid editing · Code exploration · Recovery from errors · Struggling pattern · Session milestones · Tier upgrades
+
+</details>
+
+<details>
+<summary>Supported languages</summary>
+
+TypeScript · JavaScript · Python · Rust · Go · Ruby · Java · Kotlin · Swift · C/C++ · CSS · HTML · Vue · Svelte · Shell · SQL · Proto · GraphQL · Config · Docs · Tests
 
 </details>
 
@@ -190,18 +203,17 @@ Optional. Create `~/.config/codachi/config.json`:
 {
   "name": "Mochi",
   "animal": "cat",
-  "palette": 0,
-  "animationSpeed": 1.5
+  "palette": 3
 }
 ```
 
 | Option | Default | Values |
 |:-------|:--------|:-------|
-| `name` | species | Custom pet name |
+| `name` | species name | Custom pet name |
 | `animal` | random | `cat` `penguin` `owl` `octopus` `bunny` |
 | `palette` | random | `0`-`9` |
 | `showTokens` | `true` | Token count display |
-| `showVelocity` | `true` | Context burn speed |
+| `showVelocity` | `true` | Context burn speed + time remaining |
 | `showCache` | `true` | Cache hit rate |
 | `showGit` | `true` | Git status line |
 | `showUptime` | `true` | Session uptime |
@@ -217,32 +229,46 @@ Claude Code ──stdin:JSON──▶ codachi ──stdout:ANSI──▶ statusl
                  └──hook──▶ events.json ──▶ mood engine
 ```
 
-- Hooks log tool events (zero tokens, zero API calls)
-- Event-reactive moods: hot (< 15s), warm (< 60s), cold (< 5m)
-- Pattern detection: struggling, recovery, rapid editing, exploring
-- Animation driven by wall clock — correct frame on every refresh
-- Git results cached 2 seconds
-- Session bound to `transcript_path`
+- **Zero cost** — hooks log events to disk, no API calls, no tokens
+- **Event-reactive** — hot (< 15s), warm (< 60s), cold (< 5m) freshness tiers
+- **Pattern detection** — struggling (3+ failures), recovery, rapid editing, exploring
+- **Predictive** — estimates time until context is full based on burn velocity
+- **Atomic writes** — state files use write-to-tmp + rename to prevent corruption
+- **Fast** — git results cached 2s, ~50ms render time
+- **Session-bound** — pet identity tied to `transcript_path`
 
 <details>
 <summary>Project structure</summary>
 
 ```
 src/
-├── index.ts          # Entry point
+├── index.ts          # Entry point + init/demo routing
+├── init.ts           # One-command install
+├── demo.ts           # Live terminal demo
 ├── hook.ts           # Claude Code hook — logs events
-├── events.ts         # Event reader + classifier
+├── events.ts         # Event reader + 40-type classifier
 ├── stdin.ts          # Parse Claude Code JSON
 ├── git.ts            # Git status + file type detection
-├── state.ts          # Session, velocity, memory
+├── state.ts          # Session, velocity, memory, tier tracking
 ├── config.ts         # User configuration
 ├── identity.ts       # Animal + palette selection
-├── mood.ts           # 350+ messages, 14-tier priority
-├── project.ts        # Language detection
-├── width.ts          # Terminal char width
+├── mood.ts           # 850+ messages, 15-tier priority
+├── project.ts        # Language detection (21 markers)
+├── fs-utils.ts       # Atomic file writes
+├── width.ts          # Terminal char width (CJK-aware)
 ├── types.ts          # TypeScript types
-├── animals/          # 5 species × 5 sizes × 4 states × 4 frames
+├── animals/          # 5 species × 5 sizes × 5 states × 4 frames
 └── render/           # 3-line compositor + truecolor
+```
+
+</details>
+
+<details>
+<summary>Testing</summary>
+
+```bash
+npm test              # 292 tests
+npm run test:cov      # coverage report (91%+ lines)
 ```
 
 </details>
