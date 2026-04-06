@@ -7,7 +7,7 @@
 Your pet hatches when you start coding, grows as context fills up,<br>
 reacts to your work, and remembers you between sessions.
 
-![codachi statusline](codachi.png)
+![codachi demo](codachi-demo.gif)
 
 </div>
 
