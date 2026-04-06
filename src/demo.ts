@@ -4,19 +4,11 @@
  */
 import { render } from './render/index.js';
 import { getAnimalName } from './animals/index.js';
-import { rgb } from './render/colors.js';
+import { PALETTES } from './identity.js';
 import type { AnimalType } from './types.js';
 import type { EventContext } from './events.js';
 
 const ANIMALS: AnimalType[] = ['cat', 'penguin', 'owl', 'octopus', 'bunny'];
-
-const PALETTES = [
-  { body: rgb(255, 127, 80), accent: rgb(255, 99, 71), face: rgb(255, 200, 150), blush: rgb(255, 160, 122) },
-  { body: rgb(80, 180, 255), accent: rgb(50, 140, 255), face: rgb(170, 220, 255), blush: rgb(130, 200, 255) },
-  { body: rgb(50, 220, 160), accent: rgb(0, 200, 130), face: rgb(150, 255, 210), blush: rgb(255, 180, 150) },
-  { body: rgb(180, 120, 255), accent: rgb(150, 80, 255), face: rgb(220, 190, 255), blush: rgb(255, 150, 200) },
-  { body: rgb(255, 110, 170), accent: rgb(255, 70, 140), face: rgb(255, 200, 220), blush: rgb(255, 130, 160) },
-];
 
 const noEvent: EventContext = {
   category: null, freshness: 'none', detail: '',

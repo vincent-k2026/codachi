@@ -7,6 +7,18 @@ const CACHE_TTL_MS = 2000; // cache git results for 2s
 
 let cached: { status: GitStatus | null; cwd: string; time: number } | null = null;
 
+// Pre-sorted by extension length (longest first) so .test.ts matches before .ts
+const EXT_MAP: Record<string, string> = {
+  '.test.ts': 'Tests', '.test.js': 'Tests', '.spec.ts': 'Tests', '.spec.js': 'Tests',
+  '.ts': 'TypeScript', '.tsx': 'TypeScript', '.js': 'JavaScript', '.jsx': 'JavaScript',
+  '.py': 'Python', '.rs': 'Rust', '.go': 'Go', '.rb': 'Ruby', '.java': 'Java',
+  '.kt': 'Kotlin', '.swift': 'Swift', '.c': 'C', '.cpp': 'C++', '.h': 'C',
+  '.css': 'Styles', '.scss': 'Styles', '.html': 'HTML', '.vue': 'Vue', '.svelte': 'Svelte',
+  '.md': 'Docs', '.json': 'Config', '.yaml': 'Config', '.yml': 'Config', '.toml': 'Config',
+  '.sh': 'Shell', '.sql': 'SQL', '.proto': 'Proto', '.graphql': 'GraphQL',
+};
+const SORTED_EXT_MAP: [string, string][] = Object.entries(EXT_MAP).sort((a, b) => b[0].length - a[0].length);
+
 function run(cmd: string, cwd?: string): string {
   try {
     return execSync(cmd, { cwd, encoding: 'utf8', timeout: GIT_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }).trim();
@@ -51,8 +63,8 @@ function compute(cwd?: string): GitStatus | null {
 
   const branchMatch = branchLine.match(/^## ([^\s.]+)/);
   let branch = branchMatch ? branchMatch[1] : 'HEAD';
-  // Truncate long branch names
-  if (branch.length > 25) branch = branch.slice(0, 22) + '...';
+  // Truncate long branch names (Unicode-safe)
+  if (stringWidth(branch) > 25) branch = truncateByWidth(branch, 25);
 
   let ahead = 0, behind = 0;
   const abMatch = branchLine.match(/\[(?:ahead (\d+))?(?:, )?(?:behind (\d+))?\]/);
@@ -91,22 +103,13 @@ function compute(cwd?: string): GitStatus | null {
   }
 
   // 3. Detect dominant file type from changed file paths
-  const extMap: Record<string, string> = {
-    '.ts': 'TypeScript', '.tsx': 'TypeScript', '.js': 'JavaScript', '.jsx': 'JavaScript',
-    '.py': 'Python', '.rs': 'Rust', '.go': 'Go', '.rb': 'Ruby', '.java': 'Java',
-    '.kt': 'Kotlin', '.swift': 'Swift', '.c': 'C', '.cpp': 'C++', '.h': 'C',
-    '.css': 'Styles', '.scss': 'Styles', '.html': 'HTML', '.vue': 'Vue', '.svelte': 'Svelte',
-    '.md': 'Docs', '.json': 'Config', '.yaml': 'Config', '.yml': 'Config', '.toml': 'Config',
-    '.test.ts': 'Tests', '.test.js': 'Tests', '.spec.ts': 'Tests', '.spec.js': 'Tests',
-    '.sh': 'Shell', '.sql': 'SQL', '.proto': 'Proto', '.graphql': 'GraphQL',
-  };
   const typeCounts: Record<string, number> = {};
   for (const line of fileLines) {
     const filePath = line.slice(3).trim().split(' -> ').pop() || '';
-    // Check longer extensions first (.test.ts before .ts)
     let matched = false;
-    for (const ext of Object.keys(extMap).sort((a, b) => b.length - a.length)) {
-      if (filePath.endsWith(ext)) { typeCounts[extMap[ext]] = (typeCounts[extMap[ext]] ?? 0) + 1; matched = true; break; }
+    // Check longer extensions first (.test.ts before .ts) — pre-sorted
+    for (const [ext, type] of SORTED_EXT_MAP) {
+      if (filePath.endsWith(ext)) { typeCounts[type] = (typeCounts[type] ?? 0) + 1; matched = true; break; }
     }
     if (!matched) typeCounts['Other'] = (typeCounts['Other'] ?? 0) + 1;
   }

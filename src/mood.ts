@@ -45,11 +45,16 @@ function pick(pool: Msg[], tick: number, detail: string = ''): string {
   // Sanitize detail for template messages
   const safeDetail = detail.length > 25 ? detail.slice(0, 22) + '...' : detail;
 
-  const m = pool[tick % pool.length];
+  const idx = tick % pool.length;
+  const m = pool[idx];
   if (typeof m === 'function') {
-    // Skip template functions when detail is empty — fall through to next message
-    if (!safeDetail) return pool[(tick + 1) % pool.length] as string;
-    return m(safeDetail);
+    if (safeDetail) return m(safeDetail);
+    // No detail — skip template functions, find next string message
+    for (let i = 1; i < pool.length; i++) {
+      const next = pool[(idx + i) % pool.length];
+      if (typeof next === 'string') return next;
+    }
+    return m('file'); // ultimate fallback: use generic detail
   }
   return m;
 }

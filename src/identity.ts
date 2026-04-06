@@ -11,7 +11,7 @@ export function getAnimalType(): AnimalType {
   return ANIMALS[getSessionAnimalIndex() % ANIMALS.length];
 }
 
-const PALETTES: PetColors[] = [
+export const PALETTES: PetColors[] = [
   { // Coral Flame
     body:   rgb(255, 127, 80),
     accent: rgb(255, 99, 71),
