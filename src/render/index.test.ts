@@ -23,7 +23,6 @@ function makeRenderInput(overrides: Record<string, unknown> = {}) {
     fiveHourUsage: null,
     sevenDayUsage: null,
     contextVelocity: 0,
-    cacheHitRate: null,
     tokenSummary: null,
     relationshipTier: 'stranger' as const,
     sessionNumber: 1,
@@ -100,11 +99,6 @@ describe('render', () => {
     expect(logOutput[0]).toContain('550K/1.0M');
   });
 
-  it('shows cache hit rate when provided', () => {
-    render(makeRenderInput({ cacheHitRate: 75 }));
-    expect(logOutput[0]).toContain('cache:75%');
-  });
-
   it('shows velocity when > 0.5', () => {
     render(makeRenderInput({ contextVelocity: 3 }));
     expect(logOutput[0]).toContain('^3%/m');
@@ -119,7 +113,7 @@ describe('render', () => {
     expect(logOutput[0]).toContain('~2h30m');
   });
 
-  it('shows seven day usage when >= 10%', () => {
+  it('shows seven day usage when provided', () => {
     render(makeRenderInput({
       sevenDayUsage: { percent: 50, resetsIn: '3d' },
     }));
@@ -127,11 +121,12 @@ describe('render', () => {
     expect(logOutput[0]).toContain('50%');
   });
 
-  it('hides seven day usage when < 10%', () => {
+  it('shows seven day usage even at low percentages', () => {
     render(makeRenderInput({
-      sevenDayUsage: { percent: 5, resetsIn: null },
+      sevenDayUsage: { percent: 5, resetsIn: '6d' },
     }));
-    expect(logOutput[0]).not.toContain('7d');
+    expect(logOutput[0]).toContain('7d');
+    expect(logOutput[0]).toContain('5%');
   });
 
   it('shows git insertions/deletions', () => {

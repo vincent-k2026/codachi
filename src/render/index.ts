@@ -18,7 +18,6 @@ interface RenderInput {
   fiveHourUsage: { percent: number; resetsIn: string | null } | null;
   sevenDayUsage: { percent: number; resetsIn: string | null } | null;
   contextVelocity: number;
-  cacheHitRate: number | null;
   tokenSummary: string | null;
   relationshipTier: RelationshipTier;
   sessionNumber: number;
@@ -129,12 +128,12 @@ export function render(input: RenderInput): void {
   const petLines = frame.lines.map(l => colorizePetLine(l, colors));
   const petW = frame.width + 2;
 
-  const { contextVelocity, cacheHitRate, relationshipTier, sessionNumber, petName, contextTimeRemaining } = input;
+  const { contextVelocity, relationshipTier, sessionNumber, petName, contextTimeRemaining } = input;
 
   const mood = getMoodMessage({
     contextPercent, size, animation, animalType, git,
     fiveHourUsage: fiveHourUsage?.percent ?? null,
-    contextVelocity, cacheHitRate, relationshipTier, sessionNumber, moodTick,
+    contextVelocity, relationshipTier, sessionNumber, moodTick,
     eventContext, tierUpgraded,
   });
 
@@ -158,19 +157,12 @@ export function render(input: RenderInput): void {
     timeLeftStr = ` ${DIM}${contextTimeRemaining}${RESET}`;
   }
 
-  // Cache hit rate
-  let cacheStr = '';
-  if (cacheHitRate !== null) {
-    const cColor = cacheHitRate >= 60 ? rgb(80, 220, 120) : cacheHitRate >= 30 ? rgb(255, 200, 50) : rgb(255, 80, 80);
-    cacheStr = ` ${cColor}cache:${cacheHitRate}%${RESET}`;
-  }
-
   // Token summary (e.g., "550K/1M")
   const { tokenSummary } = input;
   let tokStr = '';
   if (tokenSummary) tokStr = ` ${DIM}${tokenSummary}${RESET}`;
 
-  let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}${tokStr}${velStr}${timeLeftStr}${cacheStr}`;
+  let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}${tokStr}${velStr}${timeLeftStr}`;
   if (fiveHourUsage) {
     const u = fiveHourUsage;
     const uBar = progressBar(u.percent, 6, getUsageColor);
@@ -178,7 +170,7 @@ export function render(input: RenderInput): void {
     let rs = u.resetsIn ? ` ${B}~${u.resetsIn}${RESET}` : '';
     line1 += ` ${SEP} ${A}5h${RESET} ${uBar} ${uColor}${u.percent}%${RESET}${rs}`;
   }
-  if (sevenDayUsage && sevenDayUsage.percent >= 10) {
+  if (sevenDayUsage) {
     const u7 = sevenDayUsage;
     const u7Bar = progressBar(u7.percent, 5, getUsageColor);
     const u7Color = u7.percent >= 90 ? rgb(255, 80, 80) : u7.percent >= 75 ? rgb(200, 100, 255) : rgb(100, 150, 255);

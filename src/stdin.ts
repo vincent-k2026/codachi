@@ -90,12 +90,3 @@ export function getTokenSummary(stdin: StdinData): string | null {
   return `${formatTokens(used)}/${formatTokens(windowSize)}`;
 }
 
-export function getCacheHitRate(stdin: StdinData): number | null {
-  const usage = stdin.context_window?.current_usage;
-  if (!usage) return null;
-  const read = usage.cache_read_input_tokens ?? 0;
-  const create = usage.cache_creation_input_tokens ?? 0;
-  const total = read + create;
-  if (total === 0) return null;
-  return Math.round((read / total) * 100);
-}

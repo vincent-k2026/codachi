@@ -16,7 +16,6 @@ function makeMoodCtx(overrides: Record<string, unknown> = {}) {
     git: null,
     fiveHourUsage: null,
     contextVelocity: 0,
-    cacheHitRate: null,
     relationshipTier: 'stranger' as const,
     sessionNumber: 1,
     moodTick: 0,
@@ -172,25 +171,6 @@ describe('getMoodMessage', () => {
     for (let tick = 0; tick < 20; tick++) {
       const msg = getMoodMessage(makeMoodCtx({ moodTick: tick, contextVelocity: 8 }));
       if (msg.toLowerCase().includes('context') || msg.toLowerCase().includes('speed') || msg.toLowerCase().includes('throttle') || msg.toLowerCase().includes('brrr')) seen = true;
-    }
-    expect(seen).toBe(true);
-  });
-
-  // Cache messages
-  it('shows cache message for good cache hits', () => {
-    let seen = false;
-    for (let tick = 0; tick < 20; tick++) {
-      const msg = getMoodMessage(makeMoodCtx({ moodTick: tick, cacheHitRate: 80 }));
-      if (msg.toLowerCase().includes('cache')) seen = true;
-    }
-    expect(seen).toBe(true);
-  });
-
-  it('shows cache message for bad cache hits', () => {
-    let seen = false;
-    for (let tick = 0; tick < 20; tick++) {
-      const msg = getMoodMessage(makeMoodCtx({ moodTick: tick, cacheHitRate: 20 }));
-      if (msg.toLowerCase().includes('fresh') || msg.toLowerCase().includes('cache') || msg.toLowerCase().includes('uncharted')) seen = true;
     }
     expect(seen).toBe(true);
   });

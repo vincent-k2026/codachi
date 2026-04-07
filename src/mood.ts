@@ -6,7 +6,7 @@ import type { EventContext } from './events.js';
 import { EVENT_MESSAGES } from './messages/events.js';
 import type { Msg } from './messages/events.js';
 import { IDLE_MESSAGES, SIZE_MESSAGES } from './messages/idle.js';
-import { BUSY_MESSAGES, DANGER_MESSAGES, USAGE_HIGH_MESSAGES, VELOCITY_FAST, VELOCITY_SLOW, CACHE_GOOD, CACHE_BAD, COMPACT_SUGGEST } from './messages/context.js';
+import { BUSY_MESSAGES, DANGER_MESSAGES, USAGE_HIGH_MESSAGES, VELOCITY_FAST, VELOCITY_SLOW, COMPACT_SUGGEST } from './messages/context.js';
 import { WELCOME_MESSAGES, TIER_UPGRADE, RARE_EVENTS } from './messages/social.js';
 import { getGitMood, FILE_TYPE_MESSAGES } from './messages/git.js';
 
@@ -18,7 +18,6 @@ export interface MoodContext {
   git: GitStatus | null;
   fiveHourUsage: number | null;
   contextVelocity: number;
-  cacheHitRate: number | null;
   relationshipTier: RelationshipTier;
   sessionNumber: number;
   moodTick: number;
@@ -95,7 +94,7 @@ let compactSuggested = false;
 export function getMoodMessage(ctx: MoodContext): string {
   const {
     contextPercent, size, animation, animalType, git,
-    fiveHourUsage, contextVelocity, cacheHitRate,
+    fiveHourUsage, contextVelocity,
     relationshipTier, sessionNumber, moodTick: tick,
     eventContext, tierUpgraded,
   } = ctx;
@@ -114,12 +113,13 @@ export function getMoodMessage(ctx: MoodContext): string {
   }
 
   // Priority 1.5: smart /compact suggestion (one-time per trigger)
-  if (!compactSuggested && cacheHitRate !== null && cacheHitRate < 30 && contextPercent > 60 && contextVelocity > 2) {
+  // Trigger when context is filling fast and getting full
+  if (!compactSuggested && contextPercent > 70 && contextVelocity > 3) {
     compactSuggested = true;
     return COMPACT_SUGGEST[tick % COMPACT_SUGGEST.length];
   }
-  // Reset when cache improves
-  if (compactSuggested && cacheHitRate !== null && cacheHitRate >= 50) {
+  // Reset after context drops (e.g., user ran /compact)
+  if (compactSuggested && contextPercent < 40) {
     compactSuggested = false;
   }
 
@@ -175,12 +175,6 @@ export function getMoodMessage(ctx: MoodContext): string {
   }
   if (contextVelocity > 0 && contextVelocity <= 1 && tick % 8 === 2) {
     return VELOCITY_SLOW[tick % VELOCITY_SLOW.length];
-  }
-
-  // Priority 10: cache hit rate
-  if (cacheHitRate !== null && tick % 10 === 4) {
-    if (cacheHitRate >= 60) return CACHE_GOOD[tick % CACHE_GOOD.length];
-    if (cacheHitRate < 30) return CACHE_BAD[tick % CACHE_BAD.length];
   }
 
   // Priority 11: time-of-day

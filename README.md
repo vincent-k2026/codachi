@@ -17,7 +17,7 @@
 
 - **Context time prediction** — see `~15m left` before you need to `/compact`, not just a percentage
 - **Event-aware pet** — your pet watches Claude work via hooks and reacts with 850+ unique messages
-- **Cache hit rate** — the only statusline that shows token cache efficiency
+- **5h + 7d rate limits** — both reset countdowns visible at a glance
 - **Zero overhead** — no API calls, no tokens consumed, just a local process reading JSON
 
 ---
@@ -63,7 +63,7 @@ Add to `~/.claude/settings.json`:
 ## Statusline Layout
 
 ```
-Line 1   [Opus 4.6] [======----] 55% 555K/1.0M ^3%/m ~15m cache:78% | 5h [==----] 32% ~2h
+Line 1   [Opus 4.6] [======----] 55% 555K/1.0M ^3%/m ~15m | 5h [==----] 32% ~2h | 7d [-----] 8% ~6d
 Line 2   git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug
 Line 3   Mochi *slow blink* ...I love you | myapp [Node] | up 45m
 ```
@@ -74,8 +74,8 @@ Line 3   Mochi *slow blink* ...I love you | myapp [Node] | up 45m
 | `555K/1M` | Tokens used / total window size |
 | `^3%/m` | Context burn speed (how fast you're filling up) |
 | `~15m` | Estimated time until context is full |
-| `cache:78%` | Token cache efficiency (high = fast, low = time to `/compact`) |
 | `5h [==----] 32% ~2h` | 5-hour rate limit usage + reset countdown |
+| `7d [-----] 8% ~6d` | 7-day rate limit usage + reset countdown |
 | `git:(main*) ~12 ?3` | Branch, modified/untracked files |
 | `+489 -84 lines` | Insertions / deletions in working tree |
 | `Mochi *slow blink*` | Custom pet name + contextual mood message |
@@ -202,7 +202,6 @@ Optional. Create `~/.config/codachi/config.json`:
 | `palette` | random | Color palette index `0`–`9` |
 | `showTokens` | `true` | Show token count `555K/1M` |
 | `showVelocity` | `true` | Show burn speed `^3%/m` + time remaining `~15m` |
-| `showCache` | `true` | Show cache hit rate `cache:78%` |
 | `showGit` | `true` | Show git status on line 2 |
 | `showUptime` | `true` | Show session uptime |
 | `animationSpeed` | `1.5` | Seconds per animation frame |

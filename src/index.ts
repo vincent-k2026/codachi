@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage, getCacheHitRate, getTokenSummary } from './stdin.js';
+import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage, getTokenSummary } from './stdin.js';
 import { getGitStatus } from './git.js';
 import { getProjectInfo } from './project.js';
 import { getAnimalType, getPetColors } from './identity.js';
@@ -51,7 +51,6 @@ async function main(): Promise<void> {
       fiveHourUsage: getFiveHourUsage(stdin),
       sevenDayUsage: getSevenDayUsage(stdin),
       contextVelocity: cfg.showVelocity !== false ? getContextVelocity() : 0,
-      cacheHitRate: cfg.showCache !== false ? getCacheHitRate(stdin) : null,
       tokenSummary: cfg.showTokens !== false ? getTokenSummary(stdin) : null,
       relationshipTier: getRelationshipTier(),
       sessionNumber: getMemory().totalSessions,

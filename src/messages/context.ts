@@ -33,18 +33,6 @@ export const VELOCITY_SLOW = [
   'Efficient context usage!', 'Measured and precise~', 'Marathon pace, not sprint~',
 ];
 
-export const CACHE_GOOD = [
-  'Great cache hits! So efficient~', 'Cache is cooking! Snappy session~',
-  'High cache = fast vibes!', 'The cache is our best friend today!',
-  'Cache money! *cha-ching*', 'Smooth sailing with these cache hits~',
-];
-
-export const CACHE_BAD = [
-  'Lots of fresh context flowing in~', 'Cache miss... new territory!',
-  'Exploring uncharted tokens~', 'The cache is learning new things!',
-  'Fresh tokens, fresh perspectives!', 'Cache is building up... patience~',
-];
-
 export const COMPACT_SUGGEST = [
   'Cache is getting cold... maybe /compact?',
   'Might be a good time to /compact~',

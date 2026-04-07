@@ -1,5 +1,5 @@
-import { describe, it, expect, vi } from 'vitest';
-import { getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage, getTokenSummary, getCacheHitRate } from './stdin.js';
+import { describe, it, expect } from 'vitest';
+import { getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage, getTokenSummary } from './stdin.js';
 import type { StdinData } from './types.js';
 
 function makeStdin(overrides: Partial<StdinData> = {}): StdinData {
@@ -157,28 +157,3 @@ describe('getTokenSummary', () => {
   });
 });
 
-describe('getCacheHitRate', () => {
-  it('calculates hit rate', () => {
-    expect(getCacheHitRate(makeStdin())).toBe(80); // 80k/(80k+20k)
-  });
-
-  it('returns null with no usage data', () => {
-    expect(getCacheHitRate({})).toBeNull();
-  });
-
-  it('returns null when zero total cache', () => {
-    expect(getCacheHitRate({
-      context_window: {
-        current_usage: { cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
-      },
-    })).toBeNull();
-  });
-
-  it('returns 100 when all cache reads', () => {
-    expect(getCacheHitRate({
-      context_window: {
-        current_usage: { cache_read_input_tokens: 1000, cache_creation_input_tokens: 0 },
-      },
-    })).toBe(100);
-  });
-});

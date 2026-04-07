@@ -79,7 +79,6 @@ export async function runDemo(): Promise<void> {
       fiveHourUsage: { percent: 15, resetsIn: '4h12m' },
       sevenDayUsage: null,
       contextVelocity: step.velocity,
-      cacheHitRate: step.cacheHit,
       tokenSummary: `${Math.round(step.contextPercent * 10)}K/1.0M`,
       relationshipTier: 'friend',
       sessionNumber: 18,
