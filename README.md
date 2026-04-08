@@ -278,6 +278,12 @@ bash scripts/record-gif.sh     # requires asciinema + agg
 vhs scripts/demo.tape          # requires vhs
 ```
 
+---
+
+## Related projects
+
+- [**ccstatusline**](https://github.com/sirmalloc/ccstatusline) — Highly customizable statusline for Claude Code with powerline support, themes, and rich layout options. If codachi's pet is too much personality for your taste, ccstatusline is the polished, configurable alternative.
+
 ## License
 
 MIT
