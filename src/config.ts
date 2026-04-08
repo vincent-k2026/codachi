@@ -7,12 +7,15 @@ export interface CodachiConfig {
   name?: string;             // custom pet name (default: species name)
   animal?: AnimalType;       // force a specific animal (overrides random)
   palette?: number;          // force a specific palette index 0-9
+  widgets?: string[];        // line 1 widget order: model, context, velocity, rateLimit5h, rateLimit7d
   showTokens?: boolean;      // show token summary "550K/1M" (default: true)
   showVelocity?: boolean;    // show context burn speed (default: true)
   showUptime?: boolean;      // show session uptime (default: true)
   showGit?: boolean;         // show git info line (default: true)
   animationSpeed?: number;   // seconds per frame (default: 1.5)
 }
+
+export const CONFIG_PATH = path.join(os.homedir(), '.config', 'codachi', 'config.json');
 
 const CONFIG_PATHS = [
   path.join(os.homedir(), '.config', 'codachi', 'config.json'),

@@ -22,6 +22,11 @@ async function main(): Promise<void> {
     await runDemo();
     return;
   }
+  if (arg === 'config' || arg === 'configure') {
+    const { runConfigure } = await import('./configure.js');
+    await runConfigure();
+    return;
+  }
 
   try {
     const stdin = await readStdin();

@@ -1,9 +1,11 @@
 import type { PetColors, AnimalType, BodySize, Animation, GitStatus } from '../types.js';
 import type { ProjectInfo } from '../project.js';
-import { RESET, DIM, rgb, progressBar, getContextColor, getUsageColor } from './colors.js';
+import { RESET, DIM, rgb } from './colors.js';
 import { getAnimalFrame, getBodySize, getAnimation } from '../animals/index.js';
 import { getMoodMessage } from '../mood.js';
 import { stringWidth } from '../width.js';
+import { renderWidgetLine, resolveWidgetOrder } from '../widgets/index.js';
+import { getConfig } from '../config.js';
 
 import type { RelationshipTier } from '../state.js';
 import type { EventContext } from '../events.js';
@@ -139,44 +141,20 @@ export function render(input: RenderInput): void {
 
   const { body: C, accent: A, face: F, blush: B } = colors;
   const SEP = `${DIM}|${RESET}`;
-
-  // Line 1: Claude
-  const ctxBar = progressBar(contextPercent, 10, getContextColor);
-  const ctxColor = contextPercent >= 85 ? rgb(255, 80, 80)
-    : contextPercent >= 70 ? rgb(255, 200, 50) : rgb(80, 220, 120);
-  // Context velocity indicator
-  let velStr = '';
-  if (contextVelocity > 0.5) {
-    const vColor = contextVelocity > 5 ? rgb(255, 80, 80) : contextVelocity > 2 ? rgb(255, 200, 50) : rgb(80, 220, 120);
-    velStr = ` ${vColor}^${contextVelocity}%/m${RESET}`;
-  }
-
-  // Context time remaining
-  let timeLeftStr = '';
-  if (contextTimeRemaining) {
-    timeLeftStr = ` ${DIM}${contextTimeRemaining}${RESET}`;
-  }
-
-  // Token summary (e.g., "550K/1M")
   const { tokenSummary } = input;
-  let tokStr = '';
-  if (tokenSummary) tokStr = ` ${DIM}${tokenSummary}${RESET}`;
 
-  let line1 = `${A}[${modelName}]${RESET} ${ctxBar} ${ctxColor}${contextPercent}%${RESET}${tokStr}${velStr}${timeLeftStr}`;
-  if (fiveHourUsage) {
-    const u = fiveHourUsage;
-    const uBar = progressBar(u.percent, 6, getUsageColor);
-    const uColor = u.percent >= 90 ? rgb(255, 80, 80) : u.percent >= 75 ? rgb(200, 100, 255) : rgb(100, 150, 255);
-    let rs = u.resetsIn ? ` ${B}~${u.resetsIn}${RESET}` : '';
-    line1 += ` ${SEP} ${A}5h${RESET} ${uBar} ${uColor}${u.percent}%${RESET}${rs}`;
-  }
-  if (sevenDayUsage) {
-    const u7 = sevenDayUsage;
-    const u7Bar = progressBar(u7.percent, 5, getUsageColor);
-    const u7Color = u7.percent >= 90 ? rgb(255, 80, 80) : u7.percent >= 75 ? rgb(200, 100, 255) : rgb(100, 150, 255);
-    let rs = u7.resetsIn ? ` ${B}~${u7.resetsIn}${RESET}` : '';
-    line1 += ` ${SEP} ${A}7d${RESET} ${u7Bar} ${u7Color}${u7.percent}%${RESET}${rs}`;
-  }
+  // Line 1: Widget-based rendering
+  const widgetOrder = resolveWidgetOrder(getConfig().widgets);
+  const line1 = renderWidgetLine(widgetOrder, {
+    contextPercent,
+    modelName,
+    tokenSummary: tokenSummary ?? null,
+    contextVelocity,
+    contextTimeRemaining: contextTimeRemaining ?? null,
+    fiveHourUsage,
+    sevenDayUsage,
+    colors,
+  });
 
   // Line 2: Git
   let line2 = '';

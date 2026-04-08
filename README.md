@@ -32,7 +32,8 @@ node dist/index.js init
 
 Restart Claude Code. Your pet will hatch.
 
-> **Try before installing:** `node dist/index.js demo`
+> **Try before installing:** `node dist/index.js demo`  
+> **Configure interactively:** `node dist/index.js config`
 
 <details>
 <summary>Manual setup (without init command)</summary>
@@ -185,13 +186,20 @@ When your cache hit rate drops below 30%, context is above 60%, and burn speed i
 
 ## Configuration
 
-Optional. Create `~/.config/codachi/config.json`:
+Run the interactive wizard:
+
+```bash
+node dist/index.js config
+```
+
+Or edit `~/.config/codachi/config.json` directly:
 
 ```json
 {
   "name": "Mochi",
   "animal": "cat",
-  "palette": 3
+  "palette": 3,
+  "widgets": ["model", "context", "velocity", "rateLimit5h", "rateLimit7d"]
 }
 ```
 
@@ -200,11 +208,14 @@ Optional. Create `~/.config/codachi/config.json`:
 | `name` | species name | Custom pet name (e.g. "Mochi") |
 | `animal` | random | `cat` `penguin` `owl` `octopus` `bunny` |
 | `palette` | random | Color palette index `0`–`9` |
+| `widgets` | all shown | Line 1 widget order + visibility — see widgets below |
 | `showTokens` | `true` | Show token count `555K/1M` |
 | `showVelocity` | `true` | Show burn speed `^3%/m` + time remaining `~15m` |
 | `showGit` | `true` | Show git status on line 2 |
 | `showUptime` | `true` | Show session uptime |
 | `animationSpeed` | `1.5` | Seconds per animation frame |
+
+**Available widgets** (line 1): `model`, `context`, `velocity`, `rateLimit5h`, `rateLimit7d`. Reorder or remove any of them in the `widgets` array.
 
 ---
 
