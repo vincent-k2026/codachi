@@ -28,19 +28,15 @@
 
 ## Quick Start
 
-```bash
-npx codachi init              # zero-install, settings.json wired up for you
-```
-
-Restart Claude Code. Your pet will hatch.
-
-**From source** (if you want to hack on it):
+One line. That's it.
 
 ```bash
-git clone https://github.com/vincent-k2026/codachi.git
-cd codachi && npm install && npm run build
-node dist/index.js init
+npx codachi init
 ```
+
+This wires up your `~/.claude/settings.json` statusline and PostToolExecution hook. Restart Claude Code and your pet will hatch.
+
+Prefer a global install? `npm install -g codachi && codachi init` works too.
 
 **Useful commands once installed:**
 
@@ -50,6 +46,17 @@ npx codachi plugins           # list loaded plugins
 npx codachi config            # interactive TUI configurator
 npx codachi demo              # live preview without installing
 ```
+
+<details>
+<summary>From source (if you want to hack on it)</summary>
+
+```bash
+git clone https://github.com/vincent-k2026/codachi.git
+cd codachi && npm install && npm run build
+node dist/index.js init
+```
+
+</details>
 
 <details>
 <summary>Manual setup (without init command)</summary>
