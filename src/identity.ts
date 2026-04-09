@@ -2,6 +2,7 @@ import type { AnimalType, PetColors } from './types.js';
 import { rgb } from './render/colors.js';
 import { getSessionAnimalIndex, getSessionPaletteIndex } from './state.js';
 import { getConfig } from './config.js';
+import { REGISTERED_PALETTES } from './plugin-store.js';
 
 const ANIMALS: AnimalType[] = ['cat', 'penguin', 'owl', 'octopus', 'bunny'];
 
@@ -74,10 +75,16 @@ export const PALETTES: PetColors[] = [
   },
 ];
 
+/** Built-ins + plugin-contributed palettes, concatenated at call time. */
+export function getAllPalettes(): PetColors[] {
+  return REGISTERED_PALETTES.length ? [...PALETTES, ...REGISTERED_PALETTES] : PALETTES;
+}
+
 export function getPetColors(): PetColors {
   const cfg = getConfig();
-  if (cfg.palette != null && cfg.palette >= 0 && cfg.palette < PALETTES.length) {
-    return PALETTES[cfg.palette];
+  const all = getAllPalettes();
+  if (cfg.palette != null && cfg.palette >= 0 && cfg.palette < all.length) {
+    return all[cfg.palette];
   }
-  return PALETTES[getSessionPaletteIndex() % PALETTES.length];
+  return all[getSessionPaletteIndex() % all.length];
 }

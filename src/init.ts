@@ -1,6 +1,19 @@
 /**
- * codachi init — auto-configure Claude Code settings.json
- * Adds statusLine and PostToolExecution hook.
+ * codachi init — auto-configure Claude Code's ~/.claude/settings.json.
+ *
+ * Adds a statusLine entry and a PostToolExecution hook. The commands it writes
+ * depend on how codachi is running:
+ *
+ *   - When installed globally or via `npx codachi init` (argv[1] resolved to
+ *     a node_modules or npx cache path), we prefer the bin names `codachi`
+ *     and `codachi-hook` — they're short, version-stable, and don't bake
+ *     absolute paths into the user's settings.
+ *   - When run from a local clone (`node dist/index.js init`), we fall back
+ *     to absolute `node /path/to/dist/*.js` so the install still works even
+ *     if the clone is not on PATH.
+ *
+ * Idempotent: if a codachi statusLine / hook already exists, it updates in
+ * place rather than duplicating.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -8,59 +21,68 @@ import os from 'node:os';
 
 const SETTINGS_FILE = path.join(os.homedir(), '.claude', 'settings.json');
 
-export function runInit(): void {
-  // Detect codachi dist path
+function detectMode(): { statusCmd: string; hookCmd: string; mode: 'bin' | 'local' } {
+  const entry = process.argv[1] || '';
+  const fromNodeModules = entry.includes(`${path.sep}node_modules${path.sep}`);
+  const fromNpxCache = entry.includes(`${path.sep}_npx${path.sep}`) || entry.includes(`${path.sep}.npm${path.sep}`);
+
+  // `npx codachi init` is the dream path: settings reference the short bin
+  // names and npx resolves them each run.
+  if (fromNodeModules || fromNpxCache) {
+    return { statusCmd: 'codachi', hookCmd: 'codachi-hook', mode: 'bin' };
+  }
+
+  // Local dev: absolute paths into the clone.
   const distDir = path.dirname(new URL(import.meta.url).pathname);
   const indexPath = path.join(distDir, 'index.js');
   const hookPath = path.join(distDir, 'hook.js');
-
-  // Verify dist files exist
   if (!fs.existsSync(indexPath)) {
-    console.log('Error: dist/index.js not found. Run `npm run build` first.');
+    console.error('Error: dist/index.js not found. Run `npm run build` first.');
     process.exit(1);
   }
+  return {
+    statusCmd: `node ${indexPath}`,
+    hookCmd: `node ${hookPath}`,
+    mode: 'local',
+  };
+}
 
-  // Load existing settings
+export function runInit(): void {
+  const { statusCmd, hookCmd, mode } = detectMode();
+
+  // Load existing settings — preserve whatever the user already has.
   let settings: Record<string, unknown> = {};
   try {
     settings = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8')) as Record<string, unknown>;
   } catch {
-    // No existing settings — create new
+    // No existing file — fine, we'll create one.
   }
 
-  // Set statusLine
-  settings.statusLine = {
-    type: 'command',
-    command: `node ${indexPath}`,
-  };
+  settings.statusLine = { type: 'command', command: statusCmd };
 
-  // Set hooks (preserve existing hooks)
   const hooks = (settings.hooks ?? {}) as Record<string, unknown[]>;
   const postHooks = Array.isArray(hooks.PostToolExecution) ? hooks.PostToolExecution : [];
 
-  // Check if codachi hook already exists
-  const hookCommand = `node ${hookPath}`;
-  const hasHook = postHooks.some((h: unknown) => {
+  // Replace any existing codachi hook rather than duplicating.
+  const cleaned = postHooks.filter((h: unknown) => {
     const hook = h as Record<string, unknown>;
-    return typeof hook.command === 'string' && hook.command.includes('codachi');
+    return !(typeof hook.command === 'string' && /codachi(-hook)?|codachi[\\/]dist[\\/]hook/.test(hook.command));
   });
-
-  if (!hasHook) {
-    postHooks.push({ matcher: '', command: hookCommand });
-  }
-
-  hooks.PostToolExecution = postHooks;
+  cleaned.push({ matcher: '', command: hookCmd });
+  hooks.PostToolExecution = cleaned;
   settings.hooks = hooks;
 
-  // Write settings
-  const dir = path.dirname(SETTINGS_FILE);
-  fs.mkdirSync(dir, { recursive: true });
+  fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
   fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2) + '\n');
 
   console.log('codachi installed successfully!');
   console.log('');
-  console.log(`  statusLine → node ${indexPath}`);
-  console.log(`  hook       → node ${hookPath}`);
+  console.log(`  mode       ${mode === 'bin' ? 'bin (npx / global install)' : 'local clone (absolute paths)'}`);
+  console.log(`  statusLine ${statusCmd}`);
+  console.log(`  hook       ${hookCmd}`);
   console.log('');
   console.log('Restart Claude Code to see your pet hatch.');
+  if (mode === 'bin') {
+    console.log('Tip: `npx codachi stats` for a productivity summary.');
+  }
 }

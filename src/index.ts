@@ -33,6 +33,25 @@ async function main(): Promise<void> {
     runStats();
     return;
   }
+  if (arg === 'plugins') {
+    const { LOADED_PLUGINS } = await import('./plugin-store.js');
+    // Touch i18n so plugin loading runs its top-level await.
+    await import('./i18n.js');
+    const loaded = LOADED_PLUGINS;
+    if (!loaded.length) {
+      console.log('No plugins loaded.');
+      console.log('Drop .mjs files into ~/.config/codachi/plugins/ — see');
+      console.log('https://github.com/vincent-k2026/codachi#plugins');
+      return;
+    }
+    console.log(`${loaded.length} plugin(s) loaded:`);
+    for (const p of loaded) {
+      console.log(`  • ${p.name}  (${p.path})`);
+      if (p.messageKeys.length) console.log(`      messages: ${p.messageKeys.join(', ')}`);
+      if (p.paletteCount)       console.log(`      palettes: ${p.paletteCount}`);
+    }
+    return;
+  }
 
   try {
     const stdin = await readStdin();

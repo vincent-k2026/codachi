@@ -3,6 +3,7 @@ import path from 'node:path';
 import os from 'node:os';
 import type { AnimalType } from './types.js';
 import { logWarn, logError } from './log.js';
+import { REGISTERED_PALETTES } from './plugin-store.js';
 
 export interface CodachiConfig {
   name?: string;             // custom pet name (default: species name)
@@ -25,7 +26,10 @@ const CONFIG_PATHS = [
 
 const VALID_ANIMALS: ReadonlySet<string> = new Set(['cat', 'penguin', 'owl', 'octopus', 'bunny']);
 const VALID_WIDGETS: ReadonlySet<string> = new Set(['model', 'context', 'velocity', 'rateLimit5h', 'rateLimit7d']);
-const PALETTE_COUNT = 10;
+const BUILTIN_PALETTE_COUNT = 10;
+// Total palette count including plugin contributions. Queried lazily because
+// plugins may register more palettes after this module is first imported.
+function paletteCount(): number { return BUILTIN_PALETTE_COUNT + REGISTERED_PALETTES.length; }
 
 let config: CodachiConfig = {};
 
@@ -60,10 +64,11 @@ export function validateConfig(raw: unknown, source = 'config'): CodachiConfig {
   }
 
   if (typeof r.palette === 'number' && Number.isInteger(r.palette)) {
-    if (r.palette >= 0 && r.palette < PALETTE_COUNT) {
+    const max = paletteCount();
+    if (r.palette >= 0 && r.palette < max) {
       out.palette = r.palette;
     } else {
-      logWarn(source, `palette must be 0-${PALETTE_COUNT - 1}, got ${r.palette}`);
+      logWarn(source, `palette must be 0-${max - 1}, got ${r.palette}`);
     }
   } else if (r.palette !== undefined) {
     logWarn(source, `palette must be an integer, got ${typeof r.palette}`);

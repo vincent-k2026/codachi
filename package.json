@@ -10,10 +10,12 @@
   },
   "files": [
     "dist",
-    "LICENSE"
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
   ],
   "scripts": {
-    "build": "tsc",
+    "build": "tsc && node scripts/copy-assets.mjs",
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:cov": "vitest run --coverage",
@@ -33,7 +35,14 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/vincent-k2026/codachi.git"
+    "url": "git+https://github.com/vincent-k2026/codachi.git"
+  },
+  "homepage": "https://github.com/vincent-k2026/codachi#readme",
+  "bugs": {
+    "url": "https://github.com/vincent-k2026/codachi/issues"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "engines": {
     "node": ">=18.0.0"

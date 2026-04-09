@@ -2,12 +2,13 @@
 
 # codachi
 
-**A tamagotchi that lives in your [Claude Code](https://docs.anthropic.com/en/docs/claude-code) statusline.**
+**A productivity copilot disguised as a tamagotchi, living in your [Claude Code](https://docs.anthropic.com/en/docs/claude-code) statusline.**
 
 [![CI](https://github.com/vincent-k2026/codachi/actions/workflows/ci.yml/badge.svg)](https://github.com/vincent-k2026/codachi/actions/workflows/ci.yml)
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Zero Dependencies](https://img.shields.io/badge/dependencies-0-orange)
+![Tests](https://img.shields.io/badge/tests-304%20passing-brightgreen)
 
 ![codachi demo](codachi-demo.gif)
 
@@ -15,14 +16,25 @@
 
 ## Why codachi?
 
-- **Context time prediction** — see `~15m left` before you need to `/compact`, not just a percentage
-- **Event-aware pet** — your pet watches Claude work via hooks and reacts with 850+ unique messages
-- **5h + 7d rate limits** — both reset countdowns visible at a glance
-- **Zero overhead** — no API calls, no tokens consumed, just a local process reading JSON
+- **Context ETA** — `~15m left` tells you *when* to `/compact`, not just how full you are. The only statusline that predicts it.
+- **Event-aware pet** — hooks watch Claude work and react with 850+ contextual messages, across 40+ event categories.
+- **`codachi stats`** — local, zero-telemetry productivity dashboard: sessions, uptime, tier progress, last-24h test/commit/edit counts.
+- **Plugin API** — drop a `.mjs` file into `~/.config/codachi/plugins/` to add your own palettes and messages. No forking required.
+- **i18n** — bundled 简体中文; English fallback for any missing keys. BYO locale via `CODACHI_LOCALE`.
+- **Terminal-aware** — auto-detects truecolor / 256-color / 16-color / monochrome and degrades gracefully. `NO_COLOR` honored.
+- **Zero overhead** — no API calls, no tokens consumed. Local JSON + disk. Render p95 is ~0.1ms (verified by `npm run bench`).
 
 ---
 
 ## Quick Start
+
+```bash
+npx codachi init              # zero-install, settings.json wired up for you
+```
+
+Restart Claude Code. Your pet will hatch.
+
+**From source** (if you want to hack on it):
 
 ```bash
 git clone https://github.com/vincent-k2026/codachi.git
@@ -30,10 +42,14 @@ cd codachi && npm install && npm run build
 node dist/index.js init
 ```
 
-Restart Claude Code. Your pet will hatch.
+**Useful commands once installed:**
 
-> **Try before installing:** `node dist/index.js demo`  
-> **Configure interactively:** `node dist/index.js config`
+```bash
+npx codachi stats             # productivity dashboard (sessions, uptime, tiers)
+npx codachi plugins           # list loaded plugins
+npx codachi config            # interactive TUI configurator
+npx codachi demo              # live preview without installing
+```
 
 <details>
 <summary>Manual setup (without init command)</summary>
@@ -184,6 +200,79 @@ When your cache hit rate drops below 30%, context is above 60%, and burn speed i
 
 ---
 
+## Productivity dashboard
+
+Run `codachi stats` any time for a local summary of your relationship with your pet — no network calls, no telemetry, everything read from `~/.claude/plugins/codachi/`.
+
+```
+codachi stats — Mochi the cat
+
+  first met    2026-01-12  (87d ago)
+  last seen    2026-04-09
+  sessions     73
+  total uptime 4d12h
+  avg session  89m
+
+  relationship
+  current      friend
+  progress     ████████████████░░░░  80%
+  next tier    bestie (23 more sessions)
+
+  recent activity (last 24h from local events)
+  events       142
+  tests        18 pass · 3 fail
+  commits      7
+  edits        34
+
+  this session 1h12m
+```
+
+---
+
+## Plugins
+
+Drop an ES module into `~/.config/codachi/plugins/` to add custom palettes and message packs. Plugins are auto-loaded at startup — no registration, no imports in user code.
+
+```js
+// ~/.config/codachi/plugins/midnight.mjs
+export default {
+  name: 'midnight',
+  messages: {
+    BUSY_MESSAGES: ['⌘ focused', '⌘ flow state'],
+    EVENT_MESSAGES: {
+      test_passed: ['green — ship it', '✓ all green'],
+    },
+  },
+  palettes: [
+    {
+      name: 'Midnight',
+      body:   [20, 30, 80],
+      accent: [60, 80, 160],
+      face:   [180, 190, 230],
+      blush:  [120, 140, 200],
+    },
+  ],
+};
+```
+
+Run `codachi plugins` to see what's loaded. Precedence is: **locale file > plugin > English default**, so translators still have the final word.
+
+**Available message keys:** `BUSY_MESSAGES`, `DANGER_MESSAGES`, `USAGE_HIGH_MESSAGES`, `VELOCITY_FAST`, `VELOCITY_SLOW`, `COMPACT_SUGGEST`, `IDLE_MESSAGES` (per animal), `SIZE_MESSAGES` (per body size), `WELCOME_MESSAGES` (per tier), `TIER_UPGRADE` (per tier), `RARE_EVENTS`, `EVENT_MESSAGES` (per category), `FILE_TYPE_MESSAGES` (per language), `GIT_CLEAN_MESSAGES` / `GIT_BUSY_MESSAGES` / `GIT_AHEAD_MESSAGES` / `GIT_BEHIND_MESSAGES` / `GIT_STASH_MESSAGES` / `GIT_WIP_MESSAGES`.
+
+---
+
+## Localization
+
+Codachi ships with English (canonical source) and Simplified Chinese. Override any or all message keys with your own language:
+
+```bash
+CODACHI_LOCALE=zh   # or set LANG / LC_ALL on your OS
+```
+
+User overrides go in `~/.config/codachi/locales/<locale>.json` — same key schema as plugins, partial files are fine (missing keys fall through to English). To contribute a language upstream, open a PR adding `src/locales/<locale>.json`.
+
+---
+
 ## Configuration
 
 Run the interactive wizard:
@@ -216,6 +305,20 @@ Or edit `~/.config/codachi/config.json` directly:
 | `animationSpeed` | `1.5` | Seconds per animation frame |
 
 **Available widgets** (line 1): `model`, `context`, `velocity`, `rateLimit5h`, `rateLimit7d`. Reorder or remove any of them in the `widgets` array.
+
+**Environment variables:**
+
+| Var | Purpose |
+|:----|:--------|
+| `CODACHI_LOCALE` | Force a locale (`en`, `zh`, etc.) — overrides `LANG` |
+| `CODACHI_COLOR` | Force color depth: `truecolor` \| `256` \| `16` \| `none` |
+| `CODACHI_NO_PLUGINS` | Set to `1` to skip plugin scanning |
+| `CODACHI_QUIET` | Set to `1` to silence `codachi.log` writes |
+| `CODACHI_DEBUG` | Set to `1` to enable verbose debug logs |
+| `NO_COLOR` | Standard no-color opt-out (honored) |
+| `FORCE_COLOR` | Standard color force: `0`–`3` (honored) |
+
+**Debug log**: errors land in `~/.claude/plugins/codachi/codachi.log` (auto-rotated at 256KB). `tail -f` it if things look off.
 
 ---
 
@@ -275,10 +378,11 @@ src/
 
 ```bash
 npm install
-npm run build          # compile TypeScript
+npm run build          # compile TypeScript + copy locales to dist/
 npm run dev            # watch mode
-npm test               # 292 tests
+npm test               # 304 tests
 npm run test:cov       # coverage report (91%+ lines)
+npm run bench          # render p50/p95/p99 benchmark (budget: 50ms)
 ```
 
 **Record a demo GIF:**

@@ -1,4 +1,6 @@
-export const WELCOME_MESSAGES: Record<string, string[]> = {
+import { localize } from '../i18n.js';
+
+export const WELCOME_MESSAGES: Record<string, string[]> = localize<Record<string, string[]>>('WELCOME_MESSAGES', {
   stranger: [
     'Oh! A new friend! Hi!', 'Nice to meet you!', 'First time here? Welcome!',
     '*peeks out* Hello there!', 'A human! I\'ve always wanted one!',
@@ -18,9 +20,9 @@ export const WELCOME_MESSAGES: Record<string, string[]> = {
     'MY HUMAN! *tackles with affection*', 'The legend returns!',
     'Best coding partner in the universe!',
   ],
-};
+});
 
-export const TIER_UPGRADE: Record<string, string[]> = {
+export const TIER_UPGRADE: Record<string, string[]> = localize<Record<string, string[]>>('TIER_UPGRADE', {
   acquaintance: [
     'We\'re acquaintances now! Getting to know you~',
     'Hey, we\'re not strangers anymore!', 'Friendship level UP!',
@@ -33,9 +35,9 @@ export const TIER_UPGRADE: Record<string, string[]> = {
     'BESTIE STATUS UNLOCKED! WE DID IT!',
     'BEST FRIENDS FOREVER! *explodes with joy*', 'From strangers to besties... what a journey!',
   ],
-};
+});
 
-export const RARE_EVENTS = [
+export const RARE_EVENTS = localize('RARE_EVENTS', [
   'Found a bug! ...it\'s kinda cute tho', 'I dreamed in binary last night',
   'Do you think clouds dream of code?', 'I made you a mass of brackets <3',
   'Plot twist: the bug was a feature', 'Psst... you\'re doing great',
@@ -60,4 +62,4 @@ export const RARE_EVENTS = [
   'Every time you save, I do a tiny dance',
   'I don\'t need garbage collection. I\'d never throw you away',
   'You had me at "Hello, World!"',
-];
+]);

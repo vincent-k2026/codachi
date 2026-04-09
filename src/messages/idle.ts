@@ -1,6 +1,7 @@
 import type { AnimalType, BodySize } from '../types.js';
+import { localize } from '../i18n.js';
 
-export const IDLE_MESSAGES: Record<AnimalType, string[]> = {
+export const IDLE_MESSAGES: Record<AnimalType, string[]> = localize<Record<AnimalType, string[]>>('IDLE_MESSAGES', {
   cat: [
     'Purring softly...', 'Watching the cursor dance~', 'Kneading the terminal...',
     '*slow blink* ...I love you', 'If I fits, I sits~', 'Contemplating naps and code...',
@@ -58,9 +59,9 @@ export const IDLE_MESSAGES: Record<AnimalType, string[]> = {
     '*flops sideways* (that means I trust you)', 'Warren of well-organized code!',
     'Fast as a bunny, twice as cute!',
   ],
-};
+});
 
-export const SIZE_MESSAGES: Record<BodySize, string[]> = {
+export const SIZE_MESSAGES: Record<BodySize, string[]> = localize<Record<BodySize, string[]>>('SIZE_MESSAGES', {
   tiny: [
     'Smol but mighty!', 'Just a little bean~', 'Fresh start energy!', 'So much room to grow~',
     '*tiny happy noises*', 'Mini me! Mini vibes!', 'Small and nimble!',
@@ -85,4 +86,4 @@ export const SIZE_MESSAGES: Record<BodySize, string[]> = {
     'More of me to love!', 'MAXIMUM CAPACITY *vibrates*', 'I contain multitudes! Literally!',
     'Round, proud, and full of context!', 'Peak performance looks like this~',
   ],
-};
+});

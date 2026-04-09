@@ -1,6 +1,12 @@
+import { localize } from '../i18n.js';
+
 export type Msg = string | ((detail: string) => string);
 
-export const EVENT_MESSAGES: Record<string, Msg[]> = {
+// NOTE on i18n: function-form messages (detail => string) cannot be represented
+// in JSON, so locale files can only override the string entries within each
+// pool. The merge is positional — any non-string slot in an overridden array
+// silently falls back to the English version via the localize() shape check.
+export const EVENT_MESSAGES: Record<string, Msg[]> = localize<Record<string, Msg[]>>('EVENT_MESSAGES', {
   test_passed: [
     'ALL GREEN! *happy dance*', 'Tests passed! *victory spin*', 'Green across the board!',
     '*confetti* Every test passed!', 'Beautiful green checkmarks~', 'Nailed it! Every single test!',
@@ -221,4 +227,4 @@ export const EVENT_MESSAGES: Record<string, Msg[]> = {
     'Super productive!', 'You\'re a coding machine!',
     'This is one for the history books!', 'Marathon session! *stretches alongside*',
   ],
-};
+});
