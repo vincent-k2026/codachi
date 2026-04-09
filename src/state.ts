@@ -3,14 +3,22 @@ import path from 'node:path';
 import os from 'node:os';
 import { clearEvents } from './events.js';
 import { atomicWrite } from './fs-utils.js';
+import { logError } from './log.js';
 
 const STATE_DIR = path.join(os.homedir(), '.claude', 'plugins', 'codachi');
 const STATE_FILE = path.join(STATE_DIR, 'state.json');
 const MEMORY_FILE = path.join(STATE_DIR, 'memory.json');
 
+// Schema versions. Bump when shape changes and add a migration below.
+// Rule: never break an older codachi trying to read a newer file — be
+// additive when possible and carry old fields forward.
+const STATE_SCHEMA_VERSION = 1;
+const MEMORY_SCHEMA_VERSION = 1;
+
 // ── Session state ────────────────────────────────────
 
 interface DiskState {
+  version?: number;
   transcriptPath?: string;
   sessionStart?: number;
   animalIndex?: number;
@@ -19,20 +27,28 @@ interface DiskState {
 
 function loadJSON<T>(file: string): T | null {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')) as T; }
-  catch { return null; }
+  catch (err) {
+    // ENOENT is normal on first run; only log real parse/IO failures.
+    if ((err as NodeJS.ErrnoException)?.code !== 'ENOENT') {
+      logError('state.loadJSON:' + file, err);
+    }
+    return null;
+  }
 }
 
 function saveJSON(file: string, data: unknown): void {
   try {
     fs.mkdirSync(STATE_DIR, { recursive: true });
     atomicWrite(file, JSON.stringify(data));
-  } catch {}
+  } catch (err) {
+    logError('state.saveJSON:' + file, err);
+  }
 }
 
 let diskState: DiskState = {};
 
 export function initSession(transcriptPath?: string): void {
-  diskState = loadJSON<DiskState>(STATE_FILE) ?? {};
+  diskState = migrateState(loadJSON<DiskState>(STATE_FILE));
   const isSameSession = transcriptPath && diskState.transcriptPath === transcriptPath;
 
   if (!isSameSession) {
@@ -40,6 +56,7 @@ export function initSession(transcriptPath?: string): void {
     updateMemory();
     clearEvents();
     diskState = {
+      version: STATE_SCHEMA_VERSION,
       transcriptPath: transcriptPath ?? '',
       sessionStart: Date.now(),
       animalIndex: Math.floor(Math.random() * 5),
@@ -47,6 +64,21 @@ export function initSession(transcriptPath?: string): void {
     };
     saveJSON(STATE_FILE, diskState);
   }
+}
+
+/** Forward-compatible state loader. Unknown/future versions fall back to defaults. */
+function migrateState(raw: DiskState | null): DiskState {
+  if (!raw) return {};
+  const v = raw.version ?? 0;
+  if (v === 0) {
+    // Pre-versioned file: stamp with current version, keep fields as-is.
+    return { ...raw, version: STATE_SCHEMA_VERSION };
+  }
+  if (v > STATE_SCHEMA_VERSION) {
+    logError('state.migrate', new Error(`state file version ${v} newer than supported ${STATE_SCHEMA_VERSION}`));
+    return {};
+  }
+  return raw;
 }
 
 export function getSessionAnimalIndex(): number { return diskState.animalIndex ?? 0; }
@@ -111,6 +143,7 @@ export function getContextTimeRemaining(currentPct: number): string | null {
 // ── Pet memory (cross-session persistence) ───────────
 
 export interface PetMemory {
+  version?: number;
   totalSessions: number;
   totalUptimeMin: number;
   firstMet: number; // timestamp
@@ -122,11 +155,30 @@ let memory: PetMemory | null = null;
 let tierJustUpgraded: boolean = false;
 
 function loadMemory(): PetMemory {
-  return loadJSON<PetMemory>(MEMORY_FILE) ?? {
-    totalSessions: 0,
-    totalUptimeMin: 0,
-    firstMet: Date.now(),
-    lastSeen: Date.now(),
+  const raw = loadJSON<PetMemory>(MEMORY_FILE);
+  if (!raw) {
+    return {
+      version: MEMORY_SCHEMA_VERSION,
+      totalSessions: 0,
+      totalUptimeMin: 0,
+      firstMet: Date.now(),
+      lastSeen: Date.now(),
+    };
+  }
+  const v = raw.version ?? 0;
+  if (v > MEMORY_SCHEMA_VERSION) {
+    logError('memory.migrate', new Error(`memory file version ${v} newer than supported ${MEMORY_SCHEMA_VERSION}`));
+    // Don't wipe — preserve counts and stamp an unknown version so older clients
+    // degrade gracefully while newer codachi takes over.
+  }
+  // Defensive floors in case disk is corrupted.
+  return {
+    version: MEMORY_SCHEMA_VERSION,
+    totalSessions: Math.max(0, Number(raw.totalSessions) || 0),
+    totalUptimeMin: Math.max(0, Number(raw.totalUptimeMin) || 0),
+    firstMet: Number(raw.firstMet) || Date.now(),
+    lastSeen: Number(raw.lastSeen) || Date.now(),
+    lastShownTier: raw.lastShownTier,
   };
 }
 

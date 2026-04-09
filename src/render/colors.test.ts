@@ -1,8 +1,28 @@
-import { describe, it, expect } from 'vitest';
-import { rgb, RESET, DIM, getContextColor, getUsageColor, progressBar } from './colors.js';
+import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+
+// Force truecolor for these tests so we can assert exact escape sequences.
+// The new colors.ts does capability detection at import time, so we set env
+// vars before the first import.
+const savedForce = process.env.FORCE_COLOR;
+process.env.FORCE_COLOR = '3';
+
+const {
+  rgb, RESET, DIM, getContextColor, getUsageColor, progressBar, COLOR_LEVEL,
+} = await import('./colors.js');
+
+afterAll(() => {
+  if (savedForce === undefined) delete process.env.FORCE_COLOR;
+  else process.env.FORCE_COLOR = savedForce;
+});
+
+describe('color level detection', () => {
+  it('honours FORCE_COLOR=3 as truecolor', () => {
+    expect(COLOR_LEVEL).toBe('truecolor');
+  });
+});
 
 describe('rgb', () => {
-  it('returns ANSI 24-bit color escape', () => {
+  it('returns ANSI 24-bit color escape in truecolor mode', () => {
     expect(rgb(255, 0, 0)).toBe('\x1b[38;2;255;0;0m');
     expect(rgb(0, 128, 255)).toBe('\x1b[38;2;0;128;255m');
   });

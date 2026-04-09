@@ -1,11 +1,11 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { execSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 
 vi.mock('node:child_process', () => ({
-  execSync: vi.fn(),
+  spawnSync: vi.fn(),
 }));
 
-const mockExecSync = vi.mocked(execSync);
+const mockSpawnSync = vi.mocked(spawnSync);
 
 let getGitStatus: typeof import('./git.js')['getGitStatus'];
 let callCount: number;
@@ -18,24 +18,46 @@ beforeEach(async () => {
   getGitStatus = mod.getGitStatus;
 });
 
-function setupGit(statusOutput: string, combinedOutput = '') {
-  mockExecSync.mockImplementation((cmd: string) => {
+function ok(stdout: string) {
+  return { status: 0, stdout, stderr: '', signal: null, pid: 1, output: [] as any, error: undefined } as any;
+}
+function fail() {
+  return { status: 1, stdout: '', stderr: '', signal: null, pid: 1, output: [] as any, error: undefined } as any;
+}
+
+/**
+ * Mock each git subcommand individually. The `compute` function calls:
+ *   git status --porcelain -b
+ *   git diff HEAD --shortstat
+ *   git log -1 --format=%s
+ *   git stash list
+ */
+function setupGit(opts: {
+  status: string;        // output of `git status --porcelain -b`
+  shortstat?: string;
+  log?: string;
+  stash?: string;
+}) {
+  mockSpawnSync.mockImplementation((_cmd: any, args: any) => {
     callCount++;
-    const c = cmd as string;
-    if (c.includes('git status')) return statusOutput;
-    return combinedOutput;
+    const a = args as string[];
+    const sub = a[0];
+    if (sub === 'status') return opts.status ? ok(opts.status) : fail();
+    if (sub === 'diff') return ok(opts.shortstat ?? '');
+    if (sub === 'log') return ok(opts.log ?? '');
+    if (sub === 'stash') return ok(opts.stash ?? '');
+    return ok('');
   });
 }
 
 describe('getGitStatus', () => {
   it('returns null for non-git directory', () => {
-    mockExecSync.mockImplementation(() => { throw new Error('not a git repo'); });
-    // Use unique cwd to avoid cache
+    mockSpawnSync.mockImplementation(() => fail());
     expect(getGitStatus('/tmp/no-git-' + Date.now())).toBeNull();
   });
 
   it('parses clean repo', () => {
-    setupGit('## main');
+    setupGit({ status: '## main' });
     const status = getGitStatus('/tmp/clean-' + Date.now());
     expect(status).not.toBeNull();
     expect(status!.branch).toBe('main');
@@ -44,7 +66,7 @@ describe('getGitStatus', () => {
   });
 
   it('parses branch with ahead/behind', () => {
-    setupGit('## feature...origin/feature [ahead 3, behind 2]');
+    setupGit({ status: '## feature...origin/feature [ahead 3, behind 2]' });
     const status = getGitStatus('/tmp/ahead-' + Date.now());
     expect(status!.branch).toBe('feature');
     expect(status!.ahead).toBe(3);
@@ -52,13 +74,15 @@ describe('getGitStatus', () => {
   });
 
   it('parses modified/added/deleted/untracked files', () => {
-    setupGit([
-      '## main',
-      ' M src/foo.ts',
-      'A  src/bar.ts',
-      ' D src/baz.ts',
-      '?? src/new.ts',
-    ].join('\n'));
+    setupGit({
+      status: [
+        '## main',
+        ' M src/foo.ts',
+        'A  src/bar.ts',
+        ' D src/baz.ts',
+        '?? src/new.ts',
+      ].join('\n'),
+    });
     const status = getGitStatus('/tmp/dirty-' + Date.now());
     expect(status!.isDirty).toBe(true);
     expect(status!.modified).toBe(1);
@@ -68,11 +92,12 @@ describe('getGitStatus', () => {
     expect(status!.fileCount).toBe(4);
   });
 
-  it('parses insertions/deletions from combined output', () => {
-    setupGit(
-      '## main',
-      ' 3 files changed, 100 insertions(+), 50 deletions(-)\n---SEP---\nfix auth bug\n---SEP---\n',
-    );
+  it('parses insertions/deletions from shortstat', () => {
+    setupGit({
+      status: '## main',
+      shortstat: ' 3 files changed, 100 insertions(+), 50 deletions(-)',
+      log: 'fix auth bug',
+    });
     const status = getGitStatus('/tmp/stats-' + Date.now());
     expect(status!.insertions).toBe(100);
     expect(status!.deletions).toBe(50);
@@ -80,56 +105,60 @@ describe('getGitStatus', () => {
   });
 
   it('parses stash count', () => {
-    setupGit(
-      '## main',
-      '\n---SEP---\nlast commit\n---SEP---\nstash@{0}: WIP\nstash@{1}: WIP2\n',
-    );
+    setupGit({
+      status: '## main',
+      log: 'last commit',
+      stash: 'stash@{0}: WIP\nstash@{1}: WIP2',
+    });
     const status = getGitStatus('/tmp/stash-' + Date.now());
     expect(status!.stashCount).toBe(2);
   });
 
   it('handles fresh repo (No commits yet)', () => {
-    setupGit('## No commits yet on master\n?? newfile.txt');
+    setupGit({ status: '## No commits yet on master\n?? newfile.txt' });
     const status = getGitStatus('/tmp/fresh-' + Date.now());
     expect(status!.branch).toBe('master');
     expect(status!.untracked).toBe(1);
   });
 
   it('truncates long branch names', () => {
-    setupGit('## this-is-a-very-long-branch-name-that-exceeds-25-chars');
+    setupGit({ status: '## this-is-a-very-long-branch-name-that-exceeds-25-chars' });
     const status = getGitStatus('/tmp/longbranch-' + Date.now());
     expect(status!.branch.length).toBeLessThanOrEqual(25);
     expect(status!.branch).toContain('...');
   });
 
   it('detects dominant file type', () => {
-    setupGit([
-      '## main',
-      ' M src/foo.ts',
-      ' M src/bar.ts',
-      ' M src/baz.py',
-    ].join('\n'));
+    setupGit({
+      status: [
+        '## main',
+        ' M src/foo.ts',
+        ' M src/bar.ts',
+        ' M src/baz.py',
+      ].join('\n'),
+    });
     const status = getGitStatus('/tmp/filetype-' + Date.now());
     expect(status!.dominantFileType).toBe('TypeScript');
   });
 
   it('detects test files as dominant type', () => {
-    setupGit([
-      '## main',
-      ' M src/foo.test.ts',
-      ' M src/bar.test.ts',
-    ].join('\n'));
+    setupGit({
+      status: [
+        '## main',
+        ' M src/foo.test.ts',
+        ' M src/bar.test.ts',
+      ].join('\n'),
+    });
     const status = getGitStatus('/tmp/testtype-' + Date.now());
     expect(status!.dominantFileType).toBe('Tests');
   });
 
   it('uses cache for repeated calls with same cwd', () => {
-    setupGit('## main');
+    setupGit({ status: '## main' });
     const cwd = '/tmp/cache-' + Date.now();
     getGitStatus(cwd);
     const firstCallCount = callCount;
     getGitStatus(cwd);
-    // Should not make additional execSync calls (cached)
     expect(callCount).toBe(firstCallCount);
   });
 });

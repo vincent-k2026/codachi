@@ -7,6 +7,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { atomicWrite } from './fs-utils.js';
+import { logError } from './log.js';
 
 const EVENTS_FILE = path.join(os.homedir(), '.claude', 'plugins', 'codachi', 'events.json');
 
@@ -55,16 +56,17 @@ function loadEvents(): RawEvent[] {
     const raw = fs.readFileSync(EVENTS_FILE, 'utf8');
     const data = JSON.parse(raw) as { events?: RawEvent[] };
     return Array.isArray(data.events) ? data.events : [];
-  } catch {
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException)?.code !== 'ENOENT') {
+      logError('events.loadEvents', err);
+    }
     return [];
   }
 }
 
 /** Clear events file — called on new session to prevent cross-session bleed. */
 export function clearEvents(): void {
-  try {
-    atomicWrite(EVENTS_FILE, JSON.stringify({ events: [] }));
-  } catch { /* best-effort */ }
+  atomicWrite(EVENTS_FILE, JSON.stringify({ events: [] }));
 }
 
 // ── Classify a bash command ─────────────────────────

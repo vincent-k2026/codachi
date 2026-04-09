@@ -17,6 +17,7 @@
     "dev": "tsc --watch",
     "test": "vitest run",
     "test:cov": "vitest run --coverage",
+    "bench": "npm run build && node scripts/bench.mjs",
     "prepublishOnly": "npm run build && npm test"
   },
   "keywords": [

@@ -1,6 +1,7 @@
-import { execSync } from 'node:child_process';
+import { spawnSync } from 'node:child_process';
 import type { GitStatus } from './types.js';
 import { stringWidth } from './width.js';
+import { logError } from './log.js';
 
 const GIT_TIMEOUT = 2000;
 const CACHE_TTL_MS = 2000; // cache git results for 2s
@@ -19,10 +20,33 @@ const EXT_MAP: Record<string, string> = {
 };
 const SORTED_EXT_MAP: [string, string][] = Object.entries(EXT_MAP).sort((a, b) => b[0].length - a[0].length);
 
-function run(cmd: string, cwd?: string): string {
+/**
+ * Run a git subcommand without a shell. This is Windows-safe (no bash redirects)
+ * and swallows stderr at the OS level so missing refs / dirty working trees don't
+ * leak into Claude Code's statusline output.
+ */
+function git(args: string[], cwd?: string): string {
   try {
-    return execSync(cmd, { cwd, encoding: 'utf8', timeout: GIT_TIMEOUT, stdio: ['pipe', 'pipe', 'pipe'] }).trim();
-  } catch {
+    const res = spawnSync('git', args, {
+      cwd,
+      encoding: 'utf8',
+      timeout: GIT_TIMEOUT,
+      // Windows: resolve git.exe via PATH. `shell: false` avoids cmd.exe quoting hazards.
+      shell: false,
+      stdio: ['ignore', 'pipe', 'ignore'],
+      windowsHide: true,
+    });
+    if (res.error) {
+      // ENOENT (git not installed) is expected on some systems — log once, degrade silently.
+      if ((res.error as NodeJS.ErrnoException).code !== 'ENOENT') {
+        logError('git.spawn:' + args[0], res.error);
+      }
+      return '';
+    }
+    if (res.status !== 0) return '';
+    return (res.stdout || '').trim();
+  } catch (err) {
+    logError('git.spawn:' + args[0], err);
     return '';
   }
 }
@@ -41,7 +65,7 @@ function truncateByWidth(str: string, maxWidth: number): string {
 
 function compute(cwd?: string): GitStatus | null {
   // 1. Branch + files + ahead/behind in one call
-  const statusRaw = run('git status --porcelain -b', cwd);
+  const statusRaw = git(['status', '--porcelain', '-b'], cwd);
   if (!statusRaw) return null;
 
   const lines = statusRaw.split('\n');
@@ -82,25 +106,24 @@ function compute(cwd?: string): GitStatus | null {
     else modified++;
   }
 
-  // 2. Line stats + last commit + stash in one combined call
+  // 2. Line stats + last commit + stash — three separate calls, portable everywhere.
+  // spawnSync is cheap (~1ms each); parallelism via shell pipelines isn't worth the
+  // Windows compatibility cost.
   let insertions = 0, deletions = 0, lastCommit = '', stashCount = 0;
 
-  const combined = run(
-    'git diff HEAD --shortstat 2>/dev/null; echo "---SEP---"; git log -1 --format=%s 2>/dev/null; echo "---SEP---"; git stash list 2>/dev/null',
-    cwd,
-  );
-  if (combined) {
-    const parts = combined.split('---SEP---').map(s => s.trim());
-    // diff stats
-    const insMatch = parts[0]?.match(/(\d+) insertion/);
-    const delMatch = parts[0]?.match(/(\d+) deletion/);
+  const shortstat = git(['diff', 'HEAD', '--shortstat'], cwd);
+  if (shortstat) {
+    const insMatch = shortstat.match(/(\d+) insertion/);
+    const delMatch = shortstat.match(/(\d+) deletion/);
     if (insMatch) insertions = parseInt(insMatch[1]);
     if (delMatch) deletions = parseInt(delMatch[1]);
-    // last commit (unicode-safe truncation)
-    lastCommit = truncateByWidth(parts[1] || '', 40);
-    // stash count
-    stashCount = parts[2] ? parts[2].split('\n').filter(Boolean).length : 0;
   }
+
+  const lastLog = git(['log', '-1', '--format=%s'], cwd);
+  lastCommit = truncateByWidth(lastLog, 40);
+
+  const stashRaw = git(['stash', 'list'], cwd);
+  stashCount = stashRaw ? stashRaw.split('\n').filter(Boolean).length : 0;
 
   // 3. Detect dominant file type from changed file paths
   const typeCounts: Record<string, number> = {};

@@ -8,6 +8,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 import { atomicWrite } from './fs-utils.js';
+import { logError } from './log.js';
 
 const EVENTS_DIR = path.join(os.homedir(), '.claude', 'plugins', 'codachi');
 const EVENTS_FILE = path.join(EVENTS_DIR, 'events.json');
@@ -78,15 +79,21 @@ function appendEvent(event: CodachiEvent): void {
     const raw = fs.readFileSync(EVENTS_FILE, 'utf8');
     const data = JSON.parse(raw) as { events?: CodachiEvent[] };
     events = Array.isArray(data.events) ? data.events : [];
-  } catch { /* empty or corrupt — start fresh */ }
+  } catch (err) {
+    if ((err as NodeJS.ErrnoException)?.code !== 'ENOENT') {
+      logError('hook.appendEvent.read', err);
+    }
+  }
 
   events.push(event);
   if (events.length > MAX_EVENTS) events = events.slice(-MAX_EVENTS);
 
   try {
     fs.mkdirSync(EVENTS_DIR, { recursive: true });
-    atomicWrite(EVENTS_FILE, JSON.stringify({ events }));
-  } catch { /* best-effort write */ }
+  } catch (err) {
+    logError('hook.appendEvent.mkdir', err);
+  }
+  atomicWrite(EVENTS_FILE, JSON.stringify({ events }));
 }
 
 // Export for testing
@@ -104,7 +111,9 @@ if (isDirectExecution) {
       const data = JSON.parse(chunks.join('')) as Record<string, unknown>;
       const event = parseEvent(data);
       if (event) appendEvent(event);
-    } catch { /* invalid JSON — skip silently */ }
+    } catch (err) {
+      logError('hook.main', err);
+    }
     process.exit(0);
   });
   setTimeout(() => process.exit(0), 2000);

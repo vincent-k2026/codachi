@@ -8,6 +8,7 @@ import { loadConfig, getConfig } from './config.js';
 import { getEventContext } from './events.js';
 import { getAnimalName } from './animals/index.js';
 import { render } from './render/index.js';
+import { logError } from './log.js';
 
 async function main(): Promise<void> {
   // Handle subcommands
@@ -25,6 +26,11 @@ async function main(): Promise<void> {
   if (arg === 'config' || arg === 'configure') {
     const { runConfigure } = await import('./configure.js');
     await runConfigure();
+    return;
+  }
+  if (arg === 'stats') {
+    const { runStats } = await import('./stats.js');
+    runStats();
     return;
   }
 
@@ -68,7 +74,9 @@ async function main(): Promise<void> {
       tierUpgraded: didTierUpgrade(),
     });
   } catch (error) {
-    console.log('[codachi] Error:', error instanceof Error ? error.message : 'Unknown error');
+    logError('index.main', error);
+    // Degrade gracefully: keep statusline quiet (empty) so Claude Code's UI stays clean.
+    // Users can `tail ~/.claude/plugins/codachi/codachi.log` to diagnose.
   }
 }
 
