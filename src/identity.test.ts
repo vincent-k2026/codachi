@@ -1,5 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
+// Force truecolor so rgb() returns ANSI sequences in CI (no TTY, no COLORTERM).
+process.env.FORCE_COLOR = '3';
+
 vi.mock('./config.js', () => ({
   getConfig: vi.fn(() => ({})),
 }));
