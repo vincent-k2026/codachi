@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import { describe, it, expect, beforeAll, afterAll, vi } from 'vitest';
 
 // Force truecolor for these tests so we can assert exact escape sequences.
 // The new colors.ts does capability detection at import time, so we set env
@@ -88,5 +88,57 @@ describe('progressBar', () => {
     const bar = progressBar(90, 5, getContextColor);
     expect(bar).toContain(rgb(255, 80, 80));
     expect(bar).toContain(RESET);
+  });
+});
+
+describe('color level fallbacks', () => {
+  it('ansi256 mode returns 256-color escape', async () => {
+    process.env.FORCE_COLOR = '2';
+    vi.resetModules();
+    const mod = await import('./colors.js');
+    expect(mod.COLOR_LEVEL).toBe('ansi256');
+    const code = mod.rgb(255, 0, 0);
+    expect(code).toMatch(/^\x1b\[38;5;\d+m$/);
+  });
+
+  it('ansi16 mode returns basic color escape', async () => {
+    process.env.FORCE_COLOR = '1';
+    vi.resetModules();
+    const mod = await import('./colors.js');
+    expect(mod.COLOR_LEVEL).toBe('ansi16');
+    const code = mod.rgb(255, 0, 0);
+    expect(code).toMatch(/^\x1b\[\d+m$/);
+  });
+
+  it('none mode returns empty string', async () => {
+    process.env.FORCE_COLOR = '0';
+    vi.resetModules();
+    const mod = await import('./colors.js');
+    expect(mod.COLOR_LEVEL).toBe('none');
+    expect(mod.rgb(255, 0, 0)).toBe('');
+  });
+
+  it('progressBar uses ASCII in none mode', async () => {
+    process.env.FORCE_COLOR = '0';
+    vi.resetModules();
+    const mod = await import('./colors.js');
+    const bar = mod.progressBar(50, 10, mod.getContextColor);
+    expect(bar).toContain('#');
+    expect(bar).toContain('-');
+    expect(bar).not.toContain('█');
+  });
+
+  it('NO_COLOR overrides everything', async () => {
+    process.env.NO_COLOR = '1';
+    delete process.env.FORCE_COLOR;
+    vi.resetModules();
+    const mod = await import('./colors.js');
+    expect(mod.COLOR_LEVEL).toBe('none');
+    delete process.env.NO_COLOR;
+  });
+
+  afterAll(() => {
+    // Restore for subsequent test files
+    process.env.FORCE_COLOR = '3';
   });
 });

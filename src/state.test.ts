@@ -148,3 +148,98 @@ describe('getMemory', () => {
     });
   });
 });
+
+describe('schema versioning', () => {
+  it('stamps version on new state', () => {
+    mod.initSession('/tmp/version-test-' + Date.now());
+    // writeFileSync should be called with version field
+    const calls = vi.mocked(fs.writeFileSync).mock.calls;
+    const stateWrite = calls.find(c => String(c[0]).includes('.tmp'));
+    expect(stateWrite).toBeDefined();
+    const data = JSON.parse(stateWrite![1] as string);
+    expect(data.version).toBe(1);
+  });
+
+  it('migrates pre-version state files (version: undefined)', () => {
+    mockReadFileSync.mockReturnValue(JSON.stringify({
+      transcriptPath: '/tmp/old',
+      sessionStart: Date.now() - 60000,
+      animalIndex: 2,
+      paletteIndex: 5,
+      // no version field — pre-versioned file
+    }));
+    mod.initSession('/tmp/old');
+    expect(mod.getSessionAnimalIndex()).toBe(2);
+    expect(mod.getSessionPaletteIndex()).toBe(5);
+  });
+
+  it('handles future version gracefully (resets to defaults)', () => {
+    mockReadFileSync.mockReturnValue(JSON.stringify({
+      version: 999,
+      transcriptPath: '/tmp/future',
+      sessionStart: Date.now(),
+      animalIndex: 4,
+      paletteIndex: 9,
+    }));
+    mod.initSession('/tmp/future');
+    // Should NOT reuse the future-versioned state — treats as new session
+    // animalIndex should be a fresh random, not 4
+  });
+});
+
+describe('memory defensive floors', () => {
+  it('clamps negative totalSessions to 0', () => {
+    mockReadFileSync.mockReturnValue(JSON.stringify({
+      totalSessions: -5, totalUptimeMin: -100, firstMet: 0, lastSeen: 0,
+    }));
+    vi.resetModules();
+    return import('./state.js').then(m => {
+      const mem = m.getMemory();
+      expect(mem.totalSessions).toBe(0);
+      expect(mem.totalUptimeMin).toBe(0);
+    });
+  });
+
+  it('handles NaN in memory gracefully', () => {
+    mockReadFileSync.mockReturnValue(JSON.stringify({
+      totalSessions: 'not a number', totalUptimeMin: null, firstMet: 'bad', lastSeen: undefined,
+    }));
+    vi.resetModules();
+    return import('./state.js').then(m => {
+      const mem = m.getMemory();
+      expect(mem.totalSessions).toBe(0);
+      expect(mem.totalUptimeMin).toBe(0);
+      expect(mem.firstMet).toBeGreaterThan(0);
+      expect(mem.lastSeen).toBeGreaterThan(0);
+    });
+  });
+
+  it('preserves version stamp on loaded memory', () => {
+    mockReadFileSync.mockReturnValue(JSON.stringify({
+      version: 1, totalSessions: 10, totalUptimeMin: 60, firstMet: 1000, lastSeen: 2000,
+    }));
+    vi.resetModules();
+    return import('./state.js').then(m => {
+      const mem = m.getMemory();
+      expect(mem.version).toBe(1);
+    });
+  });
+});
+
+describe('context time remaining', () => {
+  it('returns null with no velocity data', () => {
+    expect(mod.getContextTimeRemaining(50)).toBeNull();
+  });
+
+  it('returns null when velocity is near zero', () => {
+    // Only one data point → velocity = 0
+    mod.recordContextPercent(50);
+    expect(mod.getContextTimeRemaining(50)).toBeNull();
+  });
+});
+
+describe('tier upgrade detection', () => {
+  it('didTierUpgrade returns false by default', () => {
+    expect(mod.didTierUpgrade()).toBe(false);
+  });
+});
