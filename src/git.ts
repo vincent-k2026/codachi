@@ -87,6 +87,14 @@ function compute(cwd?: string): GitStatus | null {
 
   const branchMatch = branchLine.match(/^## ([^\s.]+)/);
   let branch = branchMatch ? branchMatch[1] : 'HEAD';
+
+  // Detached HEAD: show short commit hash instead of bare "HEAD".
+  // `git status --porcelain -b` outputs "## HEAD (no branch)" when detached.
+  if (branch === 'HEAD') {
+    const shortHash = git(['rev-parse', '--short', 'HEAD'], cwd);
+    if (shortHash) branch = shortHash;
+  }
+
   // Truncate long branch names (Unicode-safe)
   if (stringWidth(branch) > 25) branch = truncateByWidth(branch, 25);
 

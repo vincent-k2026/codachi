@@ -21,6 +21,7 @@ interface RenderInput {
   sevenDayUsage: { percent: number; resetsIn: string | null } | null;
   contextVelocity: number;
   tokenSummary: string | null;
+  cacheHitRate: number | null;
   relationshipTier: RelationshipTier;
   sessionNumber: number;
   animTick: number;
@@ -114,7 +115,8 @@ export function render(input: RenderInput): void {
   } = input;
 
   const rawTermWidth = getTerminalWidth();
-  const termWidth = Math.max(60, rawTermWidth); // minimum 60 cols
+  const isNarrow = rawTermWidth < 80;
+  const termWidth = Math.max(40, rawTermWidth); // allow narrower terminals
   const size: BodySize = getBodySize(contextPercent);
   let animation: Animation = getAnimation(contextPercent, false);
 
@@ -135,7 +137,8 @@ export function render(input: RenderInput): void {
   const mood = getMoodMessage({
     contextPercent, size, animation, animalType, git,
     fiveHourUsage: fiveHourUsage?.percent ?? null,
-    contextVelocity, relationshipTier, sessionNumber, moodTick,
+    contextVelocity, cacheHitRate: input.cacheHitRate ?? null,
+    relationshipTier, sessionNumber, moodTick,
     eventContext, tierUpgraded,
   });
 
@@ -143,8 +146,11 @@ export function render(input: RenderInput): void {
   const SEP = `${DIM}|${RESET}`;
   const { tokenSummary } = input;
 
-  // Line 1: Widget-based rendering
-  const widgetOrder = resolveWidgetOrder(getConfig().widgets);
+  // Line 1: Widget-based rendering. On narrow terminals drop optional widgets.
+  let widgetOrder = resolveWidgetOrder(getConfig().widgets);
+  if (isNarrow && widgetOrder.length > 3) {
+    widgetOrder = widgetOrder.slice(0, 3);
+  }
   const line1 = renderWidgetLine(widgetOrder, {
     contextPercent,
     modelName,
@@ -153,6 +159,7 @@ export function render(input: RenderInput): void {
     contextTimeRemaining: contextTimeRemaining ?? null,
     fiveHourUsage,
     sevenDayUsage,
+    cacheHitRate: input.cacheHitRate ?? null,
     colors,
   });
 

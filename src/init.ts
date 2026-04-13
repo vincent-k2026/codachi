@@ -19,7 +19,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
-const SETTINGS_FILE = path.join(os.homedir(), '.claude', 'settings.json');
+export const SETTINGS_FILE = path.join(os.homedir(), '.claude', 'settings.json');
 
 function detectMode(): { statusCmd: string; hookCmd: string; mode: 'bin' | 'local' } {
   const entry = process.argv[1] || '';
@@ -85,4 +85,48 @@ export function runInit(): void {
   if (mode === 'bin') {
     console.log('Tip: `npx codachi stats` for a productivity summary.');
   }
+}
+
+export function runUninstall(): void {
+  let settings: Record<string, unknown> = {};
+  try {
+    settings = JSON.parse(fs.readFileSync(SETTINGS_FILE, 'utf8')) as Record<string, unknown>;
+  } catch {
+    console.log('No settings file found — nothing to uninstall.');
+    return;
+  }
+
+  let changed = false;
+
+  // Remove statusLine if it references codachi.
+  const sl = settings.statusLine as Record<string, unknown> | undefined;
+  if (sl && typeof sl.command === 'string' && /codachi/.test(sl.command)) {
+    delete settings.statusLine;
+    changed = true;
+  }
+
+  // Remove codachi hook from PostToolExecution.
+  const hooks = settings.hooks as Record<string, unknown[]> | undefined;
+  if (hooks?.PostToolExecution && Array.isArray(hooks.PostToolExecution)) {
+    const before = hooks.PostToolExecution.length;
+    hooks.PostToolExecution = hooks.PostToolExecution.filter((h: unknown) => {
+      const hook = h as Record<string, unknown>;
+      return !(typeof hook.command === 'string' && /codachi(-hook)?|codachi[\\/]dist[\\/]hook/.test(hook.command));
+    });
+    if (hooks.PostToolExecution.length < before) changed = true;
+    if (hooks.PostToolExecution.length === 0) delete hooks.PostToolExecution;
+    if (Object.keys(hooks).length === 0) delete settings.hooks;
+  }
+
+  if (!changed) {
+    console.log('codachi is not configured in settings — nothing to remove.');
+    return;
+  }
+
+  fs.writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2) + '\n');
+  console.log('codachi uninstalled from Claude Code settings.');
+  console.log('Restart Claude Code to take effect.');
+  console.log('');
+  console.log('Note: pet data in ~/.claude/plugins/codachi/ is preserved.');
+  console.log('Delete it manually if you want a clean break.');
 }

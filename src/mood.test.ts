@@ -16,6 +16,7 @@ function makeMoodCtx(overrides: Record<string, unknown> = {}) {
     git: null,
     fiveHourUsage: null,
     contextVelocity: 0,
+    cacheHitRate: null,
     relationshipTier: 'stranger' as const,
     sessionNumber: 1,
     moodTick: 0,

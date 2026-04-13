@@ -43,6 +43,7 @@ async function main() {
       sevenDayUsage: { percent: 10, resetMinutes: 5 * 24 * 60 },
       contextVelocity: 2.1,
       tokenSummary: '420K/1M',
+      cacheHitRate: 65,
       relationshipTier: 'friend',
       sessionNumber: 20,
       animTick: animTick(),

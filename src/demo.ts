@@ -80,6 +80,7 @@ export async function runDemo(): Promise<void> {
       sevenDayUsage: null,
       contextVelocity: step.velocity,
       tokenSummary: `${Math.round(step.contextPercent * 10)}K/1.0M`,
+      cacheHitRate: Math.max(0, 85 - Math.round(step.contextPercent * 0.8)),
       relationshipTier: 'friend',
       sessionNumber: 18,
       animTick: Math.floor(Date.now() / 1500),
