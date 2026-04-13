@@ -158,8 +158,9 @@ export function getMoodMessage(ctx: MoodContext): string {
     if (eventContext.sessionActionCount > 30) return `${eventContext.sessionActionCount} actions this session! Wow~`;
   }
 
-  // Priority 7: COLD event (1-5 min) — show occasionally
-  if (eventContext.freshness === 'cold' && eventContext.category && tick % 5 === 0) {
+  // Priority 7: COLD event (1-5 min) — show every ~30s instead of ~50s
+  // so users still see recent event results between priority layers.
+  if (eventContext.freshness === 'cold' && eventContext.category && tick % 3 === 0) {
     const pool = EVENT_MESSAGES[eventContext.category];
     if (pool) return pick(pool, eventTick, eventContext.detail);
   }

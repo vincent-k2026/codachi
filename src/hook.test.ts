@@ -88,10 +88,40 @@ describe('parseEvent', () => {
     expect(parseEvent({ tool_name: 'Edit', tool_input: {} })).toBeNull();
   });
 
-  it('handles unknown tool types', () => {
-    const event = parseEvent({ tool_name: 'Grep', tool_input: {} });
+  it('classifies Grep as search', () => {
+    const event = parseEvent({ tool_name: 'Grep', tool_input: { pattern: 'TODO' } });
+    expect(event?.type).toBe('search');
+    expect(event?.detail).toBe('TODO');
+  });
+
+  it('classifies Glob as search', () => {
+    const event = parseEvent({ tool_name: 'Glob', tool_input: { pattern: '**/*.ts' } });
+    expect(event?.type).toBe('search');
+    expect(event?.detail).toBe('**/*.ts');
+  });
+
+  it('classifies Agent as agent', () => {
+    const event = parseEvent({ tool_name: 'Agent', tool_input: { description: 'find bugs' } });
+    expect(event?.type).toBe('agent');
+    expect(event?.detail).toBe('find bugs');
+  });
+
+  it('classifies WebSearch as web', () => {
+    const event = parseEvent({ tool_name: 'WebSearch', tool_input: { query: 'npm publish' } });
+    expect(event?.type).toBe('web');
+    expect(event?.detail).toBe('npm publish');
+  });
+
+  it('classifies LSP as lsp', () => {
+    const event = parseEvent({ tool_name: 'LSP', tool_input: { action: 'references' } });
+    expect(event?.type).toBe('lsp');
+    expect(event?.detail).toBe('references');
+  });
+
+  it('handles truly unknown tool types as other', () => {
+    const event = parseEvent({ tool_name: 'SomeNewTool', tool_input: {} });
     expect(event?.type).toBe('other');
-    expect(event?.detail).toBe('grep');
+    expect(event?.detail).toBe('somenewtool');
   });
 
   it('truncates long bash commands to 300 chars', () => {

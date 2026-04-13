@@ -227,4 +227,22 @@ export const EVENT_MESSAGES: Record<string, Msg[]> = localize<Record<string, Msg
     'Super productive!', 'You\'re a coding machine!',
     'This is one for the history books!', 'Marathon session! *stretches alongside*',
   ],
+  web_research: [
+    'Researching... knowledge is power!', 'Ooh, looking things up~',
+    'The internet has answers!', 'Web search mode activated!',
+    'Gathering intel...', 'Curiosity is a good sign~',
+    'Research phase! I love this part~', 'Consulting the oracle...',
+  ],
+  agent_spawned: [
+    'Subagent deployed! Teamwork~', 'Delegating like a pro!',
+    'More hands on deck!', 'The cavalry has arrived~',
+    'Parallel thinking! Smart move~', 'Agent dispatched!',
+    'Two heads are better than one!', 'Divide and conquer!',
+  ],
+  code_analysis: [
+    'Analyzing the code structure...', 'Following the trail~',
+    'LSP knows all the secrets!', 'Tracing references...',
+    'Deep code dive in progress!', 'Understanding the architecture~',
+    'Reading the code map!', 'Symbols and references, oh my~',
+  ],
 });

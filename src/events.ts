@@ -38,7 +38,10 @@ export type EventCategory =
   | 'struggling'
   | 'first_action'
   | 'many_edits'
-  | 'many_actions';
+  | 'many_actions'
+  | 'web_research'
+  | 'agent_spawned'
+  | 'code_analysis';
 
 export interface EventContext {
   category: EventCategory | null;
@@ -211,9 +214,11 @@ export function getEventContext(): EventContext {
     return ctx;
   }
 
-  // Deep exploring: 6+ reads in 60s
-  const recentReads = events.filter(e => e.type === 'read' && now - e.ts < 60000).length;
-  if (recentReads >= 6) {
+  // Deep exploring: 6+ reads/searches in 60s
+  const recentExploring = events.filter(e =>
+    (e.type === 'read' || e.type === 'search' || e.type === 'lsp') && now - e.ts < 60000
+  ).length;
+  if (recentExploring >= 6) {
     ctx.category = 'exploring';
     return ctx;
   }
@@ -240,8 +245,16 @@ export function getEventContext(): EventContext {
     ctx.category = 'creating_file';
   } else if (latest.type === 'edit') {
     ctx.category = classifyFile(latest.detail);
+  } else if (latest.type === 'search') {
+    ctx.category = 'search';
+  } else if (latest.type === 'agent') {
+    ctx.category = 'agent_spawned';
+  } else if (latest.type === 'web') {
+    ctx.category = 'web_research';
+  } else if (latest.type === 'lsp') {
+    ctx.category = 'code_analysis';
   }
-  // reads alone are not interesting enough for a mood change
+  // plain reads alone are not interesting enough for a mood change
 
   return ctx;
 }
