@@ -1,7 +1,7 @@
 /**
  * codachi init — auto-configure Claude Code's ~/.claude/settings.json.
  *
- * Adds a statusLine entry and a PostToolExecution hook. The commands it writes
+ * Adds a statusLine entry and a PostToolUse hook. The commands it writes
  * depend on how codachi is running:
  *
  *   - When installed globally or via `npx codachi init` (argv[1] resolved to
@@ -13,7 +13,8 @@
  *     if the clone is not on PATH.
  *
  * Idempotent: if a codachi statusLine / hook already exists, it updates in
- * place rather than duplicating.
+ * place rather than duplicating. Also migrates any legacy PostToolExecution
+ * entries from pre-fix installs onto the canonical PostToolUse key.
  */
 import fs from 'node:fs';
 import path from 'node:path';
@@ -47,6 +48,20 @@ function detectMode(): { statusCmd: string; hookCmd: string; mode: 'bin' | 'loca
   };
 }
 
+const isCodachiCommand = (cmd: unknown): boolean =>
+  typeof cmd === 'string' && /codachi(-hook)?|codachi[\\/]dist[\\/]hook/.test(cmd);
+
+const isCodachiEntry = (h: unknown): boolean => {
+  const hook = h as Record<string, unknown>;
+  if (isCodachiCommand(hook.command)) return true;
+  if (Array.isArray(hook.hooks)) {
+    return (hook.hooks as Record<string, unknown>[]).some(
+      inner => isCodachiCommand(inner.command),
+    );
+  }
+  return false;
+};
+
 export function runInit(): void {
   const { statusCmd, hookCmd, mode } = detectMode();
 
@@ -61,15 +76,30 @@ export function runInit(): void {
   settings.statusLine = { type: 'command', command: statusCmd };
 
   const hooks = (settings.hooks ?? {}) as Record<string, unknown[]>;
-  const postHooks = Array.isArray(hooks.PostToolExecution) ? hooks.PostToolExecution : [];
 
-  // Replace any existing codachi hook rather than duplicating.
-  const cleaned = postHooks.filter((h: unknown) => {
-    const hook = h as Record<string, unknown>;
-    return !(typeof hook.command === 'string' && /codachi(-hook)?|codachi[\\/]dist[\\/]hook/.test(hook.command));
+  // Migrate any legacy `PostToolExecution` entries (from versions before
+  // this fix) onto the canonical `PostToolUse` key so upgrading users don't
+  // end up with a stale hook that never fires.
+  if (Array.isArray(hooks.PostToolExecution)) {
+    const legacy = hooks.PostToolExecution;
+    delete hooks.PostToolExecution;
+    hooks.PostToolUse = [
+      ...(Array.isArray(hooks.PostToolUse) ? hooks.PostToolUse : []),
+      ...legacy,
+    ];
+  }
+
+  const postHooks = Array.isArray(hooks.PostToolUse) ? hooks.PostToolUse : [];
+
+  // Replace any existing codachi hook rather than duplicating. Match both
+  // the canonical wrapped form ({matcher, hooks: [{type, command}]}) and
+  // any legacy flat form ({matcher, command}).
+  const cleaned = postHooks.filter(h => !isCodachiEntry(h));
+  cleaned.push({
+    matcher: '',
+    hooks: [{ type: 'command', command: hookCmd }],
   });
-  cleaned.push({ matcher: '', command: hookCmd });
-  hooks.PostToolExecution = cleaned;
+  hooks.PostToolUse = cleaned;
   settings.hooks = hooks;
 
   fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
@@ -105,16 +135,17 @@ export function runUninstall(): void {
     changed = true;
   }
 
-  // Remove codachi hook from PostToolExecution.
+  // Remove codachi hook from PostToolUse (and any leftover PostToolExecution).
   const hooks = settings.hooks as Record<string, unknown[]> | undefined;
-  if (hooks?.PostToolExecution && Array.isArray(hooks.PostToolExecution)) {
-    const before = hooks.PostToolExecution.length;
-    hooks.PostToolExecution = hooks.PostToolExecution.filter((h: unknown) => {
-      const hook = h as Record<string, unknown>;
-      return !(typeof hook.command === 'string' && /codachi(-hook)?|codachi[\\/]dist[\\/]hook/.test(hook.command));
-    });
-    if (hooks.PostToolExecution.length < before) changed = true;
-    if (hooks.PostToolExecution.length === 0) delete hooks.PostToolExecution;
+  if (hooks) {
+    for (const key of ['PostToolUse', 'PostToolExecution'] as const) {
+      const entries = hooks[key];
+      if (!Array.isArray(entries)) continue;
+      const before = entries.length;
+      hooks[key] = entries.filter(h => !isCodachiEntry(h));
+      if (hooks[key].length < before) changed = true;
+      if (hooks[key].length === 0) delete hooks[key];
+    }
     if (Object.keys(hooks).length === 0) delete settings.hooks;
   }
 
