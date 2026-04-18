@@ -103,7 +103,7 @@ describe('render', () => {
 
   it('shows five hour usage bar', () => {
     render(makeRenderInput({
-      fiveHourUsage: { percent: 40, resetsIn: '2h30m' },
+      fiveHourUsage: { percent: 40, resetsIn: '2h30m', paceDelta: 5 },
     }));
     expect(logOutput[0]).toContain('5h');
     expect(logOutput[0]).toContain('40%');
@@ -112,7 +112,7 @@ describe('render', () => {
 
   it('shows seven day usage when provided', () => {
     render(makeRenderInput({
-      sevenDayUsage: { percent: 50, resetsIn: '3d' },
+      sevenDayUsage: { percent: 50, resetsIn: '3d', paceDelta: -3 },
     }));
     expect(logOutput[0]).toContain('7d');
     expect(logOutput[0]).toContain('50%');
@@ -120,7 +120,7 @@ describe('render', () => {
 
   it('shows seven day usage even at low percentages', () => {
     render(makeRenderInput({
-      sevenDayUsage: { percent: 5, resetsIn: '6d' },
+      sevenDayUsage: { percent: 5, resetsIn: '6d', paceDelta: null },
     }));
     expect(logOutput[0]).toContain('7d');
     expect(logOutput[0]).toContain('5%');

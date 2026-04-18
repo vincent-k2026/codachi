@@ -47,8 +47,6 @@ describe('loadConfig', () => {
       palette: 5,
       showTokens: false,
       showVelocity: false,
-      showCache: true,
-      showUptime: true,
       showGit: false,
       animationSpeed: 2.0,
     }));

@@ -12,6 +12,7 @@ function makeCtx(overrides: Partial<WidgetContext> = {}): WidgetContext {
     contextTimeRemaining: null,
     fiveHourUsage: null,
     sevenDayUsage: null,
+    sessionCost: null,
     colors: {
       body: rgb(255, 127, 80),
       accent: rgb(255, 99, 71),
@@ -74,7 +75,7 @@ describe('velocityWidget', () => {
 describe('rateLimit widgets', () => {
   it('renders 5h rate limit', () => {
     const out = WIDGET_REGISTRY.rateLimit5h.render(makeCtx({
-      fiveHourUsage: { percent: 32, resetsIn: '2h' },
+      fiveHourUsage: { percent: 32, resetsIn: '2h', paceDelta: 3 },
     }));
     expect(out).toContain('5h');
     expect(out).toContain('32%');
@@ -83,7 +84,7 @@ describe('rateLimit widgets', () => {
 
   it('renders 7d rate limit', () => {
     const out = WIDGET_REGISTRY.rateLimit7d.render(makeCtx({
-      sevenDayUsage: { percent: 8, resetsIn: '5d' },
+      sevenDayUsage: { percent: 8, resetsIn: '5d', paceDelta: -2 },
     }));
     expect(out).toContain('7d');
     expect(out).toContain('8%');

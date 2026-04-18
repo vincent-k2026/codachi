@@ -45,7 +45,7 @@ The renderer never calls APIs and never blocks on I/O longer than a git status (
 - `stdin.ts` → `state.ts` → `mood.ts` → `render/` is the render pipeline
 - `events.ts` classifies ~40 tool-use categories; `hook.ts` recognizes Bash, Edit, Write, Read, Glob, Grep, Agent, WebSearch, WebFetch, LSP (not just Bash+file ops)
 - `mood.ts` is a 15-tier priority engine that picks a message from `messages/*` based on event freshness (hot <15s, warm <60s, cold <5m), context %, velocity, memory tier, and idle fallbacks
-- `messages/` holds 850+ strings split by domain (events, idle, context, social, git) — when adding reactions, add to the right file and the category in `events.ts`
+- `messages/` holds 900+ strings split by domain (events, idle, context, social, git) — when adding reactions, add to the right file and the category in `events.ts`
 - `animals/` is species × size (5 context buckets) × mood (idle/happy/busy/danger/sleep) × 4 animation frames; `identity.ts` picks species+palette (10 truecolor palettes + plugin palettes)
 - `state.ts` tracks velocity (context burn %/min), session uptime, memory tiers (stranger→bestie at 0/3/15/50 sessions), and the "struggling" / "recovery" / "rapid editing" pattern detectors. State and memory files carry a schema `version` for forward-compatible migration.
 - `render/colors.ts` detects terminal capability (truecolor/ansi256/ansi16/none) and `rgb()` auto-downgrades. Honors `NO_COLOR`, `FORCE_COLOR`, `COLORTERM`.
