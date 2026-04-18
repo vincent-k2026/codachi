@@ -98,32 +98,29 @@ function parseEvent(data: Record<string, unknown>): CodachiEvent | null {
 }
 
 /**
- * Append an event with a simple optimistic-concurrency guard.
+ * Append an event with retry-on-conflict.
  *
  * Problem: two hook invocations can overlap (read → modify → write),
  * causing the slower one to overwrite the faster one's append.
  *
- * Solution: the events file carries a monotonic `gen` counter.
- * After reading, we write with `gen + 1`. On write, if the file's gen
- * has moved past ours (another hook raced us), we re-read and retry
- * once. One retry is enough — the window is <5ms per hook invocation,
- * so triple-collisions are astronomically unlikely.
+ * Solution: read the current file, append our event, write it back.
+ * After writing, re-read and verify our specific event is present
+ * (matched by timestamp). If a concurrent hook overwrote us, we retry
+ * once with the fresh state (which already contains the other hook's
+ * event, so both survive).
  */
 const MAX_RETRIES = 1;
 
-function readEvents(): { events: CodachiEvent[]; gen: number } {
+function readEvents(): CodachiEvent[] {
   try {
     const raw = fs.readFileSync(EVENTS_FILE, 'utf8');
-    const data = JSON.parse(raw) as { events?: CodachiEvent[]; gen?: number };
-    return {
-      events: Array.isArray(data.events) ? data.events : [],
-      gen: typeof data.gen === 'number' ? data.gen : 0,
-    };
+    const data = JSON.parse(raw) as { events?: CodachiEvent[] };
+    return Array.isArray(data.events) ? data.events : [];
   } catch (err) {
     if ((err as NodeJS.ErrnoException)?.code !== 'ENOENT') {
       logError('hook.appendEvent.read', err);
     }
-    return { events: [], gen: 0 };
+    return [];
   }
 }
 
@@ -135,21 +132,21 @@ function appendEvent(event: CodachiEvent): void {
   }
 
   for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-    const { events, gen } = readEvents();
+    const events = readEvents();
     events.push(event);
     const trimmed = events.length > MAX_EVENTS ? events.slice(-MAX_EVENTS) : events;
-    const nextGen = gen + 1;
 
-    if (!atomicWrite(EVENTS_FILE, JSON.stringify({ events: trimmed, gen: nextGen }))) {
-      continue; // write failed (e.g., disk full) — retry
+    if (!atomicWrite(EVENTS_FILE, JSON.stringify({ events: trimmed }))) {
+      continue; // write failed — retry
     }
 
-    // Optimistic check: re-read and verify our gen landed.
-    // If another hook overwrote us, our gen won't match.
+    // Verify our event landed by checking the last event's timestamp.
+    // If another hook overwrote us, our event won't be there — retry
+    // with fresh state (which includes the other hook's event too).
     if (attempt < MAX_RETRIES) {
       const check = readEvents();
-      if (check.gen === nextGen) return; // success
-      // Race detected — retry with fresh state.
+      const found = check.some(e => e.ts === event.ts && e.type === event.type && e.detail === event.detail);
+      if (found) return;
       continue;
     }
     return;

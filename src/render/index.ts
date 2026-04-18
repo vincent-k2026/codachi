@@ -112,7 +112,7 @@ export function render(input: RenderInput): void {
   } = input;
 
   const rawTermWidth = getTerminalWidth();
-  const isNarrow = rawTermWidth < 80;
+  const isNarrow = rawTermWidth <= 100;
   const termWidth = Math.max(40, rawTermWidth); // allow narrower terminals
   const size: BodySize = getBodySize(contextPercent);
   let animation: Animation = getAnimation(contextPercent, false);

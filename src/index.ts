@@ -1,7 +1,6 @@
 #!/usr/bin/env node
 import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage, getTokenSummary, getSessionCost } from './stdin.js';
 import { getGitStatus } from './git.js';
-// project.ts is still available for stats/plugins but no longer rendered in the statusline.
 import { getAnimalType, getPetColors } from './identity.js';
 import { initSession, animTick, moodTick, recordContextPercent, getContextVelocity, getContextTimeRemaining, getMemory, getRelationshipTier, didTierUpgrade } from './state.js';
 import { loadConfig, getConfig } from './config.js';

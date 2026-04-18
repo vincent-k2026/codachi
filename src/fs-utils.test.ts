@@ -35,10 +35,10 @@ describe('atomicWrite', () => {
     );
   });
 
-  it('includes pid in tmp filename for uniqueness', () => {
+  it('includes unique id in tmp filename', () => {
     atomicWrite('/path/file', 'data');
     const tmpPath = vi.mocked(fs.writeFileSync).mock.calls[0][0] as string;
-    expect(tmpPath).toContain(`.tmp.${process.pid}`);
+    expect(tmpPath).toMatch(/\.tmp\.[0-9a-f-]{36}$/);
   });
 
   it('returns false and cleans up on write failure', () => {

@@ -74,8 +74,9 @@ function computePaceDelta(usedPct: number, resetsAt: number | undefined, windowM
   if (typeof resetsAt !== 'number' || resetsAt <= 0) return null;
   const remainingMin = (resetsAt * 1000 - Date.now()) / 60000;
   if (remainingMin < 0 || remainingMin > windowMin) return null;
+  const clampedPct = Math.min(100, Math.max(0, usedPct));
   const elapsedPct = ((windowMin - remainingMin) / windowMin) * 100;
-  return Math.round(usedPct - elapsedPct);
+  return Math.round(clampedPct - elapsedPct);
 }
 
 export function getFiveHourUsage(stdin: StdinData): RateLimitInfo | null {
