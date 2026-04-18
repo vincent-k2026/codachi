@@ -85,14 +85,12 @@ describe('render', () => {
     expect(logOutput[2]).toContain('Cat');
   });
 
-  it('includes project name in line 3', () => {
+  it('line 3 is pet name + mood only', () => {
     render(makeRenderInput());
-    expect(logOutput[2]).toContain('myapp');
-  });
-
-  it('includes uptime in line 3', () => {
-    render(makeRenderInput());
-    expect(logOutput[2]).toContain('5m');
+    // Line 3 should contain pet name but NOT project/uptime clutter
+    expect(logOutput[2]).toContain('Cat');
+    expect(logOutput[2]).not.toContain('myapp');
+    expect(logOutput[2]).not.toContain('[Node]');
   });
 
   it('shows token summary when provided', () => {
@@ -168,8 +166,8 @@ describe('render', () => {
     expect(logOutput[1]).toContain('stash:3');
   });
 
-  it('shows language tag', () => {
+  it('does not show language tag on line 3', () => {
     render(makeRenderInput());
-    expect(logOutput[2]).toContain('[Node]');
+    expect(logOutput[2]).not.toContain('[Node]');
   });
 });

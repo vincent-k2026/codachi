@@ -192,15 +192,8 @@ export function render(input: RenderInput): void {
     if (git.stashCount > 0) line2 += ` ${SEP} ${rgb(255, 200, 100)}stash:${git.stashCount}${RESET}`;
   }
 
-  // Line 3: Pet
-  const now = new Date();
-  const timeStr = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  const { project, uptime } = input;
-  let line3 = `${A}${petName}${RESET} ${F}${mood}${RESET}`;
-  line3 += ` ${SEP} ${C}${project.name}${RESET}`;
-  if (project.lang) line3 += ` ${A}[${project.lang}]${RESET}`;
-  line3 += ` ${SEP} ${B}${timeStr}${RESET}`;
-  line3 += ` ${SEP} ${F}up ${uptime}${RESET}`;
+  // Line 3: Pet name + mood message
+  const line3 = `${A}${petName}${RESET} ${F}${mood}${RESET}`;
 
   // Compose — output pet on left, info on right
   const infoWidth = Math.max(1, termWidth - petW);

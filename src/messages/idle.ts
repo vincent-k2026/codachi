@@ -12,6 +12,9 @@ export const IDLE_MESSAGES: Record<AnimalType, string[]> = localize<Record<Anima
     'The keyboard is warm. I stay.', 'Meow? ...I mean, yes, your code looks fine',
     '*tail swish* Something moved in the diff...', 'I see dead... code. Just kidding~',
     'Not sleeping. Just resting my eyes. On your code.',
+    '*pushes your cursor off the edge* Oops~', 'Did you know: cats can debug with their whiskers',
+    'You missed a spot... in the code', 'I have opinions about your variable names',
+    '*curls up on the warm laptop*', 'Mrrow? That function looks suspicious...',
   ],
   penguin: [
     '*happy waddle*', 'Sliding through the codebase!', 'Flap flap! I\'m helping!',
@@ -22,6 +25,9 @@ export const IDLE_MESSAGES: Record<AnimalType, string[]> = localize<Record<Anima
     'Huddle up! It\'s coding time!', 'Noot noot! *happy penguin sounds*',
     'Fish? No thanks. I eat bugs for breakfast!', 'Standing tall, coding proud!',
     '*wiggles* I\'m aerodynamic for speed coding!', 'Antarctica was nice but this terminal is better~',
+    'Fun fact: penguins can hold their breath for 20 minutes. I can hold context for longer!',
+    '*does the penguin rock* Left foot, right foot, commit~',
+    'I waddle, therefore I am', 'March of the commits!',
   ],
   owl: [
     '*hoo hoo*', 'Wise owl watches your code~', 'Night owl coding session!',
@@ -33,6 +39,10 @@ export const IDLE_MESSAGES: Record<AnimalType, string[]> = localize<Record<Anima
     'The ancient scrolls... I mean, docs... say...', 'In my expert owl-pinion, this is going well',
     '*adjusts monocle* Yes, yes, quite elegant', 'Hoo knew coding could be this fun?',
     'Silence is golden. Except for keyboard clicks.', 'Every bug is a lesson. I collect them all.',
+    'Did you know owls can turn their heads 270 degrees? I can turn this bug around too',
+    'The owl pellets of programming: stack traces',
+    '*fluffs feathers* Cold? Never. Wise? Always.',
+    'Hoo hoo... the code speaks to me',
   ],
   octopus: [
     '*wiggles tentacles*', 'Eight arms, infinite possibilities!', 'Multi-tasking like a pro~',
@@ -45,6 +55,10 @@ export const IDLE_MESSAGES: Record<AnimalType, string[]> = localize<Record<Anima
     'I can type 8x faster than you~ theoretically',
     '*squirts ink* Oops, that was the dark theme', 'Under the sea, under the C... code',
     'Boneless but not spineless!', 'The Kraken of clean code!',
+    'I have three hearts, and they all race when tests pass',
+    'Chromatophores activated: matching your color scheme~',
+    '*wraps tentacle around coffee mug* Mine now',
+    'Octo-commit: 8 files at once!',
   ],
   bunny: [
     '*nose twitch twitch*', 'Nibbling on some syntax~', 'Ears up! Something interesting...',
@@ -58,6 +72,10 @@ export const IDLE_MESSAGES: Record<AnimalType, string[]> = localize<Record<Anima
     'Multiplying... functions! What did you think I meant?',
     '*flops sideways* (that means I trust you)', 'Warren of well-organized code!',
     'Fast as a bunny, twice as cute!',
+    '*thumps foot approvingly* Good code!',
+    'My ears pick up every compiler warning~',
+    'Binky alert: that refactor was clean!',
+    'Bunnies don\'t hibernate, and neither does good code',
   ],
 });
 
