@@ -129,7 +129,6 @@ async function promptDisplay(r: readline.Interface, existing: CodachiConfig): Pr
     showTokens:   await promptBool(r, 'Show token count (555K/1M)', existing.showTokens ?? true),
     showVelocity: await promptBool(r, 'Show burn speed + time remaining (^3%/m ~15m)', existing.showVelocity ?? true),
     showGit:      await promptBool(r, 'Show git status line', existing.showGit ?? true),
-    showUptime:   await promptBool(r, 'Show session uptime', existing.showUptime ?? true),
   };
 }
 

@@ -8,7 +8,7 @@
 ![Node](https://img.shields.io/badge/node-%3E%3D18-brightgreen)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Zero Dependencies](https://img.shields.io/badge/dependencies-0-orange)
-![Tests](https://img.shields.io/badge/tests-304%20passing-brightgreen)
+![Tests](https://img.shields.io/badge/tests-369%20passing-brightgreen)
 
 ![codachi demo](codachi-demo.gif)
 
@@ -17,7 +17,7 @@
 ## Why codachi?
 
 - **Context ETA** — `~15m left` tells you *when* to `/compact`, not just how full you are. The only statusline that predicts it.
-- **Event-aware pet** — hooks watch Claude work and react with 850+ contextual messages, across 40+ event categories.
+- **Event-aware pet** — hooks watch Claude work and react with 900+ contextual messages, across 40+ event categories.
 - **`codachi stats`** — local, zero-telemetry productivity dashboard: sessions, uptime, tier progress, last-24h test/commit/edit counts.
 - **Plugin API** — drop a `.mjs` file into `~/.config/codachi/plugins/` to add your own palettes and messages. No forking required.
 - **i18n** — bundled 简体中文; English fallback for any missing keys. BYO locale via `CODACHI_LOCALE`.
@@ -87,24 +87,24 @@ Add to `~/.claude/settings.json`:
 ## Statusline Layout
 
 ```
-Line 1   [Opus 4.6] [======----] 55% 555K/1.0M ^3%/m ~15m | 5h [==----] 32% ~2h | 7d [-----] 8% ~6d
+Line 1   Opus 4.6 | ██░░ 55% 555K/1.0M ^3%/m ~15m | 5h ████░░░░ 32% ⇡5% ~2h | 7d ██░░░░░░ 8% ⇣2% ~6d
 Line 2   git:(main*) ~12 ?3 | +489 -84 lines | last: fix auth bug
-Line 3   Mochi *slow blink* ...I love you | myapp [Node] | up 45m
+Line 3   Mochi *slow blink* ...I love you
 ```
 
 | Metric | Description |
 |:-------|:------------|
-| `[======----] 55%` | Context window usage with progress bar |
+| `██░░ 55%` | Context window usage with progress bar |
 | `555K/1M` | Tokens used / total window size |
 | `^3%/m` | Context burn speed (how fast you're filling up) |
 | `~15m` | Estimated time until context is full |
-| `5h [==----] 32% ~2h` | 5-hour rate limit usage + reset countdown |
-| `7d [-----] 8% ~6d` | 7-day rate limit usage + reset countdown |
+| `5h ████░░░░ 32% ⇡5% ~2h` | 5-hour rate limit + pace delta + reset countdown |
+| `7d ██░░░░░░ 8% ⇣2% ~6d` | 7-day rate limit + pace delta + reset countdown |
+| `⇡5%` | Over-consuming (red) — your pace exceeds the natural rate limit window |
+| `⇣2%` | Has headroom (green) — you're below the natural pace |
 | `git:(main*) ~12 ?3` | Branch, modified/untracked files |
 | `+489 -84 lines` | Insertions / deletions in working tree |
 | `Mochi *slow blink*` | Custom pet name + contextual mood message |
-| `myapp [Node]` | Project name + detected language |
-| `up 45m` | Session uptime |
 
 ---
 
@@ -149,7 +149,7 @@ Each session randomly assigns a species and color palette (or set them in config
 
 **Palettes:** Coral Flame · Electric Blue · Neon Mint · Purple Haze · Hot Pink · Golden Sun · Ice Violet · Cherry Blossom · Cyan Surge · Tangerine
 
-### Event-reactive mood (850+ messages)
+### Event-reactive mood (900+ messages)
 
 Via the PostToolExecution hook, your pet knows what Claude is doing and reacts in real time.
 
@@ -308,7 +308,6 @@ Or edit `~/.config/codachi/config.json` directly:
 | `showTokens` | `true` | Show token count `555K/1M` |
 | `showVelocity` | `true` | Show burn speed `^3%/m` + time remaining `~15m` |
 | `showGit` | `true` | Show git status on line 2 |
-| `showUptime` | `true` | Show session uptime |
 | `animationSpeed` | `1.5` | Seconds per animation frame |
 
 **Available widgets** (line 1): `model`, `context`, `velocity`, `rateLimit5h`, `rateLimit7d`. Reorder or remove any of them in the `widgets` array.
@@ -358,7 +357,7 @@ src/
 ├── hook.ts            # Claude Code PostToolExecution hook
 ├── events.ts          # Event classifier (40 categories)
 ├── mood.ts            # Mood engine (15-tier priority)
-├── messages/          # 850+ messages split by category
+├── messages/          # 900+ messages split by category
 │   ├── events.ts      #   Event-reactive messages
 │   ├── idle.ts        #   Animal idle + body size messages
 │   ├── context.ts     #   Velocity, cache, danger, busy

@@ -10,7 +10,7 @@
 import { performance } from 'node:perf_hooks';
 import { render } from '../dist/render/index.js';
 import { getAnimalType, getPetColors } from '../dist/identity.js';
-import { initSession, animTick, moodTick, sessionUptime } from '../dist/state.js';
+import { initSession, animTick, moodTick } from '../dist/state.js';
 import { getEventContext } from '../dist/events.js';
 import { getAnimalName } from '../dist/animals/index.js';
 
@@ -38,9 +38,8 @@ async function main() {
       animalType: getAnimalType(),
       colors: getPetColors(),
       git: null,
-      project: { name: 'bench', language: 'TypeScript' },
-      fiveHourUsage: { percent: 30, resetMinutes: 120 },
-      sevenDayUsage: { percent: 10, resetMinutes: 5 * 24 * 60 },
+      fiveHourUsage: { percent: 30, resetsIn: '3h40m', paceDelta: -5 },
+      sevenDayUsage: { percent: 10, resetsIn: '6d', paceDelta: -2 },
       contextVelocity: 2.1,
       tokenSummary: '420K/1M',
       sessionCost: 0.85,
@@ -48,7 +47,6 @@ async function main() {
       sessionNumber: 20,
       animTick: animTick(),
       moodTick: moodTick(),
-      uptime: sessionUptime(),
       eventContext: getEventContext(),
       petName: getAnimalName(getAnimalType()),
       contextTimeRemaining: '~27m',

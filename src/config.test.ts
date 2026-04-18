@@ -101,11 +101,10 @@ describe('validateConfig', () => {
   });
 
   it('validates boolean flags', () => {
-    const cfg = validateConfig({ showTokens: false, showVelocity: true, showGit: false, showUptime: true });
+    const cfg = validateConfig({ showTokens: false, showVelocity: true, showGit: false });
     expect(cfg.showTokens).toBe(false);
     expect(cfg.showVelocity).toBe(true);
     expect(cfg.showGit).toBe(false);
-    expect(cfg.showUptime).toBe(true);
   });
 
   it('rejects non-boolean flags', () => {
@@ -138,7 +137,6 @@ describe('validateConfig', () => {
       widgets: ['model', 'context'],
       showTokens: true,
       showVelocity: false,
-      showUptime: true,
       showGit: true,
       animationSpeed: 2.0,
     };

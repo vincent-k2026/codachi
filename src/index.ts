@@ -1,9 +1,9 @@
 #!/usr/bin/env node
 import { readStdin, getContextPercent, getModelName, getFiveHourUsage, getSevenDayUsage, getTokenSummary, getSessionCost } from './stdin.js';
 import { getGitStatus } from './git.js';
-import { getProjectInfo } from './project.js';
+// project.ts is still available for stats/plugins but no longer rendered in the statusline.
 import { getAnimalType, getPetColors } from './identity.js';
-import { initSession, animTick, moodTick, sessionUptime, recordContextPercent, getContextVelocity, getContextTimeRemaining, getMemory, getRelationshipTier, didTierUpgrade } from './state.js';
+import { initSession, animTick, moodTick, recordContextPercent, getContextVelocity, getContextTimeRemaining, getMemory, getRelationshipTier, didTierUpgrade } from './state.js';
 import { loadConfig, getConfig } from './config.js';
 import { getEventContext } from './events.js';
 import { getAnimalName } from './animals/index.js';
@@ -82,7 +82,6 @@ async function main(): Promise<void> {
       animalType,
       colors: getPetColors(),
       git: cfg.showGit !== false ? getGitStatus(stdin.cwd) : null,
-      project: getProjectInfo(stdin.cwd),
       fiveHourUsage: getFiveHourUsage(stdin),
       sevenDayUsage: getSevenDayUsage(stdin),
       contextVelocity: cfg.showVelocity !== false ? getContextVelocity() : 0,
@@ -92,7 +91,6 @@ async function main(): Promise<void> {
       sessionNumber: getMemory().totalSessions,
       animTick: animTick(cfg.animationSpeed),
       moodTick: moodTick(),
-      uptime: cfg.showUptime !== false ? sessionUptime() : '',
       eventContext: getEventContext(),
       petName,
       contextTimeRemaining: cfg.showVelocity !== false ? getContextTimeRemaining(contextPercent) : null,

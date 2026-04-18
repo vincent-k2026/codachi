@@ -1,5 +1,4 @@
 import type { PetColors, AnimalType, BodySize, Animation, GitStatus } from '../types.js';
-import type { ProjectInfo } from '../project.js';
 import { RESET, DIM, rgb } from './colors.js';
 import { getAnimalFrame, getBodySize, getAnimation } from '../animals/index.js';
 import { getMoodMessage } from '../mood.js';
@@ -16,7 +15,6 @@ interface RenderInput {
   animalType: AnimalType;
   colors: PetColors;
   git: GitStatus | null;
-  project: ProjectInfo;
   fiveHourUsage: import('../stdin.js').RateLimitInfo | null;
   sevenDayUsage: import('../stdin.js').RateLimitInfo | null;
   contextVelocity: number;
@@ -26,7 +24,6 @@ interface RenderInput {
   sessionNumber: number;
   animTick: number;
   moodTick: number;
-  uptime: string;
   eventContext: EventContext;
   petName: string;
   contextTimeRemaining: string | null;

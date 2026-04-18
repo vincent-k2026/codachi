@@ -60,8 +60,6 @@ export async function runDemo(): Promise<void> {
 
     console.log(`  \x1b[2m${step.label}\x1b[0m`);
 
-    const uptime = step.contextPercent < 30 ? '5m' : step.contextPercent < 60 ? '18m' : '32m';
-
     render({
       contextPercent: step.contextPercent,
       modelName: 'Opus 4.6',
@@ -74,17 +72,15 @@ export async function runDemo(): Promise<void> {
         lastCommit: 'feat: add auth middleware', stashCount: 0,
         dominantFileType: 'TypeScript',
       },
-      project: { name: 'myapp', lang: 'Node' },
-      fiveHourUsage: { percent: 15, resetsIn: '4h12m', paceDelta: -5 },
-      sevenDayUsage: null,
+      fiveHourUsage: { percent: Math.round(step.contextPercent * 0.4), resetsIn: '4h12m', paceDelta: step.contextPercent > 50 ? Math.round(step.contextPercent * 0.1) : -3 },
+      sevenDayUsage: { percent: Math.round(step.contextPercent * 0.3), resetsIn: '5d8h', paceDelta: step.contextPercent > 60 ? 4 : -2 },
       contextVelocity: step.velocity,
       tokenSummary: `${Math.round(step.contextPercent * 10)}K/1.0M`,
       sessionCost: step.contextPercent * 0.02,
       relationshipTier: 'friend',
       sessionNumber: 18,
       animTick: Math.floor(Date.now() / 1500),
-      moodTick: Math.floor(Date.now() / 3000), // faster tick for demo variety
-      uptime,
+      moodTick: Math.floor(Date.now() / 3000),
       eventContext: step.event,
       petName,
       contextTimeRemaining: step.velocity > 0.5 ? `~${Math.round((100 - step.contextPercent) / step.velocity)}m` : null,
