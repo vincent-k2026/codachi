@@ -6,6 +6,6 @@ export const modelWidget: Widget = {
   id: 'model',
   render(ctx) {
     if (!ctx.modelName) return '';
-    return `${ctx.colors.accent}[${ctx.modelName}]${RESET}`;
+    return `${ctx.colors.accent}${ctx.modelName}${RESET}`;
   },
 };

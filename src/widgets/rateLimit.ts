@@ -32,7 +32,7 @@ function renderRateLimit(
 export const rateLimit5hWidget: Widget = {
   id: 'rateLimit5h',
   render(ctx) {
-    return renderRateLimit('5h', 6, ctx.fiveHourUsage, ctx.colors);
+    return renderRateLimit('5h', 4, ctx.fiveHourUsage, ctx.colors);
   },
 };
 
@@ -40,6 +40,6 @@ export const rateLimit5hWidget: Widget = {
 export const rateLimit7dWidget: Widget = {
   id: 'rateLimit7d',
   render(ctx) {
-    return renderRateLimit('7d', 5, ctx.sevenDayUsage, ctx.colors);
+    return renderRateLimit('7d', 4, ctx.sevenDayUsage, ctx.colors);
   },
 };

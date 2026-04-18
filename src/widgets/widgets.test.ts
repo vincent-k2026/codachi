@@ -25,7 +25,7 @@ function makeCtx(overrides: Partial<WidgetContext> = {}): WidgetContext {
 describe('modelWidget', () => {
   it('renders model name in brackets', () => {
     const out = WIDGET_REGISTRY.model.render(makeCtx());
-    expect(out).toContain('[Opus 4.6]');
+    expect(out).toContain('Opus 4.6');
   });
 
   it('returns empty string when modelName is empty', () => {
@@ -98,7 +98,7 @@ describe('rateLimit widgets', () => {
 describe('renderWidgetLine', () => {
   it('joins widgets with separator', () => {
     const out = renderWidgetLine(['model', 'context'], makeCtx());
-    expect(out).toContain('[Opus 4.6]');
+    expect(out).toContain('Opus 4.6');
     expect(out).toContain('50%');
     expect(out).toContain('|');
   });
@@ -106,14 +106,14 @@ describe('renderWidgetLine', () => {
   it('skips empty widgets', () => {
     const out = renderWidgetLine(['model', 'velocity'], makeCtx());
     // velocity is empty (no data), so no separator should appear
-    expect(out).toContain('[Opus 4.6]');
+    expect(out).toContain('Opus 4.6');
     expect(out).not.toMatch(/\|.*\|/); // no double separator
   });
 
   it('ignores unknown widget ids', () => {
     // @ts-expect-error — testing runtime behavior with bad input
     const out = renderWidgetLine(['model', 'nonexistent'], makeCtx());
-    expect(out).toContain('[Opus 4.6]');
+    expect(out).toContain('Opus 4.6');
   });
 });
 
