@@ -90,7 +90,6 @@ export async function runDemo(): Promise<void> {
     await sleep(step.pauseMs);
   }
 
-  console.log('');
-  console.log(`  \x1b[2mInstall:\x1b[0m \x1b[1mnode dist/index.js init\x1b[0m`);
-  console.log('');
+  // End with the final pet frame visible (no blank lines — important for GIF recording).
+  console.log(`\n  \x1b[2mnpx codachi init\x1b[0m\n`);
 }
