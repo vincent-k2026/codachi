@@ -25,7 +25,7 @@ const CONFIG_PATHS = [
 ];
 
 const VALID_ANIMALS: ReadonlySet<string> = new Set(['cat', 'penguin', 'owl', 'octopus', 'bunny']);
-const VALID_WIDGETS: ReadonlySet<string> = new Set(['model', 'context', 'velocity', 'rateLimit5h', 'rateLimit7d']);
+const VALID_WIDGETS: ReadonlySet<string> = new Set(['model', 'context', 'velocity', 'cost', 'rateLimit5h', 'rateLimit7d']);
 const BUILTIN_PALETTE_COUNT = 10;
 // Total palette count including plugin contributions. Queried lazily because
 // plugins may register more palettes after this module is first imported.

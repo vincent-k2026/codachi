@@ -1,5 +1,7 @@
 import type { PetColors } from '../types.js';
 
+import type { RateLimitInfo } from '../stdin.js';
+
 /** Context passed to every widget's render function */
 export interface WidgetContext {
   contextPercent: number;
@@ -7,8 +9,9 @@ export interface WidgetContext {
   tokenSummary: string | null;
   contextVelocity: number;
   contextTimeRemaining: string | null;
-  fiveHourUsage: { percent: number; resetsIn: string | null } | null;
-  sevenDayUsage: { percent: number; resetsIn: string | null } | null;
+  fiveHourUsage: RateLimitInfo | null;
+  sevenDayUsage: RateLimitInfo | null;
+  sessionCost: number | null;
   colors: PetColors;
 }
 
@@ -23,6 +26,7 @@ export type WidgetId =
   | 'model'
   | 'context'
   | 'velocity'
+  | 'cost'
   | 'rateLimit5h'
   | 'rateLimit7d';
 
@@ -30,6 +34,7 @@ export const DEFAULT_WIDGET_ORDER: WidgetId[] = [
   'model',
   'context',
   'velocity',
+  'cost',
   'rateLimit5h',
   'rateLimit7d',
 ];

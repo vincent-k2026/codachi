@@ -3,6 +3,7 @@ import { modelWidget } from './model.js';
 import { contextWidget } from './context.js';
 import { velocityWidget } from './velocity.js';
 import { rateLimit5hWidget, rateLimit7dWidget } from './rateLimit.js';
+import { costWidget } from './cost.js';
 
 import { DEFAULT_WIDGET_ORDER } from './types.js';
 import type { Widget, WidgetContext, WidgetId } from './types.js';
@@ -15,6 +16,7 @@ export const WIDGET_REGISTRY: Record<WidgetId, Widget> = {
   model:       modelWidget,
   context:     contextWidget,
   velocity:    velocityWidget,
+  cost:        costWidget,
   rateLimit5h: rateLimit5hWidget,
   rateLimit7d: rateLimit7dWidget,
 };

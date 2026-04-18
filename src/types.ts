@@ -26,6 +26,9 @@ export interface StdinData {
       resets_at?: number;
     };
   };
+  cost?: {
+    total_cost_usd?: number;
+  };
 }
 
 export type BodySize = 'tiny' | 'small' | 'medium' | 'chubby' | 'thicc';

@@ -17,10 +17,11 @@ interface RenderInput {
   colors: PetColors;
   git: GitStatus | null;
   project: ProjectInfo;
-  fiveHourUsage: { percent: number; resetsIn: string | null } | null;
-  sevenDayUsage: { percent: number; resetsIn: string | null } | null;
+  fiveHourUsage: import('../stdin.js').RateLimitInfo | null;
+  sevenDayUsage: import('../stdin.js').RateLimitInfo | null;
   contextVelocity: number;
   tokenSummary: string | null;
+  sessionCost: number | null;
   relationshipTier: RelationshipTier;
   sessionNumber: number;
   animTick: number;
@@ -158,6 +159,7 @@ export function render(input: RenderInput): void {
     contextTimeRemaining: contextTimeRemaining ?? null,
     fiveHourUsage,
     sevenDayUsage,
+    sessionCost: input.sessionCost ?? null,
     colors,
   });
 
