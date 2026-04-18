@@ -4,6 +4,43 @@ All notable changes to codachi are documented here. This project follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0] — 2026-04-18
+
+### Added
+
+- **Broader tool recognition** — hook now classifies Glob, Grep, Agent,
+  WebSearch, WebFetch, and LSP tool calls (previously fell through to
+  generic 'other' with no mood feedback). Three new event categories:
+  `web_research`, `agent_spawned`, `code_analysis` with 24 new messages.
+- **`codachi uninstall`** — cleanly removes statusLine and hook from
+  `~/.claude/settings.json`, preserving pet data.
+- **Detached HEAD display** — shows short commit hash instead of bare
+  "HEAD" when git is in detached state.
+- **Narrow terminal support** — minimum width lowered to 40 columns;
+  widgets auto-trim to 3 when width < 80.
+- **CI benchmark gate** — `npm run bench` now runs in CI (node 22) and
+  fails the build if render p95 exceeds 50ms.
+
+### Changed
+
+- **Concurrent-safe event append** — events.json carries a generation
+  counter; hook retries once on lost-update race between rapid tool
+  calls. Prevents the double-hook event loss bug.
+- **Cold event visibility** — messages from events 1–5 minutes old now
+  show every ~30s (was ~50s) so users don't miss recent test results.
+- **Hook timeout** — raised from 2s to 5s for slow storage / NFS.
+
+### Removed
+
+- **Cache hit rate widget** (`cacheHit`) — removed; the data was
+  unreliable and added clutter without actionable signal.
+
+### Tests
+
+- **370 tests** (up from 304 in 0.2.0). New test files for log, i18n,
+  plugins, stats, fs-utils. Expanded config, state, colors, hook tests.
+  Coverage: 79% statements, 81% branches, 89% functions.
+
 ## [0.2.0] — 2026-04-09
 
 First release published to npm. Same cute pet, but now survivable in the wild:

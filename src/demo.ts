@@ -20,22 +20,21 @@ interface DemoStep {
   event: EventContext;
   label: string;
   velocity: number;
-  cacheHit: number;
   pauseMs: number;
 }
 
 const DEMO_STEPS: DemoStep[] = [
-  { contextPercent: 3, event: noEvent, label: 'Session starts...', velocity: 0, cacheHit: 95, pauseMs: 2000 },
-  { contextPercent: 8, event: { ...noEvent, category: 'exploring', freshness: 'hot', sessionActionCount: 6 }, label: 'Exploring the codebase...', velocity: 1.2, cacheHit: 88, pauseMs: 2500 },
-  { contextPercent: 18, event: { ...noEvent, category: 'edit_code', freshness: 'hot', detail: 'auth.ts', sessionEditCount: 3, sessionActionCount: 12 }, label: 'Editing code...', velocity: 2.1, cacheHit: 82, pauseMs: 2500 },
-  { contextPercent: 28, event: { ...noEvent, category: 'test_failed', freshness: 'hot', sessionActionCount: 15 }, label: 'Test fails...', velocity: 2.8, cacheHit: 75, pauseMs: 2500 },
-  { contextPercent: 35, event: { ...noEvent, category: 'recovered', freshness: 'hot', sessionActionCount: 18 }, label: 'Fixed! Tests pass!', velocity: 2.5, cacheHit: 70, pauseMs: 2500 },
-  { contextPercent: 45, event: { ...noEvent, category: 'git_commit', freshness: 'hot', sessionActionCount: 20 }, label: 'Git commit!', velocity: 3.0, cacheHit: 65, pauseMs: 2500 },
-  { contextPercent: 55, event: { ...noEvent, category: 'rapid_editing', freshness: 'hot', sessionEditCount: 15, sessionActionCount: 30 }, label: 'Rapid editing spree!', velocity: 4.2, cacheHit: 55, pauseMs: 2500 },
-  { contextPercent: 68, event: { ...noEvent, category: 'build_passed', freshness: 'hot', sessionActionCount: 35 }, label: 'Build passes!', velocity: 3.5, cacheHit: 48, pauseMs: 2500 },
-  { contextPercent: 78, event: { ...noEvent, category: 'git_push', freshness: 'hot', sessionActionCount: 38 }, label: 'Push to remote!', velocity: 2.8, cacheHit: 42, pauseMs: 2500 },
-  { contextPercent: 88, event: noEvent, label: 'Context getting full!', velocity: 3.0, cacheHit: 30, pauseMs: 2500 },
-  { contextPercent: 25, event: { ...noEvent, category: 'test_passed', freshness: 'hot', sessionActionCount: 42 }, label: 'After /compact — all green!', velocity: 1.0, cacheHit: 90, pauseMs: 3000 },
+  { contextPercent: 3, event: noEvent, label: 'Session starts...', velocity: 0, pauseMs: 2000 },
+  { contextPercent: 8, event: { ...noEvent, category: 'exploring', freshness: 'hot', sessionActionCount: 6 }, label: 'Exploring the codebase...', velocity: 1.2, pauseMs: 2500 },
+  { contextPercent: 18, event: { ...noEvent, category: 'edit_code', freshness: 'hot', detail: 'auth.ts', sessionEditCount: 3, sessionActionCount: 12 }, label: 'Editing code...', velocity: 2.1, pauseMs: 2500 },
+  { contextPercent: 28, event: { ...noEvent, category: 'test_failed', freshness: 'hot', sessionActionCount: 15 }, label: 'Test fails...', velocity: 2.8, pauseMs: 2500 },
+  { contextPercent: 35, event: { ...noEvent, category: 'recovered', freshness: 'hot', sessionActionCount: 18 }, label: 'Fixed! Tests pass!', velocity: 2.5, pauseMs: 2500 },
+  { contextPercent: 45, event: { ...noEvent, category: 'git_commit', freshness: 'hot', sessionActionCount: 20 }, label: 'Git commit!', velocity: 3.0, pauseMs: 2500 },
+  { contextPercent: 55, event: { ...noEvent, category: 'rapid_editing', freshness: 'hot', sessionEditCount: 15, sessionActionCount: 30 }, label: 'Rapid editing spree!', velocity: 4.2, pauseMs: 2500 },
+  { contextPercent: 68, event: { ...noEvent, category: 'build_passed', freshness: 'hot', sessionActionCount: 35 }, label: 'Build passes!', velocity: 3.5, pauseMs: 2500 },
+  { contextPercent: 78, event: { ...noEvent, category: 'git_push', freshness: 'hot', sessionActionCount: 38 }, label: 'Push to remote!', velocity: 2.8, pauseMs: 2500 },
+  { contextPercent: 88, event: noEvent, label: 'Context getting full!', velocity: 3.0, pauseMs: 2500 },
+  { contextPercent: 25, event: { ...noEvent, category: 'test_passed', freshness: 'hot', sessionActionCount: 42 }, label: 'After /compact — all green!', velocity: 1.0, pauseMs: 3000 },
 ];
 
 function sleep(ms: number): Promise<void> {
@@ -80,7 +79,6 @@ export async function runDemo(): Promise<void> {
       sevenDayUsage: null,
       contextVelocity: step.velocity,
       tokenSummary: `${Math.round(step.contextPercent * 10)}K/1.0M`,
-      cacheHitRate: Math.max(0, 85 - Math.round(step.contextPercent * 0.8)),
       relationshipTier: 'friend',
       sessionNumber: 18,
       animTick: Math.floor(Date.now() / 1500),

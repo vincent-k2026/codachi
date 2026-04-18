@@ -3,7 +3,7 @@ import { modelWidget } from './model.js';
 import { contextWidget } from './context.js';
 import { velocityWidget } from './velocity.js';
 import { rateLimit5hWidget, rateLimit7dWidget } from './rateLimit.js';
-import { cacheHitWidget } from './cacheHit.js';
+
 import { DEFAULT_WIDGET_ORDER } from './types.js';
 import type { Widget, WidgetContext, WidgetId } from './types.js';
 
@@ -17,7 +17,6 @@ export const WIDGET_REGISTRY: Record<WidgetId, Widget> = {
   velocity:    velocityWidget,
   rateLimit5h: rateLimit5hWidget,
   rateLimit7d: rateLimit7dWidget,
-  cacheHit:    cacheHitWidget,
 };
 
 /** Render an ordered list of widgets into a single line, joined by separator. */

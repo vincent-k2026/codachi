@@ -78,17 +78,6 @@ function formatTokens(n: number): string {
   return `${n}`;
 }
 
-/** Returns cache hit rate 0-100 or null if no cache data. */
-export function getCacheHitRate(stdin: StdinData): number | null {
-  const usage = stdin.context_window?.current_usage;
-  if (!usage) return null;
-  const cacheRead = usage.cache_read_input_tokens ?? 0;
-  const cacheCreate = usage.cache_creation_input_tokens ?? 0;
-  const total = cacheRead + cacheCreate;
-  if (total === 0) return null;
-  return Math.round((cacheRead / total) * 100);
-}
-
 /** Returns human-readable token usage like "550K/1M" */
 export function getTokenSummary(stdin: StdinData): string | null {
   const usage = stdin.context_window?.current_usage;

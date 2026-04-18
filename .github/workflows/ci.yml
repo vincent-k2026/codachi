@@ -20,3 +20,6 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
+      - name: Render benchmark (p95 < 50ms gate)
+        if: matrix.node-version == 22
+        run: node scripts/bench.mjs

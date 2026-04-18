@@ -9,7 +9,6 @@ export interface WidgetContext {
   contextTimeRemaining: string | null;
   fiveHourUsage: { percent: number; resetsIn: string | null } | null;
   sevenDayUsage: { percent: number; resetsIn: string | null } | null;
-  cacheHitRate: number | null;
   colors: PetColors;
 }
 
@@ -25,14 +24,12 @@ export type WidgetId =
   | 'context'
   | 'velocity'
   | 'rateLimit5h'
-  | 'rateLimit7d'
-  | 'cacheHit';
+  | 'rateLimit7d';
 
 export const DEFAULT_WIDGET_ORDER: WidgetId[] = [
   'model',
   'context',
   'velocity',
-  'cacheHit',
   'rateLimit5h',
   'rateLimit7d',
 ];

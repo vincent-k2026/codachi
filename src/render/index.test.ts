@@ -24,7 +24,6 @@ function makeRenderInput(overrides: Record<string, unknown> = {}) {
     sevenDayUsage: null,
     contextVelocity: 0,
     tokenSummary: null,
-    cacheHitRate: null,
     relationshipTier: 'stranger' as const,
     sessionNumber: 1,
     animTick: 0,

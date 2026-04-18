@@ -201,7 +201,7 @@ Tier upgrades trigger a one-time celebration: *"BESTIE STATUS UNLOCKED! WE DID I
 
 ### Smart `/compact` suggestion
 
-When your cache hit rate drops below 30%, context is above 60%, and burn speed is high, your pet gently suggests compacting — once per trigger, never nagging.
+When context is above 70% and burn speed is high, your pet gently suggests compacting — once per trigger, never nagging.
 
 > *"Cache is getting cold... maybe /compact?"*
 
@@ -387,7 +387,7 @@ src/
 npm install
 npm run build          # compile TypeScript + copy locales to dist/
 npm run dev            # watch mode
-npm test               # 304 tests
+npm test               # 370 tests
 npm run test:cov       # coverage report (91%+ lines)
 npm run bench          # render p50/p95/p99 benchmark (budget: 50ms)
 ```

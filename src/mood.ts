@@ -18,7 +18,6 @@ export interface MoodContext {
   git: GitStatus | null;
   fiveHourUsage: number | null;
   contextVelocity: number;
-  cacheHitRate: number | null;
   relationshipTier: RelationshipTier;
   sessionNumber: number;
   moodTick: number;
@@ -95,7 +94,7 @@ let compactSuggested = false;
 export function getMoodMessage(ctx: MoodContext): string {
   const {
     contextPercent, size, animation, animalType, git,
-    fiveHourUsage, contextVelocity, cacheHitRate,
+    fiveHourUsage, contextVelocity,
     relationshipTier, sessionNumber, moodTick: tick,
     eventContext, tierUpgraded,
   } = ctx;
@@ -114,9 +113,8 @@ export function getMoodMessage(ctx: MoodContext): string {
   }
 
   // Priority 1.5: smart /compact suggestion (one-time per trigger)
-  // Trigger when context is filling fast, OR cache is going cold with high context.
-  const cacheCold = cacheHitRate !== null && cacheHitRate < 25;
-  if (!compactSuggested && contextPercent > 60 && (contextVelocity > 3 || (cacheCold && contextPercent > 70))) {
+  // Trigger when context is filling fast and getting full.
+  if (!compactSuggested && contextPercent > 70 && contextVelocity > 3) {
     compactSuggested = true;
     return COMPACT_SUGGEST[tick % COMPACT_SUGGEST.length];
   }

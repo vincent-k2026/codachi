@@ -21,7 +21,6 @@ interface RenderInput {
   sevenDayUsage: { percent: number; resetsIn: string | null } | null;
   contextVelocity: number;
   tokenSummary: string | null;
-  cacheHitRate: number | null;
   relationshipTier: RelationshipTier;
   sessionNumber: number;
   animTick: number;
@@ -137,7 +136,7 @@ export function render(input: RenderInput): void {
   const mood = getMoodMessage({
     contextPercent, size, animation, animalType, git,
     fiveHourUsage: fiveHourUsage?.percent ?? null,
-    contextVelocity, cacheHitRate: input.cacheHitRate ?? null,
+    contextVelocity,
     relationshipTier, sessionNumber, moodTick,
     eventContext, tierUpgraded,
   });
@@ -159,7 +158,6 @@ export function render(input: RenderInput): void {
     contextTimeRemaining: contextTimeRemaining ?? null,
     fiveHourUsage,
     sevenDayUsage,
-    cacheHitRate: input.cacheHitRate ?? null,
     colors,
   });
 
