@@ -34,7 +34,6 @@ export const DEFAULT_WIDGET_ORDER: WidgetId[] = [
   'model',
   'context',
   'velocity',
-  'cost',
   'rateLimit5h',
   'rateLimit7d',
 ];
