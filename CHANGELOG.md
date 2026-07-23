@@ -4,6 +4,18 @@ All notable changes to codachi are documented here. This project follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Hook never fired** — `init` registered the hook under `PostToolExecution`
+  with a flat `command` key. Claude Code's event is `PostToolUse`, and entries
+  need a nested `hooks: [{type, command}]` array, so the hook was silently
+  ignored: no events were ever recorded and pets fell back to idle messages.
+  `init` now writes the correct shape and clears the stale legacy entry;
+  `uninstall` removes both. Existing installs are migrated by re-running
+  `codachi init`.
+
 ## [0.3.0] — 2026-04-18
 
 ### Added

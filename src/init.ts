@@ -1,7 +1,7 @@
 /**
  * codachi init — auto-configure Claude Code's ~/.claude/settings.json.
  *
- * Adds a statusLine entry and a PostToolExecution hook. The commands it writes
+ * Adds a statusLine entry and a PostToolUse hook. The commands it writes
  * depend on how codachi is running:
  *
  *   - When installed globally or via `npx codachi init` (argv[1] resolved to
@@ -20,6 +20,30 @@ import path from 'node:path';
 import os from 'node:os';
 
 export const SETTINGS_FILE = path.join(os.homedir(), '.claude', 'settings.json');
+
+/** The Claude Code hook event we attach to. */
+const HOOK_EVENT = 'PostToolUse';
+
+/** Pre-0.3.1 releases wrote this event name, which Claude Code never fires. */
+const LEGACY_HOOK_EVENT = 'PostToolExecution';
+
+const CODACHI_CMD = /codachi(-hook)?|codachi[\\/]dist[\\/]hook/;
+
+/**
+ * True for both the nested matcher entry Claude Code expects
+ * (`{matcher, hooks: [{type, command}]}`) and the flat legacy shape codachi
+ * used to write (`{matcher, command}`), so migration and uninstall catch both.
+ */
+function isCodachiEntry(entry: unknown): boolean {
+  const e = entry as Record<string, unknown> | null;
+  if (!e || typeof e !== 'object') return false;
+  if (typeof e.command === 'string' && CODACHI_CMD.test(e.command)) return true;
+  const nested = Array.isArray(e.hooks) ? e.hooks : [];
+  return nested.some((h: unknown) => {
+    const hook = h as Record<string, unknown> | null;
+    return !!hook && typeof hook.command === 'string' && CODACHI_CMD.test(hook.command);
+  });
+}
 
 function detectMode(): { statusCmd: string; hookCmd: string; mode: 'bin' | 'local' } {
   const entry = process.argv[1] || '';
@@ -61,15 +85,20 @@ export function runInit(): void {
   settings.statusLine = { type: 'command', command: statusCmd };
 
   const hooks = (settings.hooks ?? {}) as Record<string, unknown[]>;
-  const postHooks = Array.isArray(hooks.PostToolExecution) ? hooks.PostToolExecution : [];
+  const postHooks = Array.isArray(hooks[HOOK_EVENT]) ? hooks[HOOK_EVENT] : [];
 
   // Replace any existing codachi hook rather than duplicating.
-  const cleaned = postHooks.filter((h: unknown) => {
-    const hook = h as Record<string, unknown>;
-    return !(typeof hook.command === 'string' && /codachi(-hook)?|codachi[\\/]dist[\\/]hook/.test(hook.command));
-  });
-  cleaned.push({ matcher: '', command: hookCmd });
-  hooks.PostToolExecution = cleaned;
+  const cleaned = postHooks.filter((h) => !isCodachiEntry(h));
+  cleaned.push({ matcher: '*', hooks: [{ type: 'command', command: hookCmd }] });
+  hooks[HOOK_EVENT] = cleaned;
+
+  // Migrate installs from before the event name was corrected.
+  if (Array.isArray(hooks[LEGACY_HOOK_EVENT])) {
+    const legacy = hooks[LEGACY_HOOK_EVENT].filter((h) => !isCodachiEntry(h));
+    if (legacy.length > 0) hooks[LEGACY_HOOK_EVENT] = legacy;
+    else delete hooks[LEGACY_HOOK_EVENT];
+  }
+
   settings.hooks = hooks;
 
   fs.mkdirSync(path.dirname(SETTINGS_FILE), { recursive: true });
@@ -105,16 +134,17 @@ export function runUninstall(): void {
     changed = true;
   }
 
-  // Remove codachi hook from PostToolExecution.
+  // Remove the codachi hook — including any left behind by older installs
+  // under the legacy event name.
   const hooks = settings.hooks as Record<string, unknown[]> | undefined;
-  if (hooks?.PostToolExecution && Array.isArray(hooks.PostToolExecution)) {
-    const before = hooks.PostToolExecution.length;
-    hooks.PostToolExecution = hooks.PostToolExecution.filter((h: unknown) => {
-      const hook = h as Record<string, unknown>;
-      return !(typeof hook.command === 'string' && /codachi(-hook)?|codachi[\\/]dist[\\/]hook/.test(hook.command));
-    });
-    if (hooks.PostToolExecution.length < before) changed = true;
-    if (hooks.PostToolExecution.length === 0) delete hooks.PostToolExecution;
+  if (hooks) {
+    for (const event of [HOOK_EVENT, LEGACY_HOOK_EVENT]) {
+      if (!Array.isArray(hooks[event])) continue;
+      const before = hooks[event].length;
+      hooks[event] = hooks[event].filter((h) => !isCodachiEntry(h));
+      if (hooks[event].length < before) changed = true;
+      if (hooks[event].length === 0) delete hooks[event];
+    }
     if (Object.keys(hooks).length === 0) delete settings.hooks;
   }
 
