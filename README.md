@@ -34,7 +34,7 @@ One line. That's it.
 npx codachi init
 ```
 
-This wires up your `~/.claude/settings.json` statusline and PostToolExecution hook. Restart Claude Code and your pet will hatch.
+This wires up your `~/.claude/settings.json` statusline and PostToolUse hook. Restart Claude Code and your pet will hatch.
 
 Prefer a global install? `npm install -g codachi && codachi init` works too.
 
@@ -70,10 +70,15 @@ Add to `~/.claude/settings.json`:
     "command": "node /absolute/path/to/codachi/dist/index.js"
   },
   "hooks": {
-    "PostToolExecution": [
+    "PostToolUse": [
       {
-        "matcher": "",
-        "command": "node /absolute/path/to/codachi/dist/hook.js"
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node /absolute/path/to/codachi/dist/hook.js"
+          }
+        ]
       }
     ]
   }
@@ -151,7 +156,7 @@ Each session randomly assigns a species and color palette (or set them in config
 
 ### Event-reactive mood (900+ messages)
 
-Via the PostToolExecution hook, your pet knows what Claude is doing and reacts in real time.
+Via the PostToolUse hook, your pet knows what Claude is doing and reacts in real time.
 
 | Event | Example message |
 |:------|:----------------|
@@ -354,7 +359,7 @@ src/
 ├── index.ts           # Entry point + init/demo routing
 ├── init.ts            # One-command install (codachi init)
 ├── demo.ts            # Live terminal demo
-├── hook.ts            # Claude Code PostToolExecution hook
+├── hook.ts            # Claude Code PostToolUse hook
 ├── events.ts          # Event classifier (40 categories)
 ├── mood.ts            # Mood engine (15-tier priority)
 ├── messages/          # 900+ messages split by category

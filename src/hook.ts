@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * Claude Code PostToolExecution hook — logs tool events for codachi.
+ * Claude Code PostToolUse hook — logs tool events for codachi.
  * Receives JSON on stdin from Claude Code, appends to events file.
  * Must exit quickly to never block Claude Code.
  */

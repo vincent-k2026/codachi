@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project
 
-**codachi** — a tamagotchi pet that lives in the Claude Code statusline. Zero runtime dependencies, pure TypeScript compiled to ESM. Two binaries: `codachi` (statusline renderer, reads JSON from stdin → writes ANSI to stdout) and `codachi-hook` (PostToolExecution hook that records events to disk).
+**codachi** — a tamagotchi pet that lives in the Claude Code statusline. Zero runtime dependencies, pure TypeScript compiled to ESM. Two binaries: `codachi` (statusline renderer, reads JSON from stdin → writes ANSI to stdout) and `codachi-hook` (PostToolUse hook that records events to disk).
 
 ## Commands
 
