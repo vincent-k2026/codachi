@@ -16,6 +16,22 @@ const STATE_SCHEMA_VERSION = 1;
 const MEMORY_SCHEMA_VERSION = 1;
 
 // ── Session state ────────────────────────────────────
+//
+// Several Claude Code sessions can render at once, and they all share this
+// file, so each session's identity lives in its own entry of `sessions`,
+// keyed by transcript path. The top-level fields mirror the most recently
+// started session: they are what codachi wrote before `sessions` existed,
+// so older versions and `codachi stats` keep reading them unchanged.
+
+interface SessionEntry {
+  sessionStart: number;
+  /** Last render, refreshed at most once per SEEN_REFRESH_MS. */
+  lastSeen: number;
+  /** Up to when this session's uptime has been added to memory. */
+  creditedUntil: number;
+  animalIndex: number;
+  paletteIndex: number;
+}
 
 interface DiskState {
   version?: number;
@@ -23,7 +39,15 @@ interface DiskState {
   sessionStart?: number;
   animalIndex?: number;
   paletteIndex?: number;
+  sessions?: Record<string, SessionEntry>;
 }
+
+/** Sessions not rendered for this long are pruned (and their uptime credited). */
+const SESSION_TTL_MS = 24 * 60 * 60 * 1000;
+/** Upper bound on remembered sessions, oldest by lastSeen dropped first. */
+const MAX_SESSIONS = 50;
+/** How stale lastSeen may get before a render rewrites the file. */
+const SEEN_REFRESH_MS = 60 * 1000;
 
 function loadJSON<T>(file: string): T | null {
   try { return JSON.parse(fs.readFileSync(file, 'utf8')) as T; }
@@ -46,24 +70,103 @@ function saveJSON(file: string, data: unknown): void {
 }
 
 let diskState: DiskState = {};
+/** The entry for the session this process renders. */
+let current: SessionEntry | null = null;
+
+function isEntry(e: unknown): e is SessionEntry {
+  const o = e as SessionEntry;
+  return !!o && typeof o === 'object'
+    && Number.isFinite(o.sessionStart) && Number.isFinite(o.lastSeen)
+    && Number.isFinite(o.creditedUntil)
+    && Number.isInteger(o.animalIndex) && Number.isInteger(o.paletteIndex);
+}
+
+/** The valid entries of a loaded file, adopting a pre-`sessions` top level. */
+function loadSessions(state: DiskState): Record<string, SessionEntry> {
+  const out: Record<string, SessionEntry> = {};
+  const raw = state.sessions;
+  if (raw && typeof raw === 'object') {
+    for (const [k, e] of Object.entries(raw)) if (isEntry(e)) out[k] = e;
+  }
+  // A file from an older codachi (or rewritten by one) carries its session
+  // only at the top level; keep that session's identity rather than re-roll.
+  const tp = state.transcriptPath;
+  if (tp && !out[tp] && Number.isFinite(state.sessionStart)
+      && Number.isInteger(state.animalIndex) && Number.isInteger(state.paletteIndex)) {
+    const start = state.sessionStart as number;
+    out[tp] = {
+      sessionStart: start,
+      lastSeen: Date.now(),
+      // Nothing has credited this session's uptime yet: an older codachi
+      // only does that when the next session starts.
+      creditedUntil: start,
+      animalIndex: state.animalIndex as number,
+      paletteIndex: state.paletteIndex as number,
+    };
+  }
+  return out;
+}
+
+/** Add a session's not-yet-credited uptime to memory, in whole minutes. */
+function creditUptime(m: PetMemory, e: SessionEntry): void {
+  const mins = Math.floor((e.lastSeen - e.creditedUntil) / 60000);
+  if (mins > 0) {
+    m.totalUptimeMin += mins;
+    e.creditedUntil += mins * 60000;
+  }
+}
+
+/** Drop sessions unseen for SESSION_TTL_MS, then the oldest beyond MAX_SESSIONS. */
+function pruneSessions(sessions: Record<string, SessionEntry>, m: PetMemory, now: number): void {
+  for (const [k, e] of Object.entries(sessions)) {
+    if (now - e.lastSeen > SESSION_TTL_MS) {
+      creditUptime(m, e);
+      delete sessions[k];
+    }
+  }
+  const keys = Object.keys(sessions).sort((a, b) => sessions[a].lastSeen - sessions[b].lastSeen);
+  for (const k of keys.slice(0, Math.max(0, keys.length - MAX_SESSIONS))) {
+    creditUptime(m, sessions[k]);
+    delete sessions[k];
+  }
+}
 
 export function initSession(transcriptPath?: string): void {
   diskState = migrateState(loadJSON<DiskState>(STATE_FILE));
-  const isSameSession = transcriptPath && diskState.transcriptPath === transcriptPath;
+  const sessions = loadSessions(diskState);
+  const now = Date.now();
+  const key = transcriptPath ?? '';
+  const existing = transcriptPath ? sessions[key] : undefined;
 
-  if (!isSameSession) {
-    // New session: update memory, reset state, clear stale events
-    updateMemory();
-    clearEvents();
-    diskState = {
-      version: STATE_SCHEMA_VERSION,
-      transcriptPath: transcriptPath ?? '',
-      sessionStart: Date.now(),
+  if (existing) {
+    current = existing;
+    if (now - existing.lastSeen < SEEN_REFRESH_MS && diskState.sessions) return;
+    existing.lastSeen = now;
+  } else {
+    // A session this file has never seen: count it, give it an identity,
+    // and clear stale events. Other sessions' entries are left alone.
+    const m = loadMemory();
+    for (const e of Object.values(sessions)) creditUptime(m, e);
+    pruneSessions(sessions, m, now);
+    countSession(m);
+    current = {
+      sessionStart: now,
+      lastSeen: now,
+      creditedUntil: now,
       animalIndex: Math.floor(Math.random() * 5),
       paletteIndex: Math.floor(Math.random() * 10),
     };
-    saveJSON(STATE_FILE, diskState);
+    sessions[key] = current;
+    clearEvents();
+    diskState = {
+      transcriptPath: key,
+      sessionStart: current.sessionStart,
+      animalIndex: current.animalIndex,
+      paletteIndex: current.paletteIndex,
+    };
   }
+  diskState = { ...diskState, version: STATE_SCHEMA_VERSION, sessions };
+  saveJSON(STATE_FILE, diskState);
 }
 
 /** Forward-compatible state loader. Unknown/future versions fall back to defaults. */
@@ -81,8 +184,8 @@ function migrateState(raw: DiskState | null): DiskState {
   return raw;
 }
 
-export function getSessionAnimalIndex(): number { return diskState.animalIndex ?? 0; }
-export function getSessionPaletteIndex(): number { return diskState.paletteIndex ?? 0; }
+export function getSessionAnimalIndex(): number { return current?.animalIndex ?? 0; }
+export function getSessionPaletteIndex(): number { return current?.paletteIndex ?? 0; }
 
 export function animTick(speedSec: number = 1.5): number {
   return Math.floor(Date.now() / (speedSec * 1000));
@@ -90,7 +193,7 @@ export function animTick(speedSec: number = 1.5): number {
 export function moodTick(): number { return Math.floor(Date.now() / 10000); }
 
 export function sessionUptime(): string {
-  const start = diskState.sessionStart ?? Date.now();
+  const start = current?.sessionStart ?? Date.now();
   const ms = Date.now() - start;
   const mins = Math.floor(ms / 60000);
   if (mins < 1) return '<1m';
@@ -182,15 +285,10 @@ function loadMemory(): PetMemory {
   };
 }
 
-function updateMemory(): void {
-  // Called when a NEW session starts — save stats from previous session
-  const m = loadMemory();
+/** Count one new session in memory (already loaded and credited) and save it. */
+function countSession(m: PetMemory): void {
   m.totalSessions += 1;
   m.lastSeen = Date.now();
-  // Uptime from previous session (approximate)
-  if (diskState.sessionStart) {
-    m.totalUptimeMin += Math.floor((Date.now() - diskState.sessionStart) / 60000);
-  }
 
   // Check for tier upgrade
   const oldTier = m.lastShownTier ?? 'stranger';

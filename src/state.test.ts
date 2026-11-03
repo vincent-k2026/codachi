@@ -5,6 +5,7 @@ vi.mock('node:fs', () => ({
   default: {
     readFileSync: vi.fn(),
     writeFileSync: vi.fn(),
+    renameSync: vi.fn(),
     mkdirSync: vi.fn(),
   },
 }));
@@ -241,5 +242,128 @@ describe('context time remaining', () => {
 describe('tier upgrade detection', () => {
   it('didTierUpgrade returns false by default', () => {
     expect(mod.didTierUpgrade()).toBe(false);
+  });
+});
+
+describe('parallel sessions', () => {
+  // A tiny in-memory disk: atomicWrite writes a temp file then renames it.
+  let disk: Map<string, string>;
+
+  function useDisk(initial: Record<string, unknown> = {}) {
+    disk = new Map();
+    for (const [name, data] of Object.entries(initial)) {
+      disk.set(name, JSON.stringify(data));
+    }
+    const base = (p: unknown) => String(p).split('/').pop() as string;
+    mockReadFileSync.mockImplementation(((p: unknown) => {
+      const v = disk.get(base(p));
+      if (v === undefined) throw Object.assign(new Error('ENOENT'), { code: 'ENOENT' });
+      return v;
+    }) as typeof fs.readFileSync);
+    vi.mocked(fs.writeFileSync).mockImplementation(((p: unknown, d: unknown) => {
+      disk.set(base(p), String(d));
+    }) as typeof fs.writeFileSync);
+    vi.mocked(fs.renameSync).mockImplementation(((from: unknown, to: unknown) => {
+      disk.set(base(to), disk.get(base(from)) as string);
+      disk.delete(base(from));
+    }) as typeof fs.renameSync);
+  }
+
+  /** One statusline render, as its own process: fresh module state. */
+  async function render(transcript: string) {
+    vi.resetModules();
+    const m = await import('./state.js');
+    m.initSession(transcript);
+    return { animal: m.getSessionAnimalIndex(), palette: m.getSessionPaletteIndex() };
+  }
+
+  const read = (name: string) => JSON.parse(disk.get(name) as string);
+
+  it('keeps each session\'s pet and counts each session once', async () => {
+    useDisk();
+    const a1 = await render('/tmp/a');
+    const b1 = await render('/tmp/b');
+    for (let i = 0; i < 5; i++) {
+      expect(await render('/tmp/a')).toEqual(a1);
+      expect(await render('/tmp/b')).toEqual(b1);
+    }
+    expect(read('memory.json').totalSessions).toBe(2);
+  });
+
+  it('does not clear events when another session renders', async () => {
+    useDisk();
+    await render('/tmp/a');
+    await render('/tmp/b');
+    const { clearEvents } = await import('./events.js');
+    vi.mocked(clearEvents).mockClear();
+    await render('/tmp/a');
+    await render('/tmp/b');
+    expect(clearEvents).not.toHaveBeenCalled();
+  });
+
+  it('mirrors the latest new session at the top level for older readers', async () => {
+    useDisk();
+    await render('/tmp/a');
+    const b = await render('/tmp/b');
+    await render('/tmp/a');
+    const state = read('state.json');
+    expect(state.transcriptPath).toBe('/tmp/b');
+    expect(state.animalIndex).toBe(b.animal);
+    expect(state.paletteIndex).toBe(b.palette);
+    expect(Object.keys(state.sessions).sort()).toEqual(['/tmp/a', '/tmp/b']);
+  });
+
+  it('adopts a session from a file written by an older codachi', async () => {
+    useDisk({
+      'state.json': { version: 1, transcriptPath: '/tmp/a', sessionStart: Date.now() - 60000, animalIndex: 3, paletteIndex: 7 },
+      'memory.json': { version: 1, totalSessions: 4, totalUptimeMin: 0, firstMet: 1, lastSeen: 1 },
+    });
+    expect(await render('/tmp/a')).toEqual({ animal: 3, palette: 7 });
+    expect(read('memory.json').totalSessions).toBe(4);
+  });
+
+  it('credits an adopted older session\'s uptime when a new one starts', async () => {
+    useDisk({
+      'state.json': { version: 1, transcriptPath: '/tmp/a', sessionStart: Date.now() - 30 * 60000, animalIndex: 3, paletteIndex: 7 },
+      'memory.json': { version: 1, totalSessions: 4, totalUptimeMin: 10, firstMet: 1, lastSeen: 1 },
+    });
+    await render('/tmp/b');
+    const mem = read('memory.json');
+    expect(mem.totalSessions).toBe(5);
+    expect(mem.totalUptimeMin).toBe(40);
+  });
+
+  it('prunes sessions unseen for a day, crediting their uptime', async () => {
+    const day = 24 * 60 * 60 * 1000;
+    const stale = Date.now() - 2 * day;
+    useDisk({
+      'state.json': {
+        version: 1,
+        sessions: {
+          '/tmp/old': { sessionStart: stale - 90 * 60000, lastSeen: stale, creditedUntil: stale - 90 * 60000, animalIndex: 1, paletteIndex: 1 },
+        },
+      },
+      'memory.json': { version: 1, totalSessions: 1, totalUptimeMin: 0, firstMet: 1, lastSeen: 1 },
+    });
+    await render('/tmp/new');
+    expect(Object.keys(read('state.json').sessions)).toEqual(['/tmp/new']);
+    expect(read('memory.json').totalUptimeMin).toBe(90);
+  });
+
+  it('does not rewrite the file on every render of a known session', async () => {
+    useDisk();
+    await render('/tmp/a');
+    vi.mocked(fs.writeFileSync).mockClear();
+    await render('/tmp/a');
+    expect(fs.writeFileSync).not.toHaveBeenCalled();
+  });
+
+  it('ignores malformed session entries', async () => {
+    useDisk({
+      'state.json': { version: 1, sessions: { '/tmp/a': { animalIndex: 'x' }, '/tmp/b': null } },
+    });
+    await render('/tmp/a');
+    expect(read('memory.json').totalSessions).toBe(1);
+    expect(Object.keys(read('state.json').sessions)).toEqual(['/tmp/a']);
   });
 });
