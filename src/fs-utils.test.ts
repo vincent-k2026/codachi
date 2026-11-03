@@ -8,6 +8,9 @@ vi.mock('node:fs', () => ({
     unlinkSync: vi.fn(),
     mkdirSync: vi.fn(),
     statSync: vi.fn(() => { throw new Error('ENOENT'); }),
+    realpathSync: vi.fn(() => { throw new Error('ENOENT'); }),
+    lstatSync: vi.fn(() => { throw new Error('ENOENT'); }),
+    readlinkSync: vi.fn(),
     appendFileSync: vi.fn(),
   },
 }));
@@ -17,6 +20,10 @@ let atomicWrite: typeof import('./fs-utils.js')['atomicWrite'];
 beforeEach(async () => {
   vi.resetAllMocks();
   vi.resetModules();
+  // resetAllMocks drops the factory implementations; nothing exists yet.
+  const enoent = () => { throw Object.assign(new Error('ENOENT'), { code: 'ENOENT' }); };
+  vi.mocked(fs.realpathSync).mockImplementation(enoent as unknown as typeof fs.realpathSync);
+  vi.mocked(fs.lstatSync).mockImplementation(enoent as unknown as typeof fs.lstatSync);
   const mod = await import('./fs-utils.js');
   atomicWrite = mod.atomicWrite;
 });

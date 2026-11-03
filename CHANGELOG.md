@@ -4,6 +4,18 @@ All notable changes to codachi are documented here. This project follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Symlinked state files stay linked** — every write is a temp file
+  renamed into place, and renaming onto a symlink replaces the link
+  itself. A `memory.json` linked into a synced folder (to carry pet
+  progress between machines) became a plain local file on the first
+  write and silently stopped syncing. Writes now follow the link and
+  replace the file it points to, including a link whose target does
+  not exist yet.
+
 ## [0.3.0] — 2026-04-18
 
 ### Added
