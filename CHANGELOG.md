@@ -4,6 +4,20 @@ All notable changes to codachi are documented here. This project follows
 [Keep a Changelog](https://keepachangelog.com/en/1.1.0/) and
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Fixed
+
+- **Parallel sessions no longer re-roll each other's pet** — with two
+  Claude Code sessions open, each render from one replaced the other's
+  identity in the shared `state.json`, so pets changed species and
+  palette mid-session, `events.json` was cleared, and every switch
+  counted as a new session (inflating `totalSessions` and the tier).
+  `state.json` now keeps an entry per transcript path under `sessions`,
+  pruned after a day unseen, and uptime is credited per session. The
+  top-level fields still mirror the latest session, so older versions
+  and `codachi stats` read the file as before.
+
 ## [0.3.0] — 2026-04-18
 
 ### Added
